@@ -1,27 +1,28 @@
 import "./App.scss";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/container";
-import Col from "react-bootstrap/col";
-import Row from "react-bootstrap/row";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  BrowserRouter as Router, 
+  Switch, 
+  Route
+} from "react-router-dom";
+import Home from "./pages/Home/Home";
+import FormSettings from "./pages/FormSettings/FormSettings";
+
 
 function App() {
   return (
-    <div className="App">
-      <main className="main">
-        <Container className="container">
-          <Row>
-            <Col>
-              <div className="start-text">
-                <h1>Volleyo</h1>
-                <h2>A web app to track a volleyball game.</h2>
-                <Button className="start-button" size="lg">Start</Button>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      </main>
-    </div>
+    <Router>
+      <div className="App">
+        <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route path="/form-settings">
+            <FormSettings />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
 }
 

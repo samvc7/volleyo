@@ -3,7 +3,7 @@ import './FormSettings.scss';
 
 const FormSettings: React.FC = () => (
   <div className="FormSettings" data-testid="FormSettings">
-    FormSettings Component
+    <h1>FormSettings Component</h1>
   </div>
 );
 
