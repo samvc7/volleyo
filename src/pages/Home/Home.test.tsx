@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/extend-expect";
 import Home from "./Home";
-import { cleanup, fireEvent, render, RenderResult, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { shallow, ShallowWrapper } from "enzyme";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 
