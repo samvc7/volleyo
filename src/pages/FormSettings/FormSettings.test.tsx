@@ -29,6 +29,7 @@ describe("renders FormSettings correctly", () => {
     expect(screen.getByLabelText(/sets/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/points per set/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/last set/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/2 points difference/i)).toBeInTheDocument();
     expect(screen.getByText(/submit/i)).toBeInTheDocument();
   });
 });

@@ -35,61 +35,67 @@ const FormSettings: React.FC = () => {
           actions.setSubmitting(false);
         }}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleSubmit,
-          handleChange,
-        }) => {
+        {({ values, errors, touched, handleSubmit, handleChange }) => {
           return (
-          <Container id="cont">
-            <h1>Game Settings</h1>
+            <div className="form-container">
+              <Container className="my-auto">
+                <h1>Game Settings</h1>
 
-            <Form onSubmit={handleSubmit}>
-              <Form.Row>
-                <InputGroup
-                  label="Sets"
-                  type="number"
-                  name="sets"
-                  value={values.sets}
-                  onChange={handleChange}
-                  isInvalid={!!(touched.sets && !!errors.sets)}
-                  ariaInvalid={ !!errors.sets }
-                  error={errors.sets}
-                />
+                <Form onSubmit={handleSubmit}>
+                  <Form.Row>
+                    <InputGroup
+                      label="Sets"
+                      type="number"
+                      name="sets"
+                      value={values.sets}
+                      onChange={handleChange}
+                      isInvalid={!!(touched.sets && !!errors.sets)}
+                      ariaInvalid={!!errors.sets}
+                      error={errors.sets}
+                    />
 
-                <InputGroup
-                  label="Points Per Set"
-                  type="number"
-                  name="pointsPerSet"
-                  value={values.pointsPerSet}
-                  onChange={handleChange}
-                  isInvalid={touched.pointsPerSet && !!errors.pointsPerSet}
-                  ariaInvalid={ !!errors.pointsPerSet }
-                  error={errors.pointsPerSet}
-                />
+                    <InputGroup
+                      label="Points per set"
+                      type="number"
+                      name="pointsPerSet"
+                      value={values.pointsPerSet}
+                      onChange={handleChange}
+                      isInvalid={touched.pointsPerSet && !!errors.pointsPerSet}
+                      ariaInvalid={!!errors.pointsPerSet}
+                      error={errors.pointsPerSet}
+                    />
 
-                <InputGroup
-                  label="Points for last set"
-                  type="number"
-                  name="pointsLastSet"
-                  value={values.pointsLastSet}
-                  onChange={handleChange}
-                  isInvalid={touched.pointsLastSet && !!errors.pointsLastSet}
-                  ariaInvalid={ !!errors.pointsLastSet }
-                  error={errors.pointsLastSet}
-                />
-              </Form.Row>
+                    <InputGroup
+                      label="Points for last set"
+                      type="number"
+                      name="pointsLastSet"
+                      value={values.pointsLastSet}
+                      onChange={handleChange}
+                      isInvalid={
+                        touched.pointsLastSet && !!errors.pointsLastSet
+                      }
+                      ariaInvalid={!!errors.pointsLastSet}
+                      error={errors.pointsLastSet}
+                    />
 
-              <Form.Row></Form.Row>
+                    <Form.Check
+                      id="2pdiff"
+                      type="checkbox"
+                      className="md-3"
+                      label="2 points difference"
+                    ></Form.Check>
+                  </Form.Row>
 
-              <Button className="form-submit primary" type="submit">
-                Submit
-              </Button>
-            </Form>
-          </Container>
-        )}}
+                  <Form.Row></Form.Row>
+
+                  <Button className="form-submit primary" type="submit">
+                    Submit
+                  </Button>
+                </Form>
+              </Container>
+            </div>
+          );
+        }}
       </Formik>
     </div>
   );

@@ -23,7 +23,7 @@ const InputGroup: React.FC<InputGroupProps> = ({
   error,
 }) => {
   return(
-  <Form.Group as={Col} md="4" controlId={`validation${name}`}>
+  <Form.Group as={Col} md="3" controlId={`validation${name}`}>
     <Form.Label>{label}</Form.Label>
     <Form.Control
       type={type}
