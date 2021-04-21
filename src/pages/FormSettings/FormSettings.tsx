@@ -5,12 +5,14 @@ import * as yup from "yup";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
-import InputGroup from "../../components/InputGroup/InputGroup";
+import InputGroup from "../../ui/InputGroup/InputGroup";
 
 interface FormValues {
   sets: number;
   pointsPerSet: number;
   pointsLastSet: number;
+  teamA: string;
+  teamB: string;
 }
 
 const FormSettings: React.FC = () => {
@@ -18,6 +20,8 @@ const FormSettings: React.FC = () => {
     sets: 7,
     pointsPerSet: 25,
     pointsLastSet: 15,
+    teamA: "",
+    teamB: "",
   };
 
   return (
@@ -28,6 +32,8 @@ const FormSettings: React.FC = () => {
           sets: yup.number().min(1).max(7).required("Required"),
           pointsPerSet: yup.number().min(5).max(30).required("Required"),
           pointsLastSet: yup.number().min(5).max(20).required("Required"),
+          teamA: yup.string().trim().min(1).max(30).required("Required"),
+          teamB: yup.string().trim().min(1).max(30).required("Required"),
         })}
         onSubmit={(values, actions) => {
           console.log({ values, actions });
@@ -52,6 +58,7 @@ const FormSettings: React.FC = () => {
                       isInvalid={!!(touched.sets && !!errors.sets)}
                       ariaInvalid={!!errors.sets}
                       error={errors.sets}
+                      mdSize="3"
                     />
 
                     <InputGroup
@@ -63,6 +70,7 @@ const FormSettings: React.FC = () => {
                       isInvalid={touched.pointsPerSet && !!errors.pointsPerSet}
                       ariaInvalid={!!errors.pointsPerSet}
                       error={errors.pointsPerSet}
+                      mdSize="3"
                     />
 
                     <InputGroup
@@ -76,6 +84,7 @@ const FormSettings: React.FC = () => {
                       }
                       ariaInvalid={!!errors.pointsLastSet}
                       error={errors.pointsLastSet}
+                      mdSize="3"
                     />
 
                     <Form.Check
@@ -83,10 +92,33 @@ const FormSettings: React.FC = () => {
                       type="checkbox"
                       className="md-3"
                       label="2 points difference"
-                    ></Form.Check>
+                    />
                   </Form.Row>
 
-                  <Form.Row></Form.Row>
+                  <Form.Row>
+                    <InputGroup
+                      label="Team name A"
+                      type="text"
+                      name="teamA"
+                      value={values.teamA}
+                      onChange={handleChange}
+                      isInvalid={touched.teamA && !!errors.teamA}
+                      ariaInvalid={!!errors.teamA}
+                      error={errors.teamA}
+                      mdSize="6"
+                    />
+                    <InputGroup
+                      label="Team name B"
+                      type="text"
+                      name="teamB"
+                      value={values.teamB}
+                      onChange={handleChange}
+                      isInvalid={touched.teamB && !!errors.teamB}
+                      ariaInvalid={!!errors.teamB}
+                      error={errors.teamB}
+                      mdSize="6"
+                    />
+                  </Form.Row>
 
                   <Button className="form-submit primary" type="submit">
                     Submit

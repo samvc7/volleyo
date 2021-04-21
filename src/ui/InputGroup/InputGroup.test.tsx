@@ -15,6 +15,7 @@ describe('valid InputGroup', () => {
         name="name"
         value="4"
         onChange={onChange}
+        mdSize="3"
       />
     );
     inputGroup = screen.getByLabelText('label');
@@ -44,6 +45,7 @@ describe('invalid InputGroup', () => {
         isInvalid={true}
         ariaInvalid={true}
         error="error message"
+        mdSize="3"
       />
     );
   })

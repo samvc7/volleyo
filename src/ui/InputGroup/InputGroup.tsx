@@ -10,6 +10,7 @@ interface InputGroupProps {
   isInvalid?: boolean;
   ariaInvalid?: boolean; 
   error?: string;
+  mdSize: string;
 }
 
 const InputGroup: React.FC<InputGroupProps> = ({
@@ -21,9 +22,10 @@ const InputGroup: React.FC<InputGroupProps> = ({
   isInvalid,
   ariaInvalid,
   error,
+  mdSize
 }) => {
   return(
-  <Form.Group as={Col} md="3" controlId={`validation${name}`}>
+  <Form.Group as={Col} md={mdSize} controlId={`validation${name}`}>
     <Form.Label>{label}</Form.Label>
     <Form.Control
       type={type}
