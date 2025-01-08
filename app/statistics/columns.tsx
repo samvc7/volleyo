@@ -10,8 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Column, ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
+import { MoreHorizontal } from "lucide-react"
+import { ColumnHeader } from "./columnHeader"
 
 // Maybe use Zod schema here later
 export type Statistics = {
@@ -48,14 +49,12 @@ export const columns: ColumnDef<Statistics>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <SortableHeaderButton
-          column={column}
-          name="Name"
-        />
-      )
-    },
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="Name"
+      />
+    ),
   },
   {
     accessorKey: "attackAttempts",
@@ -73,9 +72,9 @@ export const columns: ColumnDef<Statistics>[] = [
   {
     accessorKey: "attackSuccessRate",
     header: ({ column }) => (
-      <SortableHeaderButton
+      <ColumnHeader
         column={column}
-        name="Attack Success Rate"
+        title="Attack Success Rate"
       />
     ),
     invertSorting: true,
@@ -89,9 +88,9 @@ export const columns: ColumnDef<Statistics>[] = [
   {
     accessorKey: "digs",
     header: ({ column }) => (
-      <SortableHeaderButton
+      <ColumnHeader
         column={column}
-        name="Digs"
+        title="Digs"
       />
     ),
     invertSorting: true,
@@ -103,9 +102,9 @@ export const columns: ColumnDef<Statistics>[] = [
   {
     accessorKey: "blocks",
     header: ({ column }) => (
-      <SortableHeaderButton
+      <ColumnHeader
         column={column}
-        name="Blocks"
+        title="Blocks"
       />
     ),
     invertSorting: true,
@@ -113,9 +112,9 @@ export const columns: ColumnDef<Statistics>[] = [
   {
     accessorKey: "errors",
     header: ({ column }) => (
-      <SortableHeaderButton
+      <ColumnHeader
         column={column}
-        name="Errors"
+        title="Errors"
       />
     ),
     invertSorting: true,
@@ -149,22 +148,3 @@ export const columns: ColumnDef<Statistics>[] = [
 ]
 
 const round2DecimalPlaces = (num: number) => Math.round(num * 100) / 100
-
-type SortableHeaderButtonProps = {
-  column: Column<Statistics>
-  name: string
-}
-
-const SortableHeaderButton = ({ column, name }: SortableHeaderButtonProps) => {
-  return (
-    <Button
-      // TODO: fix hovered background color of header. Padding 0 needed because causes cell disalignment
-      className="p-0"
-      variant="ghost"
-      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    >
-      {name}
-      <ArrowUpDown className="ml-2 h-4 w-4" />
-    </Button>
-  )
-}
