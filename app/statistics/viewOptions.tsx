@@ -38,6 +38,7 @@ export function ViewOptions<TData>({ table }: ViewOptionsProps<TData>) {
           .getAllColumns()
           .filter(column => typeof column.accessorFn !== "undefined" && column.getCanHide())
           .map(column => {
+            const displayName = column.id.split("_").join(" ")
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
@@ -45,7 +46,7 @@ export function ViewOptions<TData>({ table }: ViewOptionsProps<TData>) {
                 checked={column.getIsVisible()}
                 onCheckedChange={value => column.toggleVisibility(!!value)}
               >
-                {column.id}
+                {displayName}
               </DropdownMenuCheckboxItem>
             )
           })}
