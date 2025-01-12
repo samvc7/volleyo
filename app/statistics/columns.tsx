@@ -75,12 +75,15 @@ export const columns: ColumnDef<Statistics>[] = [
   },
   {
     accessorKey: "name",
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title="# Name"
-      />
-    ),
+    header: ({ column }) => {
+      return (
+        <ColumnHeader
+          className="w-32"
+          column={column}
+          title="# Name"
+        />
+      )
+    },
   },
   {
     accessorKey: "kills",
