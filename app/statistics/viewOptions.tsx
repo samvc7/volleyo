@@ -30,12 +30,12 @@ export function ViewOptions<TData>({ table }: ViewOptionsProps<TData>) {
 
       <DropdownMenuContent
         align="end"
-        className="w-[150px]"
+        className="w-[200px] max-h-96 overflow-auto"
       >
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
-          .getAllColumns()
+          .getAllLeafColumns()
           .filter(column => typeof column.accessorFn !== "undefined" && column.getCanHide())
           .map(column => {
             const displayName = column.id.split("_").join(" ")
