@@ -81,6 +81,7 @@ export const columns: ColumnDef<Statistics>[] = [
           className="w-32"
           column={column}
           title="# Name"
+          tooltip="Player number & name"
         />
       )
     },
@@ -94,6 +95,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="K"
+            tooltip="Kills - Number of attacks which led to a point"
           />
         ),
         invertSorting: true,
@@ -104,6 +106,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="AE"
+            tooltip="Errors - Number of attacks that ended in the other team winning the point (Out, net or blocked)"
           />
         ),
         accessorFn: row => row.attackErrors,
@@ -114,6 +117,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="TA"
+            tooltip="Total Attempts - Total attacks"
           />
         ),
         invertSorting: true,
@@ -125,6 +129,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="Eff"
+            tooltip="Attack Efficiency - (Kills - Errors) / Total Attempts"
           />
         ),
         invertSorting: true,
@@ -141,6 +146,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="K/S"
+            tooltip="Kills per set"
           />
         ),
         invertSorting: true,
@@ -162,6 +168,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="SA"
+            tooltip="Serve Aces - Number of serves that led to a point"
           />
         ),
         accessorFn: row => row.serveAces,
@@ -173,6 +180,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="SE"
+            tooltip="Serve Errors - Number of serves that went out or to the net"
           />
         ),
         accessorFn: row => row.serveErrors,
@@ -184,6 +192,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="TA"
+            tooltip="Total Attempts - Total serves"
           />
         ),
         accessorFn: row => {
@@ -198,6 +207,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="SP"
+            tooltip="Percentage - % of serves that are not errors"
           />
         ),
         accessorFn: row => {
@@ -214,6 +224,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="Eff"
+            tooltip="Serve Efficiency - (Aces - Errors) / Total Attempts"
           />
         ),
         accessorFn: row => {
@@ -230,6 +241,22 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="Rating"
+            tooltip={
+              <>
+                <p>
+                  Lower is better. Serve Rating reflects the avarage pass rating that a server forces on the
+                  opponent.
+                </p>
+                <br />
+                <p>
+                  Serve Rating Breakdown: <br />
+                  0: Ace (opponent couldn't pass, pass rating 0). <br />
+                  1: Opponent passed a 1 (bad pass). <br />
+                  2: Opponent passed a 2 (ok pass). <br />
+                  3: Server error or Opponent passed a 3 (perfect pass).
+                </p>
+              </>
+            }
           />
         ),
         accessorFn: row => row.serveRating,
@@ -245,6 +272,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="3"
+            tooltip="Number of receptions that were rated at 3 (perfect)"
           />
         ),
         accessorFn: row => row.receivePerfect,
@@ -256,6 +284,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="2"
+            tooltip="Number of receptions that were rated at 2 (ok)"
           />
         ),
         accessorFn: row => row.receivePositive,
@@ -267,6 +296,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="1"
+            tooltip="Number of receptions that were rated at 1 (bad)"
           />
         ),
         accessorFn: row => row.receiveNegative,
@@ -278,9 +308,40 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="0"
+            tooltip="Number of receptions that were rated at 0 (error)"
           />
         ),
         accessorFn: row => row.receiveError,
+        invertSorting: true,
+      },
+      {
+        accessorKey: "receive_attempts",
+        header: ({ column }) => (
+          <ColumnHeader
+            column={column}
+            title="TA"
+            tooltip="Total Attempts - Total receptions"
+          />
+        ),
+        accessorFn: row => row.receiveAttempts,
+        invertSorting: true,
+      },
+      {
+        accessorKey: "receive_percentage",
+        header: ({ column }) => (
+          <ColumnHeader
+            column={column}
+            title="Pass%"
+            tooltip="Average pass rating"
+          />
+        ),
+        accessorFn: row => {
+          if (row.receivePercentage) return row.receivePercentage
+
+          const percentageRaw =
+            (row.receivePerfect * 3 + row.receivePositive * 2 + row.receiveNegative) / row.receiveAttempts
+          return round2DecimalPlaces(percentageRaw, 2)
+        },
         invertSorting: true,
       },
     ],
@@ -294,6 +355,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="Ast"
+            tooltip="Assists - Number of sets that led to a point"
           />
         ),
         accessorFn: row => row.setAssists,
@@ -305,6 +367,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="TA"
+            tooltip="Total Attempts - Total sets"
           />
         ),
         accessorFn: row => row.setsTotal,
@@ -316,6 +379,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="E"
+            tooltip="Set Errors - Number of sets that were called by the referee as a ball handling error."
           />
         ),
         accessorFn: row => row.setErrors,
@@ -332,6 +396,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="DS"
+            tooltip="Number of successful digs (continued play)"
           />
         ),
         invertSorting: true,
@@ -342,6 +407,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="DE"
+            tooltip="Number of digs that resulted in a point for the other team"
           />
         ),
         accessorFn: row => row.digErrors,
@@ -358,6 +424,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="BS"
+            tooltip="Number of blocks resulting in a point when the player is the only blocker"
           />
         ),
         accessorFn: row => row.blockSingle,
@@ -369,6 +436,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="BM"
+            tooltip="Number of blocks resulting in a point when the player is one of multiple blockers"
           />
         ),
         accessorFn: row => row.blockMultiple,
@@ -380,6 +448,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="BE"
+            tooltip="Number of blocks where the player was called for a net violation."
           />
         ),
         accessorFn: row => row.blockErrors,
@@ -391,6 +460,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="B/S"
+            tooltip="Blocks per set"
           />
         ),
         accessorFn: row => {
@@ -412,6 +482,7 @@ export const columns: ColumnDef<Statistics>[] = [
           <ColumnHeader
             column={column}
             title="SP"
+            tooltip="Number of sets played"
           />
         ),
         accessorFn: row => row.setsPlayed,
