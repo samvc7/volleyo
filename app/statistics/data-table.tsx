@@ -17,6 +17,7 @@ import {
 import { useState } from "react"
 import { Pagination } from "./pagination"
 import { ViewOptions } from "./viewOptions"
+import { getCommonPinningClasses } from "./columns"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -45,6 +46,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       columnFilters,
       columnVisibility,
       rowSelection,
+      columnPinning: {
+        left: ["select", "name"],
+      },
     },
   })
 
@@ -69,6 +73,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
+                      className={getCommonPinningClasses(header.column)}
                     >
                       {header.isPlaceholder
                         ? null
@@ -87,11 +92,16 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map(cell => {
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={getCommonPinningClasses(cell.column)}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (

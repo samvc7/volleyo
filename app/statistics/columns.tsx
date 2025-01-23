@@ -10,9 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ColumnDef } from "@tanstack/react-table"
+import { Column, ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { ColumnHeader } from "./columnHeader"
+import { cn } from "@/lib/utils"
 
 // Maybe use Zod schema here later
 export type Statistics = {
@@ -72,6 +73,8 @@ export const columns: ColumnDef<Statistics>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    // Need to define for pinning or we cannot get the proper size of the column
+    size: 32,
   },
   {
     accessorKey: "name",
@@ -524,3 +527,33 @@ const round2DecimalPlaces = (num: number, decimalPlaces: number) => {
 }
 
 const toPercentage = (num: number) => Math.round(num * 100)
+
+export const getCommonPinningClasses = <TData,>(column: Column<TData>): string => {
+  const isPinned = column.getIsPinned()
+  if (!isPinned) return ""
+
+  const isLastLeftPinnedColumn = isPinned === "left" && column.getIsLastColumn("left")
+  const isFirstRightPinnedColumn = isPinned === "right" && column.getIsFirstColumn("right")
+
+  const leftPixels = column.getStart("left")
+  // somehow directly applying the value into the leftStyle string literal doesn't work, when needed to it for right pin too
+  const pix = `${leftPixels}px`
+  const leftStyle = `left-[${pix}]`
+  const rightPixels = column.getAfter("right")
+
+  const classes = cn(
+    // Base classes for pinned columns
+    "sticky bg-white z-30",
+    // Positioning based on pinning direction
+    isPinned === "left" && leftStyle,
+    isPinned === "right" && `right-[${rightPixels}px]`,
+    // Add shadow effect for pinned columns
+    isLastLeftPinnedColumn && "shadow-[inset_-4px_0_4px_-4px_gray]",
+    isFirstRightPinnedColumn && "shadow-[inset_4px_0_4px_-4px_gray]",
+    `w-${column.getSize()}`,
+    // Add opacity to pinned columns for subtle styling
+    "opacity-95",
+  )
+
+  return classes
+}
