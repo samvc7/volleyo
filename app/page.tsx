@@ -3,24 +3,26 @@ import { GameDayCard } from "./GameDayCard"
 import { TeamSwitcher } from "./TeamSwitcher"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TeamMembersView } from "./TeamMembersView"
+import { Overview } from "./Overview"
 
 export default function Home() {
   return (
-    <main className="container flex min-h-screen max-w-screen-2xl flex-col pt-5 gap-4">
+    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <Tabs defaultValue="games">
         <div className="space-x-4">
           <TeamSwitcher teams={teams} />
           <TabsList>
-            {/* // todo: remove div? */}
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="games">Games </TabsTrigger>
+            <TabsTrigger value="games">Games</TabsTrigger>
             <TabsTrigger value="team-members">Team Members</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="overview">Coming Soon</TabsContent>
+        <TabsContent value="overview">
+          <Overview />
+        </TabsContent>
 
         <TabsContent value="games">
-          <ul className="w-full flex flex-col gap-4 pt-4">
+          <ul className="w-full flex flex-col gap-4 mt-4">
             {data.map(game => (
               <GameDayCard
                 id={game.id}
