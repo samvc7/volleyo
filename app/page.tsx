@@ -2,25 +2,25 @@ import * as React from "react"
 import { GameDayCard } from "./GameDayCard"
 import { TeamSwitcher } from "./TeamSwitcher"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TeamMembersView } from "./TeamMembersView"
 
 export default function Home() {
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col pt-5 gap-4">
       <Tabs defaultValue="games">
         <div className="space-x-4">
-          <TeamSwitcher />
+          <TeamSwitcher teams={teams} />
           <TabsList>
-            <div className="flex items-center gap-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="games">Games </TabsTrigger>
-              <TabsTrigger value="players">Players</TabsTrigger>
-            </div>
+            {/* // todo: remove div? */}
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="games">Games </TabsTrigger>
+            <TabsTrigger value="team-members">Team Members</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="overview">Coming Soon</TabsContent>
 
         <TabsContent value="games">
-          <ul className="w-full flex flex-col gap-4">
+          <ul className="w-full flex flex-col gap-4 pt-4">
             {data.map(game => (
               <GameDayCard
                 id={game.id}
@@ -34,7 +34,9 @@ export default function Home() {
           </ul>
         </TabsContent>
 
-        <TabsContent value="players">Coming Soon</TabsContent>
+        <TabsContent value="team-members">
+          <TeamMembersView />
+        </TabsContent>
       </Tabs>
     </main>
   )
@@ -69,4 +71,16 @@ const data = [
     address: "Somewhere 1234",
     participants: ["Mickey", "Minnie", "Goofy", "Pluto"],
   },
+]
+
+export type Team = {
+  id: string
+  name: string
+}
+
+const teams: Team[] = [
+  { id: "team-a", name: "Team A" },
+  { id: "team-b", name: "Team B" },
+  { id: "team-c", name: "Team C" },
+  { id: "team-d", name: "Team D" },
 ]

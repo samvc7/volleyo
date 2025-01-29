@@ -23,18 +23,20 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { CommandEmpty } from "cmdk"
-import { Check, ChevronsUpDown, Plus, PlusCircle } from "lucide-react"
+import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
 import { useState } from "react"
+import { Team } from "./page"
 
 type TeamSwitcherProps = {
+  teams: Team[]
   className?: string
 }
 
-export const TeamSwitcher = ({ className }: TeamSwitcherProps) => {
+export const TeamSwitcher = ({ teams, className }: TeamSwitcherProps) => {
   const [open, setOpen] = useState(false)
-  const [selectedTeam, setSelectedTeam] = useState<SelectTeam>()
-  const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
   const teamList = parseTeams(teams)
+  const [selectedTeam, setSelectedTeam] = useState<SelectTeam>(teamList[0])
+  const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
 
   return (
     <Dialog
@@ -131,18 +133,6 @@ export const TeamSwitcher = ({ className }: TeamSwitcherProps) => {
     </Dialog>
   )
 }
-
-type Team = {
-  id: string
-  name: string
-}
-
-const teams: Team[] = [
-  { id: "team-a", name: "Team A" },
-  { id: "team-b", name: "Team B" },
-  { id: "team-c", name: "Team C" },
-  { id: "team-d", name: "Team D" },
-]
 
 type SelectTeam = {
   value: string
