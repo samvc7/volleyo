@@ -3,7 +3,7 @@ import { GameDayCard } from "./GameDayCard"
 import { TeamSwitcher } from "./TeamSwitcher"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TeamMembersView } from "./TeamMembersView"
-import { Overview } from "./Overview"
+import { Overview } from "./overview/Overview"
 
 export default function Home() {
   return (
