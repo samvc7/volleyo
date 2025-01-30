@@ -8,7 +8,7 @@ import { Overview } from "./overview/Overview"
 export default function Home() {
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <Tabs defaultValue="games">
+      <Tabs defaultValue="overview">
         <div className="space-x-4">
           <TeamSwitcher teams={teams} />
           <TabsList>
@@ -17,7 +17,10 @@ export default function Home() {
             <TabsTrigger value="team-members">Team Members</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="overview">
+        <TabsContent
+          value="overview"
+          className="space-y-4"
+        >
           <Overview />
         </TabsContent>
 
