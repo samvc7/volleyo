@@ -4,18 +4,20 @@ import { TeamSwitcher } from "./TeamSwitcher"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TeamMembersView } from "./TeamMembersView"
 import { Overview } from "./overview/Overview"
+import { DatePickerWithRange } from "./DateRangePicker"
 
 export default function Home() {
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <Tabs defaultValue="overview">
-        <div className="space-x-4">
+        <div className="flex gap-4">
           <TeamSwitcher teams={teams} />
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="games">Games</TabsTrigger>
             <TabsTrigger value="team-members">Team Members</TabsTrigger>
           </TabsList>
+          <DatePickerWithRange className="ml-auto" />
         </div>
         <TabsContent
           value="overview"
