@@ -17,8 +17,7 @@ import {
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { ColumnHeader } from "../statistics/columnHeader"
-import { getCommonPinningClasses } from "../statistics/columns"
-import { Pagination } from "../statistics/pagination"
+import { getCommonPinningClasses, Statistics } from "../statistics/columns"
 import { ViewOptions } from "../statistics/viewOptions"
 import {
   DropdownMenu,
@@ -28,22 +27,67 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Pagination } from "./Pagination"
 
-export type TeamMember = {
-  id: string
-  name: string
-  email: string
-}
+export type LeaderboardPlayer = Pick<
+  Statistics,
+  "id" | "name" | "kills" | "attackEfficiency" | "serveAces" | "digs" | "setsTotal"
+> & { blocks: number }
 
-export const teamMembers: TeamMember[] = [
-  { id: "a1b2c3d4", name: "Liam Anderson", email: "liam.anderson@example.com" },
-  { id: "e5f6g7h8", name: "Emma Johnson", email: "emma.johnson@example.com" },
-  { id: "i9j0k1l2", name: "Noah Williams", email: "noah.williams@example.com" },
-  { id: "m3n4o5p6", name: "Olivia Brown", email: "olivia.brown@example.com" },
-  { id: "q7r8s9t0", name: "William Garcia", email: "william.garcia@example.com" },
+export const leaderboardPlayers: LeaderboardPlayer[] = [
+  {
+    id: "m5gr84i9",
+    name: "#7 Monserrat",
+    kills: 18,
+    attackEfficiency: 0.31,
+    blocks: 6,
+    serveAces: 4,
+    digs: 15,
+    setsTotal: 5,
+  },
+  {
+    id: "3u1reuv4",
+    name: "#12 Silas",
+    kills: 22,
+    attackEfficiency: 0.32,
+    blocks: 10,
+    serveAces: 6,
+    digs: 24,
+    setsTotal: 3,
+  },
+  {
+    id: "derv1ws0",
+    name: "#9 Carmella",
+    kills: 12,
+    attackEfficiency: 0.32,
+    blocks: 3,
+    serveAces: 5,
+    digs: 14,
+    setsTotal: 7,
+  },
+  {
+    id: "5kma53ae",
+    name: "#4 Kathlyn",
+    kills: 25,
+    attackEfficiency: 0.4,
+    blocks: 3,
+    serveAces: 7,
+    digs: 5,
+    setsTotal: 27,
+  },
+  {
+    id: "bhqecj4p",
+    name: "#5 Laurie",
+    kills: 30,
+    attackEfficiency: 0.45,
+    blocks: 4,
+    serveAces: 9,
+    digs: 18,
+    setsTotal: 12,
+  },
 ]
 
-export const columns: ColumnDef<TeamMember>[] = [
+export const columns: ColumnDef<LeaderboardPlayer>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -57,15 +101,73 @@ export const columns: ColumnDef<TeamMember>[] = [
     },
   },
   {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <ColumnHeader
-          column={column}
-          title="Email"
-        />
-      )
-    },
+    accessorKey: "kills",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="K"
+        tooltip="Kills - Number of attacks which led to a point"
+      />
+    ),
+    invertSorting: true,
+  },
+  {
+    accessorKey: "attack_efficiency",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="Eff"
+        tooltip="Attack Efficiency - (Kills - Errors) / Total Attempts"
+      />
+    ),
+    invertSorting: true,
+    accessorFn: row => row.attackEfficiency,
+  },
+  {
+    accessorKey: "serve_aces",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="SA"
+        tooltip="Serve Aces - Number of serves that led to a point"
+      />
+    ),
+    accessorFn: row => row.serveAces,
+    invertSorting: true,
+  },
+  {
+    accessorKey: "blocks",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="BS"
+        tooltip="Number of blocks resulting in a point when the player is the only blocker or one of multiple"
+      />
+    ),
+    invertSorting: true,
+  },
+  {
+    accessorKey: "digs",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="DS"
+        tooltip="Number of successful digs (continued play)"
+      />
+    ),
+    invertSorting: true,
+  },
+  {
+    accessorKey: "sets_total",
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title="TA"
+        tooltip="Total Attempts - Total sets"
+      />
+    ),
+    accessorFn: row => row.setsTotal,
+    invertSorting: true,
   },
   {
     id: "actions",
@@ -185,7 +287,7 @@ export function Leaderboard<TData, TValue>({ columns, data }: DataTableProps<TDa
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="justify-end">
         <Pagination table={table} />
       </CardFooter>
     </Card>

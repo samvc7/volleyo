@@ -3,7 +3,7 @@ import { CrosshairIcon, ShieldIcon, SwordsIcon, VolleyballIcon } from "lucide-re
 import { LineChartScore } from "./LineChartScore"
 import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
-import { columns, Leaderboard, teamMembers } from "./Leaderboard"
+import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
 
 export const Overview = () => {
   return (
@@ -60,7 +60,7 @@ export const Overview = () => {
         <BarChartMultiple />
         <Leaderboard
           columns={columns}
-          data={teamMembers}
+          data={leaderboardPlayers}
         />
       </div>
     </>

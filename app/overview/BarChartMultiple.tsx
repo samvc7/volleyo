@@ -16,12 +16,12 @@ const chartData = [
 
 const chartConfig = {
   desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+    label: "Attacks",
+    color: "hsl(var(--chart-2))",
   },
   mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
+    label: "Errors",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
@@ -29,8 +29,8 @@ export function BarChartMultiple() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Attack</CardTitle>
+        <CardDescription>Showing total attacks and errors.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -67,7 +67,6 @@ export function BarChartMultiple() {
         <div className="flex gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">Showing total visitors for the last 6 months</div>
       </CardFooter>
     </Card>
   )

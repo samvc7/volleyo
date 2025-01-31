@@ -104,12 +104,12 @@ const chartConfig = {
     label: "Page Views",
   },
   desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+    label: "Scores",
+    color: "hsl(var(--chart-2))",
   },
   mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
+    label: "Errors",
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
@@ -128,8 +128,8 @@ export function LineChartScore() {
     <Card>
       <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Line Chart - Interactive</CardTitle>
-          <CardDescription>Showing total visitors for the last 3 months</CardDescription>
+          <CardTitle>Scores vs. Errors</CardTitle>
+          <CardDescription>Showing overall scores and errors</CardDescription>
         </div>
         <div className="flex">
           {["desktop", "mobile"].map(key => {

@@ -15,12 +15,12 @@ const chartData = [
 
 const chartConfig = {
   running: {
-    label: "Running",
+    label: "Attack",
     color: "hsl(var(--chart-1))",
   },
   swimming: {
-    label: "Swimming",
-    color: "hsl(var(--chart-2))",
+    label: "Receive",
+    color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig
 
@@ -28,8 +28,8 @@ export function StackedBarChartErrors() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tooltip - Advanced</CardTitle>
-        <CardDescription>Tooltip with custom formatter and total.</CardDescription>
+        <CardTitle>Error Distribution</CardTitle>
+        <CardDescription>Visualizing error distribution accross attack and receive.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -78,7 +78,7 @@ export function StackedBarChartErrors() {
                       {chartConfig[name as keyof typeof chartConfig]?.label || name}
                       <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
                         {value}
-                        <span className="font-normal text-muted-foreground">kcal</span>
+                        <span className="font-normal text-muted-foreground">errors</span>
                       </div>
                       {/* Add this after the last item */}
                       {index === 1 && (
@@ -86,7 +86,7 @@ export function StackedBarChartErrors() {
                           Total
                           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
                             {item.payload.running + item.payload.swimming}
-                            <span className="font-normal text-muted-foreground">kcal</span>
+                            <span className="font-normal text-muted-foreground">errors</span>
                           </div>
                         </div>
                       )}
