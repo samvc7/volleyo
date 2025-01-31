@@ -6,7 +6,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import Link from "next/link"
-import { TeamSwitcher } from "./TeamSwitcher"
 
 export const MainNav = () => {
   return (
@@ -24,20 +23,6 @@ export const MainNav = () => {
               >
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>Teams</NavigationMenuLink>
               </Link>
-              {/* <Link
-                href="/games"
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>Games</NavigationMenuLink>
-              </Link>
-              <Link
-                href="/players"
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>Players</NavigationMenuLink>
-              </Link> */}
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>

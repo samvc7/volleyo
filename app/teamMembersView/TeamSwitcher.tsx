@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils"
 import { CommandEmpty } from "cmdk"
 import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
 import { useState } from "react"
-import { Team } from "./page"
+import { Team } from "../page"
 
 type TeamSwitcherProps = {
   teams: Team[]

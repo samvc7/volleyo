@@ -1,8 +1,8 @@
 import * as React from "react"
-import { GameDayCard } from "./GameDayCard"
-import { TeamSwitcher } from "./TeamSwitcher"
+import { GamesView } from "./games/GamesView"
+import { TeamSwitcher } from "./teamMembersView/TeamSwitcher"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TeamMembersView } from "./TeamMembersView"
+import { TeamMembersView } from "./teamMembersView/TeamMembersView"
 import { Overview } from "./overview/Overview"
 import { DatePickerWithRange } from "./DateRangePicker"
 
@@ -27,18 +27,7 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="games">
-          <ul className="w-full flex flex-col gap-4 mt-4">
-            {data.map(game => (
-              <GameDayCard
-                id={game.id}
-                key={game.id}
-                title={game.title}
-                date={game.date}
-                address={game.address}
-                participants={game.participants}
-              />
-            ))}
-          </ul>
+          <GamesView />
         </TabsContent>
 
         <TabsContent value="team-members">
@@ -48,37 +37,6 @@ export default function Home() {
     </main>
   )
 }
-
-const data = [
-  {
-    id: 1,
-    title: "Tournament X",
-    date: new Date(),
-    address: "Somewhere 1234",
-    participants: ["Kevin", "John", "Lisa", "Richard"],
-  },
-  {
-    id: 2,
-    title: "Tournament Y",
-    date: new Date(),
-    address: "Somewhere 1234",
-    participants: ["Steven", "Karl", "Jennie", "Pauline"],
-  },
-  {
-    id: 3,
-    title: "Tuneup 1",
-    date: new Date(),
-    address: "Somewhere 1234",
-    participants: ["Tom", "Jerry", "Mickey", "Donald"],
-  },
-  {
-    id: 4,
-    title: "Training 1",
-    date: new Date(),
-    address: "Somewhere 1234",
-    participants: ["Mickey", "Minnie", "Goofy", "Pluto"],
-  },
-]
 
 export type Team = {
   id: string

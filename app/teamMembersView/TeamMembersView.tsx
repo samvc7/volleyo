@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,7 +13,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, PlusCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -26,10 +26,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ColumnHeader } from "./statistics/columnHeader"
-import { getCommonPinningClasses } from "./statistics/columns"
-import { Pagination } from "./statistics/pagination"
-import { ViewOptions } from "./statistics/viewOptions"
+import { ColumnHeader } from "../statistics/columnHeader"
+import { getCommonPinningClasses } from "../statistics/columns"
+import { Pagination } from "../statistics/pagination"
+import { ViewOptions } from "../statistics/viewOptions"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 
 export const TeamMembersView = () => {
   return (
@@ -164,7 +174,7 @@ function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValu
   })
 
   return (
-    <div>
+    <AddTeamMemberDialog>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter names ..."
@@ -230,6 +240,64 @@ function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValu
       </div>
 
       <Pagination table={table} />
-    </div>
+    </AddTeamMemberDialog>
+  )
+}
+
+const AddTeamMemberDialog = ({ children }: { children: ReactNode }) => {
+  const [showNewMemberDialog, setShowNewMemberDialog] = useState(false)
+
+  return (
+    <Dialog
+      open={showNewMemberDialog}
+      onOpenChange={setShowNewMemberDialog}
+    >
+      <DialogTrigger
+        className="flex"
+        asChild
+      >
+        <Button
+          variant={"outline"}
+          aria-expanded={showNewMemberDialog}
+          aria-label="Create Team Member"
+          onClick={() => {
+            setShowNewMemberDialog(true)
+          }}
+          className="ml-auto"
+        >
+          <PlusCircle className="h-5 w-5" />
+          Create Game
+        </Button>
+      </DialogTrigger>
+      {children}
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create Team Member</DialogTitle>
+          <DialogDescription>Add a team member for your team.</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2 pb-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setShowNewMemberDialog(false)}
+          >
+            Cancel
+          </Button>
+          <Button type="submit">Create</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

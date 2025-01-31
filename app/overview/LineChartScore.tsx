@@ -100,9 +100,6 @@ const chartData = [
 ]
 
 const chartConfig = {
-  views: {
-    label: "Page Views",
-  },
   desktop: {
     label: "Scores",
     color: "hsl(var(--chart-2))",
@@ -182,7 +179,7 @@ export function LineChartScore() {
               content={
                 <ChartTooltipContent
                   className="w-[150px]"
-                  nameKey="views"
+                  nameKey={activeChart}
                   labelFormatter={value => {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
