@@ -53,7 +53,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   })
 
   return (
-    <div>
+    <>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter names ..."
@@ -107,11 +107,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No Results.
-                </TableCell>
+                  colSpan={table.getAllLeafColumns().length}
+                  className="h-24"
+                />
               </TableRow>
             )}
           </TableBody>
@@ -119,6 +117,6 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       </div>
 
       <Pagination table={table} />
-    </div>
+    </>
   )
 }

@@ -5,15 +5,12 @@ export default async function StatisticsPage() {
   const data = await getData()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <div className="container mx-auto py-10">
-          <DataTable
-            columns={columns}
-            data={data}
-          />
-        </div>
-      </div>
+    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
+      <h1 className="text-3xl font-bold">Statistics</h1>
+      <DataTable
+        columns={columns}
+        data={data}
+      />
     </main>
   )
 }
