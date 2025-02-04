@@ -266,14 +266,14 @@ const AddTeamMemberDialog = ({ children }: { children: ReactNode }) => {
           className="ml-auto"
         >
           <PlusCircle className="h-5 w-5" />
-          Create Game
+          Add Member
         </Button>
       </DialogTrigger>
       {children}
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Team Member</DialogTitle>
+          <DialogTitle>Add Team Member</DialogTitle>
           <DialogDescription>Add a team member for your team.</DialogDescription>
         </DialogHeader>
 
