@@ -1,17 +1,17 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 async function main() {
-  const members: Prisma.MemberCreateInput[] = [
-    { name: "Liam Anderson", email: "liam.anderson@example.com" },
-    { name: "Emma Johnson", email: "emma.johnson@example.com" },
-    { name: "Noah Williams", email: "noah.williams@example.com" },
-    { name: "Olivia Brown", email: "olivia.brown@example.com" },
-    { name: "William Garcia", email: "william.garcia@example.com" },
-    { name: "Sophia Martinez", email: "sophia.martinez@example.com" },
-    { name: "James Rodriguez", email: "james.rodriguez@example.com" },
-    { name: "Ava Davis", email: "ava.davis@example.com" },
-    { name: "Benjamin Wilson", email: "benjamin.wilson@example.com" },
-    { name: "Mia Lopez", email: "mia.lopez@example.com" },
+  const members = [
+    { firstName: "Liam", lastName: "Anderson", email: "liam.anderson@example.com" },
+    { firstName: "Emma", lastName: "Johnson", email: "emma.johnson@example.com" },
+    { firstName: "Noah", lastName: "Williams", email: "noah.williams@example.com" },
+    { firstName: "Olivia", lastName: "Brown", email: "olivia.brown@example.com" },
+    { firstName: "William", lastName: "Garcia", email: "william.garcia@example.com" },
+    { firstName: "Sophia", lastName: "Martinez", email: "sophia.martinez@example.com" },
+    { firstName: "James", lastName: "Rodriguez", email: "james.rodriguez@example.com" },
+    { firstName: "Ava", lastName: "Davis", email: "ava.davis@example.com" },
+    { firstName: "Benjamin", lastName: "Wilson", email: "benjamin.wilson@example.com" },
+    { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" },
   ]
 
   for (const member of members) {

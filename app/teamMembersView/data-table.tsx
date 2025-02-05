@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useState } from "react"
+import { useActionState, useState } from "react"
 import {
   DialogHeader,
   DialogFooter,
@@ -24,7 +24,7 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table"
-import { PlusCircle, MoreHorizontal } from "lucide-react"
+import { PlusCircle, MoreHorizontal, Loader2 } from "lucide-react"
 import { getCommonPinningClasses } from "../statistics/columns"
 import { Pagination } from "../statistics/pagination"
 import { ViewOptions } from "../statistics/viewOptions"
@@ -42,6 +42,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Member } from "@prisma/client"
+import { createMember } from "./actions"
+import { useToast } from "@/hooks/use-toast"
 
 export const columns: ColumnDef<Member>[] = [
   {
@@ -76,6 +78,7 @@ export const columns: ColumnDef<Member>[] = [
         />
       )
     },
+    accessorFn: row => (row.nickName ? row.nickName : `${row.firstName} ${row.lastName}`),
   },
   {
     accessorKey: "email",
@@ -146,7 +149,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   })
 
   return (
-    <AddTeamMemberDialog>
+    <>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter names ..."
@@ -154,7 +157,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
-        <ViewOptions table={table} />
+        <div className="flex gap-2 ml-auto">
+          <AddTeamMemberDialog />
+          <ViewOptions table={table} />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -212,12 +218,25 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       </div>
 
       <Pagination table={table} />
-    </AddTeamMemberDialog>
+    </>
   )
 }
 
-const AddTeamMemberDialog = ({ children }: { children: ReactNode }) => {
+const AddTeamMemberDialog = () => {
+  const { toast } = useToast()
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false)
+  const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+    try {
+      await createMember(formData)
+      setShowNewMemberDialog(false)
+      toast({ title: "Team member added successfully" })
+    } catch (error) {
+      console.error(error)
+      return "Could not create new team member. Please try again"
+    }
+
+    return null
+  }, null)
 
   return (
     <Dialog
@@ -229,46 +248,84 @@ const AddTeamMemberDialog = ({ children }: { children: ReactNode }) => {
         asChild
       >
         <Button
+          className="h-8"
           variant={"outline"}
+          size="sm"
           aria-expanded={showNewMemberDialog}
           aria-label="Create Team Member"
           onClick={() => {
             setShowNewMemberDialog(true)
           }}
-          className="ml-auto"
         >
           <PlusCircle className="h-5 w-5" />
           Add Member
         </Button>
       </DialogTrigger>
-      {children}
 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Team Member</DialogTitle>
           <DialogDescription>Add a team member for your team.</DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-2 pb-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" />
+        <form action={formAction}>
+          <div className="space-y-4 py-2 pb-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nickName">Nick Name</Label>
+              <Input
+                id="nickName"
+                name="nickName"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" />
-          </div>
-        </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setShowNewMemberDialog(false)}
-          >
-            Cancel
-          </Button>
-          <Button type="submit">Create</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowNewMemberDialog(false)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              disabled={isPending}
+              type="submit"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )
