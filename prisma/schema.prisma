@@ -8,11 +8,90 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Member {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  firstName String   @map("first_name")
-  lastName  String   @map("last_name")
-  nickName  String?  @map("nick_name")
-  createdAt DateTime @default(now()) @map("created_at")
+model Person {
+  id                 String             @id @default(cuid())
+  email              String?            @unique
+  firstName          String             @map("first_name")
+  lastName           String             @map("last_name")
+  nickName           String?            @map("nick_name")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  team               TeamMembers[]
+  gameParticipations GameParticipants[]
+  statistics         Statistics[]
+}
+
+model Team {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  members     TeamMembers[]
+  games       Game[]
+}
+
+model TeamMembers {
+  Person   Person @relation(fields: [personId], references: [id])
+  personId String
+  Team     Team   @relation(fields: [teamId], references: [id])
+  teamId   String
+
+  @@id([personId, teamId])
+}
+
+model Game {
+  id           String             @id @default(cuid())
+  title        String
+  score        String?
+  description  String?
+  date         DateTime
+  participants GameParticipants[]
+  Team         Team?              @relation(fields: [teamId], references: [id])
+  teamId       String?
+  statistics   Statistics[]
+}
+
+model GameParticipants {
+  Person   Person @relation(fields: [personId], references: [id])
+  personId String
+  Game     Game   @relation(fields: [gameId], references: [id])
+  gameId   String
+
+  @@id([personId, gameId])
+}
+
+model Statistics {
+  id                String @id @default(cuid())
+  kills             Int
+  attackErrors      Int    @map("attack_errors")
+  attackAttempts    Int    @map("attack_attempts")
+  attackEfficiency  Float  @map("attack_efficiency")
+  killsPerSet       Float  @map("kills_per_set")
+  serveAces         Int    @map("serve_aces")
+  serveErrors       Int    @map("serve_errors")
+  serveAttempts     Int    @map("serve_attempts")
+  servePercentage   Float  @map("serve_percentage")
+  serveEfficiency   Float  @map("serve_efficiency")
+  serveRating       Float  @map("serve_rating")
+  receivePerfect    Int    @map("receive_perfect")
+  receivePositive   Int    @map("receive_positive")
+  receiveNegative   Int    @map("receive_negative")
+  receiveError      Int    @map("receive_error")
+  receiveAttempts   Int    @map("receive_attempts")
+  receivePercentage Float  @map("receive_percentage")
+  setAssists        Int    @map("set_assists")
+  setsTotal         Int    @map("sets_total")
+  setErrors         Int    @map("set_errors")
+  digs              Int    @map("digs")
+  digErrors         Int    @map("dig_errors")
+  blockSingle       Int    @map("block_single")
+  blockMultiple     Int    @map("block_multiple")
+  blockErrors       Int    @map("block_errors")
+  blocksPerSet      Float  @map("blocks_per_set")
+  setsPlayed        Int    @map("sets_played")
+
+  Person   Person @relation(fields: [personId], references: [id])
+  personId String
+  Game     Game   @relation(fields: [gameId], references: [id])
+  gameId   String
+
+  @@unique([personId, gameId])
 }

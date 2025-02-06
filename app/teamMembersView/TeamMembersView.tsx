@@ -1,9 +1,9 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { columns, DataTable } from "./data-table"
-import { Member } from "@prisma/client"
+import { Person } from "@prisma/client"
 
 export const TeamMembersView = async () => {
-  const teamMembers: Member[] = await prisma.member.findMany()
+  const teamMembers: Person[] = await prisma.person.findMany()
 
   return (
     <section>

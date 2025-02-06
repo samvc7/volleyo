@@ -41,11 +41,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Member } from "@prisma/client"
+import { Person } from "@prisma/client"
 import { createMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
 
-export const columns: ColumnDef<Member>[] = [
+export const columns: ColumnDef<Person>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -298,7 +298,6 @@ const AddTeamMemberDialog = () => {
                 id="email"
                 name="email"
                 type="email"
-                required
               />
             </div>
           </div>

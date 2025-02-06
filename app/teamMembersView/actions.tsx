@@ -12,9 +12,9 @@ export const createMember = async (formData: FormData) => {
     firstName: formData.get("firstName") as string,
     lastName: formData.get("lastName") as string,
     ...(nickName ? { nickName } : {}),
-  } satisfies Prisma.MemberCreateInput
+  } satisfies Prisma.PersonCreateInput
 
-  await prisma.member.create({
+  await prisma.person.create({
     data,
   })
 
