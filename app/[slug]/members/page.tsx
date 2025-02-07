@@ -2,7 +2,7 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { columns, DataTable } from "./data-table"
 import { Person } from "@prisma/client"
 
-export const TeamMembersView = async () => {
+export default async function TeamMembersView() {
   const teamMembers: Person[] = await prisma.person.findMany()
 
   return (

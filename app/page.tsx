@@ -1,51 +1,22 @@
 import * as React from "react"
-import { GamesView } from "./games/GamesView"
-import { TeamSwitcher } from "./teamMembersView/TeamSwitcher"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TeamMembersView } from "./teamMembersView/TeamMembersView"
-import { Overview } from "./overview/Overview"
-import { DatePickerWithRange } from "./DateRangePicker"
+import { prisma } from "@/prisma/singlePrismaClient"
+import { TeamSwitcher } from "./team-switcher/TeamSwitcher"
 
-export default function Home() {
+export default async function Home() {
+  const teams = await prisma.team.findMany({
+    select: { slug: true, name: true, description: true, id: true },
+  })
+
+  if (teams.length === 0) {
+    return <h1>No teams found.</h1>
+  }
+
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <Tabs defaultValue="overview">
-        <div className="flex gap-4">
-          <TeamSwitcher teams={teams} />
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="games">Games</TabsTrigger>
-            <TabsTrigger value="team-members">Team Members</TabsTrigger>
-          </TabsList>
-          <DatePickerWithRange className="ml-auto" />
-        </div>
-        <TabsContent
-          value="overview"
-          className="space-y-4"
-        >
-          <Overview />
-        </TabsContent>
-
-        <TabsContent value="games">
-          <GamesView />
-        </TabsContent>
-
-        <TabsContent value="team-members">
-          <TeamMembersView />
-        </TabsContent>
-      </Tabs>
+      <TeamSwitcher
+        teams={teams}
+        selectedTeam={teams[0]}
+      />
     </main>
   )
 }
-
-export type Team = {
-  id: string
-  name: string
-}
-
-const teams: Team[] = [
-  { id: "team-a", name: "Team A" },
-  { id: "team-b", name: "Team B" },
-  { id: "team-c", name: "Team C" },
-  { id: "team-d", name: "Team D" },
-]

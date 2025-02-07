@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: "Volleyo",
   description: "Volleyo is a platform for volleyball players.",
 }
-
 export default function RootLayout({
   children,
 }: Readonly<{

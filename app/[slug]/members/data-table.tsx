@@ -25,13 +25,13 @@ import {
   flexRender,
 } from "@tanstack/react-table"
 import { PlusCircle, MoreHorizontal, Loader2 } from "lucide-react"
-import { getCommonPinningClasses } from "../statistics/columns"
-import { Pagination } from "../statistics/pagination"
-import { ViewOptions } from "../statistics/viewOptions"
+import { getCommonPinningClasses } from "../../statistics/columns"
+import { Pagination } from "../../statistics/pagination"
+import { ViewOptions } from "../../statistics/viewOptions"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 
-import { ColumnHeader } from "../statistics/columnHeader"
+import { ColumnHeader } from "../../statistics/columnHeader"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,

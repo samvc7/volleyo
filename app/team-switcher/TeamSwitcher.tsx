@@ -1,8 +1,12 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Team } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -22,21 +26,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { CommandEmpty } from "cmdk"
 import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
-import { useState } from "react"
-import { Team } from "../page"
 
 type TeamSwitcherProps = {
   teams: Team[]
+  selectedTeam: Team
   className?: string
 }
 
-export const TeamSwitcher = ({ teams, className }: TeamSwitcherProps) => {
+export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherProps) => {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
-  const teamList = parseTeams(teams)
-  const [selectedTeam, setSelectedTeam] = useState<SelectTeam>(teamList[0])
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
+  const teamList = parseTeams(teams)
+  const selectedTeamParsed = parseTeam(selectedTeam)
+
+  const handleSelectTeam = (team: Team) => {
+    setOpen(false)
+    router.push(`/${team.slug}`)
+  }
 
   return (
     <Dialog
@@ -55,7 +63,7 @@ export const TeamSwitcher = ({ teams, className }: TeamSwitcherProps) => {
             aria-label="Select Team"
             className={cn("w-[200px] justify-between", className)}
           >
-            {selectedTeam ? selectedTeam.label : "Select Team"}
+            {selectedTeamParsed ? selectedTeamParsed.label : "Select Team"}
             <ChevronsUpDown className="ml-auto opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -68,17 +76,14 @@ export const TeamSwitcher = ({ teams, className }: TeamSwitcherProps) => {
               <CommandGroup>
                 {teamList.map(team => (
                   <CommandItem
-                    key={team.value}
-                    onSelect={() => {
-                      setSelectedTeam(team)
-                      setOpen(false)
-                    }}
+                    key={team.value.id}
+                    onSelect={() => handleSelectTeam(team.value)}
                   >
                     {team.label}
                     <Check
                       className={cn(
                         "ml-auto",
-                        selectedTeam?.value === team.value ? "opacity-100" : "opacity-0",
+                        selectedTeam?.id === team.value.id ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>
@@ -135,10 +140,14 @@ export const TeamSwitcher = ({ teams, className }: TeamSwitcherProps) => {
 }
 
 type SelectTeam = {
-  value: string
+  value: Team
   label: string
 }
 
 const parseTeams = (teams: Team[]): SelectTeam[] => {
-  return teams.map(team => ({ value: team.id, label: team.name }))
+  return teams.map(team => parseTeam(team))
+}
+
+const parseTeam = (team: Team): SelectTeam => {
+  return { value: team, label: team.name }
 }

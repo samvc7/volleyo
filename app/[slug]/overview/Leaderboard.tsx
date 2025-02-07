@@ -16,9 +16,9 @@ import {
 } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
-import { ColumnHeader } from "../statistics/columnHeader"
-import { getCommonPinningClasses, Statistics } from "../statistics/columns"
-import { ViewOptions } from "../statistics/viewOptions"
+import { ColumnHeader } from "../../statistics/columnHeader"
+import { getCommonPinningClasses, Statistics } from "../../statistics/columns"
+import { ViewOptions } from "../../statistics/viewOptions"
 import {
   DropdownMenu,
   DropdownMenuContent,
