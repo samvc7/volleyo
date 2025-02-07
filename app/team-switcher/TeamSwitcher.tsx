@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useActionState, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Team } from "@prisma/client"
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2, PlusCircle } from "lucide-react"
+import { createTeam } from "./actions"
 
 type TeamSwitcherProps = {
   teams: Team[]
@@ -38,6 +39,19 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
+  const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+    try {
+      const createdTeam = await createTeam(formData)
+      setShowNewTeamDialog(false)
+      router.push(`/${createdTeam.slug}`)
+    } catch (error) {
+      console.error(error)
+      return "Could not create new team. Please try again."
+    }
+
+    return null
+  }, null)
+
   const teamList = parseTeams(teams)
   const selectedTeamParsed = parseTeam(selectedTeam)
 
@@ -117,23 +131,36 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
           <DialogTitle>Create Team</DialogTitle>
           <DialogDescription>Add a new team to manage statistics and players.</DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-2 pb-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Team Name</Label>
-            <Input id="name" />
+        <form action={formAction}>
+          <div className="space-y-4 py-2 pb-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Team Name</Label>
+              <Input id="name" name="name" required/>
+            </div>
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setShowNewTeamDialog(false)}
-          >
-            Cancel
-          </Button>
-          <Button type="submit">Create</Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowNewTeamDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isPending}
+              type="submit"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

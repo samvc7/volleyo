@@ -44,6 +44,7 @@ import {
 import { Person } from "@prisma/client"
 import { createMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
+import { useParams } from "next/navigation"
 
 export const columns: ColumnDef<Person>[] = [
   {
@@ -223,11 +224,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 }
 
 const AddTeamMemberDialog = () => {
+  const { slug } = useParams() as { slug: string }
   const { toast } = useToast()
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false)
+  const createMemberWithTeamSlug = createMember.bind(null, slug)
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     try {
-      await createMember(formData)
+      createMemberWithTeamSlug(formData)
       setShowNewMemberDialog(false)
       toast({ title: "Team member added successfully" })
     } catch (error) {

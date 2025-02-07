@@ -10,7 +10,7 @@ datasource db {
 
 model Person {
   id                 String             @id @default(cuid())
-  email              String?            @unique
+  email              String?
   firstName          String             @map("first_name")
   lastName           String             @map("last_name")
   nickName           String?            @map("nick_name")
