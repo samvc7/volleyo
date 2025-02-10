@@ -16,8 +16,13 @@ export default async function GamesView({ params }: { params: Promise<{ slug: st
     participants: game.participants.map(p => p.Person),
   }))
 
+  const members = await prisma.person.findMany({
+    where: { team: { some: { Team: { slug } } } },
+    select: { id: true, firstName: true, lastName: true, nickName: true },
+  })
+
   return (
-    <NewGameDialog>
+    <NewGameDialog participants={members}>
       <ul className="w-full flex flex-col gap-4 mt-4">
         {formattedGames.map(game => (
           <GameCard

@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DATE_FORMAT } from "./utils"
 
-const FORMAT = "dd.MM.yy"
 export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
@@ -49,10 +49,10 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, FORMAT)} - {format(date.to, FORMAT)}
+                  {format(date.from, DATE_FORMAT)} - {format(date.to, DATE_FORMAT)}
                 </>
               ) : (
-                format(date.from, FORMAT)
+                format(date.from, DATE_FORMAT)
               )
             ) : (
               <span>Pick a date</span>

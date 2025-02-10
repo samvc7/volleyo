@@ -31,8 +31,14 @@ export const GameCard = ({ id, title, date, description, participants }: GameDay
             <CardDescription>{description}</CardDescription>
           </CardHeader>
           <CardContent>
-            <h2>Participants:</h2>
-            <p>{participants?.map(participant => parsePersonName(participant)).join(", ")}</p>
+            {participants?.length ? (
+              <>
+                <h2>Participants:</h2>
+                <p>{participants?.map(participant => parsePersonName(participant)).join(", ")}</p>
+              </>
+            ) : (
+              <h2>No participants yet.</h2>
+            )}
           </CardContent>
         </Card>
       </Link>
