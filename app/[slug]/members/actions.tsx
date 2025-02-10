@@ -28,5 +28,5 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
     data,
   })
 
-  revalidatePath("/[slug]/members")
+  revalidatePath("/[slug]/members", "page")
 }

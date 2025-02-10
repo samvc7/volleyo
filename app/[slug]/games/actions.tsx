@@ -29,5 +29,5 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
     },
   })
 
-  revalidatePath("/[slug]/games")
+  revalidatePath("/[slug]/games", "page")
 }

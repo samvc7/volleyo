@@ -47,10 +47,10 @@ export const NewGameDialog = ({
     try {
       createGameWithDateAndTeamSlug(formData)
       setShowNewGameDialog(false)
-      toast({ title: "Team member added successfully" })
+      toast({ title: "New game created" })
     } catch (error) {
       console.error(error)
-      return "Could not create new team member. Please try again"
+      return "Could not create new game. Please try again"
     }
 
     return null
