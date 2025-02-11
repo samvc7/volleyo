@@ -17,7 +17,7 @@ export default async function GamesView({ params }: { params: Promise<{ slug: st
   }))
 
   const members = await prisma.person.findMany({
-    where: { team: { some: { Team: { slug } } } },
+    where: { team: { some: { Team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
     select: { id: true, firstName: true, lastName: true, nickName: true },
   })
 

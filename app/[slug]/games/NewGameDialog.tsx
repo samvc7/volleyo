@@ -33,7 +33,7 @@ export const NewGameDialog = ({
 }) => {
   const { slug } = useParams() as { slug: string }
 
-  const [showNewGamedialog, setShowNewGameDialog] = useState(false)
+  const [showDialog, setShowDialog] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date>()
 
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
@@ -46,7 +46,7 @@ export const NewGameDialog = ({
 
     try {
       createGameWithDateAndTeamSlug(formData)
-      setShowNewGameDialog(false)
+      setShowDialog(false)
       toast({ title: "New game created" })
     } catch (error) {
       console.error(error)
@@ -58,8 +58,8 @@ export const NewGameDialog = ({
 
   return (
     <Dialog
-      open={showNewGamedialog}
-      onOpenChange={setShowNewGameDialog}
+      open={showDialog}
+      onOpenChange={setShowDialog}
     >
       <DialogTrigger
         className="flex"
@@ -67,10 +67,10 @@ export const NewGameDialog = ({
       >
         <Button
           variant={"outline"}
-          aria-expanded={showNewGamedialog}
+          aria-expanded={showDialog}
           aria-label="Create Game"
           onClick={() => {
-            setShowNewGameDialog(true)
+            setShowDialog(true)
           }}
           className="ml-auto"
         >
@@ -129,7 +129,7 @@ export const NewGameDialog = ({
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowNewGameDialog(false)}
+              onClick={() => setShowDialog(false)}
             >
               Cancel
             </Button>
