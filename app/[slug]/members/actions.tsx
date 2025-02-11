@@ -31,6 +31,25 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
   revalidatePath("/[slug]/members", "page")
 }
 
+export const editMember = async (id: string, formData: FormData) => {
+  const nickName = formData.get("nickName") as string
+  const email = formData.get("email") as string | null
+
+  const data = {
+    email: email ? email : null,
+    firstName: formData.get("firstName") as string,
+    lastName: formData.get("lastName") as string,
+    ...(nickName ? { nickName } : {}),
+  } satisfies Prisma.PersonUpdateInput
+
+  await prisma.person.update({
+    data,
+    where: { id },
+  })
+
+  revalidatePath("/[slug]/members", "page")
+}
+
 export const removeMember = async (teamSlug: string, id: string) => {
   const teamId = await prisma.team.findUnique({
     where: { slug: teamSlug },

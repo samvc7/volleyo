@@ -1,15 +1,6 @@
 "use client"
 
-import { useActionState, useState, useTransition } from "react"
-import {
-  DialogHeader,
-  DialogFooter,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog"
+import { useState, useTransition } from "react"
 import { Input } from "@/components/ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table"
 import {
@@ -24,12 +15,11 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table"
-import { PlusCircle, MoreHorizontal, Loader2 } from "lucide-react"
+import { MoreHorizontal, Loader2 } from "lucide-react"
 import { getCommonPinningClasses } from "../../statistics/columns"
 import { Pagination } from "../../statistics/pagination"
 import { ViewOptions } from "../../statistics/viewOptions"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 
 import { ColumnHeader } from "../../statistics/columnHeader"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -42,9 +32,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Person } from "@prisma/client"
-import { createMember, removeMember } from "./actions"
+import { editMember, removeMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
+import { AddTeamMemberDialog, EditTeamMemberDialog } from "./dialogs"
 
 export const columns: ColumnDef<Person>[] = [
   {
@@ -95,7 +86,7 @@ export const columns: ColumnDef<Person>[] = [
   {
     id: "actions",
     cell: data => {
-      return <MemberActions memberId={data.row.original.id} />
+      return <MemberActions member={data.row.original} />
     },
   },
 ]
@@ -204,7 +195,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   )
 }
 
-const MemberActions = ({ memberId }: { memberId: string }) => {
+const MemberActions = ({ member }: { member: Person }) => {
   const { slug } = useParams() as { slug: string }
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
@@ -212,7 +203,7 @@ const MemberActions = ({ memberId }: { memberId: string }) => {
   const handleRemove = () => {
     startTransition(async () => {
       try {
-        await removeMember(slug, memberId)
+        await removeMember(slug, member.id)
         toast({ title: "Team member removed successfully" })
       } catch (error) {
         console.error(error)
@@ -244,122 +235,20 @@ const MemberActions = ({ memberId }: { memberId: string }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+        <EditTeamMemberDialog member={member}>
+          <DropdownMenuItem
+            onSelect={e => {
+              e.preventDefault()
+            }}
+          >
+            Edit
+          </DropdownMenuItem>
+        </EditTeamMemberDialog>
         <DropdownMenuItem onClick={handleRemove}>Remove</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled>View Player</DropdownMenuItem>
         <DropdownMenuItem disabled>View Statistics</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
-
-const AddTeamMemberDialog = () => {
-  const { slug } = useParams() as { slug: string }
-  const { toast } = useToast()
-  const [showNewMemberDialog, setShowNewMemberDialog] = useState(false)
-  const createMemberWithTeamSlug = createMember.bind(null, slug)
-  const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
-    try {
-      createMemberWithTeamSlug(formData)
-      setShowNewMemberDialog(false)
-      toast({ title: "Team member added successfully" })
-    } catch (error) {
-      console.error(error)
-      return "Could not create new team member. Please try again"
-    }
-
-    return null
-  }, null)
-
-  return (
-    <Dialog
-      open={showNewMemberDialog}
-      onOpenChange={setShowNewMemberDialog}
-    >
-      <DialogTrigger
-        className="flex"
-        asChild
-      >
-        <Button
-          className="h-8"
-          variant={"outline"}
-          size="sm"
-          aria-expanded={showNewMemberDialog}
-          aria-label="Create Team Member"
-          onClick={() => {
-            setShowNewMemberDialog(true)
-          }}
-        >
-          <PlusCircle className="h-5 w-5" />
-          Add Member
-        </Button>
-      </DialogTrigger>
-
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add Team Member</DialogTitle>
-          <DialogDescription>Add a team member for your team.</DialogDescription>
-        </DialogHeader>
-        <form action={formAction}>
-          <div className="space-y-4 py-2 pb-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="nickName">Nick Name</Label>
-              <Input
-                id="nickName"
-                name="nickName"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowNewMemberDialog(false)}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              disabled={isPending}
-              type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create"
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   )
 }
