@@ -17,14 +17,14 @@ export default async function Layout({
   const { slug } = await params
   const teams = await prisma.team.findMany()
   // TODO: not found team with slug
-  const selectedTeam = await prisma.team.findUnique({ where: { slug } })
+  const selectedTeam = (await prisma.team.findUnique({ where: { slug } })) ?? undefined
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <div className="flex gap-4">
         <TeamSwitcher
           teams={teams}
-          selectedTeam={selectedTeam ?? teams[0]}
+          selectedTeam={selectedTeam}
         />
         <NavigationMenu>
           <NavigationMenuList>

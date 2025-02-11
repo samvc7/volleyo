@@ -13,10 +13,7 @@ export default async function Home() {
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <TeamSwitcher
-        teams={teams}
-        selectedTeam={teams[0]}
-      />
+      <TeamSwitcher teams={teams} />
     </main>
   )
 }

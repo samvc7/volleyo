@@ -31,7 +31,7 @@ import { createTeam } from "./actions"
 
 type TeamSwitcherProps = {
   teams: Team[]
-  selectedTeam: Team
+  selectedTeam?: Team
   className?: string
 }
 
@@ -53,7 +53,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
   }, null)
 
   const teamList = parseTeams(teams)
-  const selectedTeamParsed = parseTeam(selectedTeam)
+  const selectedTeamParsed = selectedTeam ? parseTeam(selectedTeam) : undefined
 
   const handleSelectTeam = (team: Team) => {
     setOpen(false)
@@ -135,7 +135,11 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
           <div className="space-y-4 py-2 pb-4">
             <div className="space-y-2">
               <Label htmlFor="name">Team Name</Label>
-              <Input id="name" name="name" required/>
+              <Input
+                id="name"
+                name="name"
+                required
+              />
             </div>
           </div>
 
