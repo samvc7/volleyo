@@ -30,3 +30,18 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
 
   revalidatePath("/[slug]/members", "page")
 }
+
+export const removeMember = async (teamSlug: string, id: string) => {
+  const teamId = await prisma.team.findUnique({
+    where: { slug: teamSlug },
+    select: { id: true },
+  })
+  if (!teamId) throw new Error("Team not found")
+
+  await prisma.teamMembers.update({
+    data: { removedAt: new Date() },
+    where: { personId_teamId: { personId: id, teamId: teamId.id } },
+  })
+
+  revalidatePath("/[slug]/members", "page")
+}

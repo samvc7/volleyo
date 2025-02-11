@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useState } from "react"
+import { useActionState, useState, useTransition } from "react"
 import {
   DialogHeader,
   DialogFooter,
@@ -42,7 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Person } from "@prisma/client"
-import { createMember } from "./actions"
+import { createMember, removeMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
 
@@ -94,27 +94,8 @@ export const columns: ColumnDef<Person>[] = [
   },
   {
     id: "actions",
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View Player</DropdownMenuItem>
-            <DropdownMenuItem>View Statistics</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
+    cell: data => {
+      return <MemberActions memberId={data.row.original.id} />
     },
   },
 ]
@@ -223,12 +204,62 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   )
 }
 
+const MemberActions = ({ memberId }: { memberId: string }) => {
+  const { slug } = useParams() as { slug: string }
+  const { toast } = useToast()
+  const [isPending, startTransition] = useTransition()
+
+  const handleRemove = () => {
+    startTransition(async () => {
+      try {
+        await removeMember(slug, memberId)
+        toast({ title: "Team member removed successfully" })
+      } catch (error) {
+        console.error(error)
+        toast({ title: "Could not remove team member. Please try again" })
+      }
+    })
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="h-8 w-8 p-0"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <span className="sr-only">Loading</span>
+              <Loader2 className="animate-spin h-4 w-4" />
+            </>
+          ) : (
+            <>
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem disabled>Edit</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleRemove}>Remove</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem disabled>View Player</DropdownMenuItem>
+        <DropdownMenuItem disabled>View Statistics</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 const AddTeamMemberDialog = () => {
   const { slug } = useParams() as { slug: string }
   const { toast } = useToast()
   const [showNewMemberDialog, setShowNewMemberDialog] = useState(false)
   const createMemberWithTeamSlug = createMember.bind(null, slug)
-  const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+  const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     try {
       createMemberWithTeamSlug(formData)
       setShowNewMemberDialog(false)

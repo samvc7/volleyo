@@ -30,10 +30,11 @@ model Team {
 }
 
 model TeamMembers {
-  Person   Person @relation(fields: [personId], references: [id])
-  personId String
-  Team     Team   @relation(fields: [teamId], references: [id])
-  teamId   String
+  Person    Person    @relation(fields: [personId], references: [id])
+  personId  String
+  Team      Team      @relation(fields: [teamId], references: [id])
+  teamId    String
+  removedAt DateTime? @map("removed_at")
 
   @@id([personId, teamId])
 }
