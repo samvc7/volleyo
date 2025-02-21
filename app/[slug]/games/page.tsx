@@ -1,6 +1,8 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { NewGameDialog } from "./NewGameDialog"
 import { GameCard } from "./GameDayCard"
+import { Game, Person } from "@prisma/client"
+import { Separator } from "@/components/ui/separator"
 
 export default async function GamesView({
   params,
@@ -22,30 +24,77 @@ export default async function GamesView({
     orderBy: { date: "desc" },
   })
 
-  const formattedGames = games.map(game => ({
-    ...game,
-    participants: game.participants.map(p => p.Person),
-  }))
-
   const members = await prisma.person.findMany({
     where: { team: { some: { Team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
     select: { id: true, firstName: true, lastName: true, nickName: true },
   })
 
+  const today = new Date()
+  const [upcomingGames, pastGames] = games.reduce<
+    [GameWithFormattedParticipants[], GameWithFormattedParticipants[]]
+  >(
+    ([upcoming, past], game) => {
+      const formattedGame = {
+        ...game,
+        participants: game.participants.map(p => p.Person),
+      }
+
+      if (game.date >= today) {
+        upcoming.push(formattedGame)
+      } else {
+        past.push(formattedGame)
+      }
+
+      return [upcoming, past]
+    },
+    [[], []],
+  )
+
+  if (!games.length) {
+    return <h1>No Games yet.</h1>
+  }
+
   return (
     <NewGameDialog participants={members}>
-      <ul className="w-full flex flex-col gap-4 mt-4">
-        {formattedGames.map(game => (
-          <GameCard
-            id={game.id}
-            key={game.id}
-            title={game.title}
-            date={game.date}
-            description={game.description}
-            participants={game.participants}
-          />
-        ))}
-      </ul>
+      {upcomingGames.length ? (
+        <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
+          {upcomingGames.map(game => (
+            <GameCard
+              id={game.id}
+              key={game.id}
+              title={game.title}
+              date={game.date}
+              description={game.description}
+              participants={game.participants}
+            />
+          ))}
+        </ul>
+      ) : null}
+
+      <div className="flex items-center w-full gap-4">
+        <Separator allowShrink />
+        <span className="px-4 whitespace-nowrap text-muted-foreground text-sm">Past Games</span>
+        <Separator allowShrink />
+      </div>
+
+      {pastGames.length ? (
+        <ul className="w-full flex flex-col gap-4 mt-4">
+          {pastGames.map(game => (
+            <GameCard
+              id={game.id}
+              key={game.id}
+              title={game.title}
+              date={game.date}
+              description={game.description}
+              participants={game.participants}
+            />
+          ))}
+        </ul>
+      ) : null}
     </NewGameDialog>
   )
+}
+
+type GameWithFormattedParticipants = Omit<Game, "participants"> & {
+  participants: Pick<Person, "firstName" | "lastName" | "nickName">[]
 }
