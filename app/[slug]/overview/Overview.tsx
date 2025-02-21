@@ -4,8 +4,32 @@ import { LineChartScore } from "./LineChartScore"
 import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
 import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
+import { Game } from "@prisma/client"
+import { prisma } from "@/prisma/singlePrismaClient"
 
-export const Overview = () => {
+type OverviewProps = {
+  teamSlug: string
+  fromDateFilter: Date
+  toDateFilter: Date
+}
+
+export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
+  const games = await prisma.game.findMany({
+    include: {
+      participants: { select: { Person: { select: { firstName: true, lastName: true, nickName: true } } } },
+    },
+    where: {
+      Team: { slug: teamSlug },
+      score: { not: null, notIn: [""] },
+      ...(fromDateFilter && toDateFilter
+        ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } }
+        : {}),
+    },
+    orderBy: { date: "desc" },
+  })
+
+  const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(games)
+
   return (
     <>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
@@ -15,8 +39,10 @@ export const Overview = () => {
             <VolleyballIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Total Games: 25</div>
-            <p className="text-xs text-muted-foreground">Win Percentage: 72%, Wins: 18, Loses: 7</p>
+            <div className="text-2xl font-bold">Total Games: {totalGames}</div>
+            <p className="text-xs text-muted-foreground">
+              Win Percentage: {winPercentage}, Wins: {wins}, Loses: {loses}
+            </p>
           </CardContent>
         </Card>
 
@@ -65,4 +91,23 @@ export const Overview = () => {
       </div>
     </>
   )
+}
+
+const calculateGamesOverview = (games: Game[]) => {
+  let wins = 0
+  let loses = 0
+
+  games.forEach(game => {
+    if (!game.score) return
+
+    const [ourScore, enemyScore] = game.score.split("-").map(Number)
+    if (ourScore > enemyScore) {
+      wins++
+    } else {
+      loses++
+    }
+  })
+
+  const winPercentage = games.length > 0 ? Math.ceil((wins / games.length) * 10000) / 100 : 0
+  return { wins, loses, winPercentage: `${winPercentage}%`, totalGames: games.length }
 }
