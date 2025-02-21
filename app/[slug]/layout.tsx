@@ -1,15 +1,12 @@
 import { ReactNode } from "react"
-import Link from "next/link"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { DatePickerWithRange } from "../DateRangePicker"
 import { TeamSwitcher } from "../team-switcher/TeamSwitcher"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
+import { OverviewLink } from "./navigations/OverviewLink"
+import { GamesLink } from "./navigations/GamesLink"
+import { MembersLink } from "./navigations/MembersLink"
+
 export default async function Layout({
   params,
   children,
@@ -29,33 +26,15 @@ export default async function Layout({
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem className="space-x-1">
-              <Link
-                href={`/${slug}`}
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>Overview</NavigationMenuLink>
-              </Link>
+              <OverviewLink href={`/${slug}`} />
             </NavigationMenuItem>
 
             <NavigationMenuItem className="space-x-1">
-              <Link
-                href={`/${slug}/games`}
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>Games</NavigationMenuLink>
-              </Link>
+              <GamesLink href={`/${slug}/games`} />
             </NavigationMenuItem>
 
             <NavigationMenuItem className="space-x-1">
-              <Link
-                href={`/${slug}/members`}
-                legacyBehavior
-                passHref
-              >
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>Members</NavigationMenuLink>
-              </Link>
+              <MembersLink href={`/${slug}/members`} />
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>

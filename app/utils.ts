@@ -5,3 +5,4 @@ export const parsePersonName = (person: Pick<Person, "firstName" | "lastName" | 
 }
 
 export const DATE_FORMAT = "dd.MM.yy"
+export const DATE_ISO_FORMAT = "yyyy-MM-dd"

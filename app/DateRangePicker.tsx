@@ -1,24 +1,37 @@
 "use client"
 
-import * as React from "react"
+import React, { useEffect } from "react"
 import { format, subDays } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DATE_FORMAT } from "./utils"
+import { DATE_FORMAT, DATE_ISO_FORMAT } from "./utils"
+import { usePathname, useRouter } from "next/navigation"
 
 export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const shouldRender = !pathname.includes("members")
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: subDays(new Date(), 30),
     to: new Date(),
   })
 
-  const handleSelect = (value: string) => {
+  useEffect(() => {
+    if (date?.from && date?.to) {
+      const params = new URLSearchParams()
+      params.set("from", format(date.from, DATE_ISO_FORMAT))
+      params.set("to", format(date.to, DATE_ISO_FORMAT))
+
+      router.push(`${pathname}?${params.toString()}`)
+    }
+  }, [date])
+
+  const handleSelectPreset = (value: string) => {
     const date = new Date()
 
     switch (value) {
@@ -36,6 +49,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
     }
   }
 
+  if (!shouldRender) return null
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -63,7 +77,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
           className="flex flex-col space-y-2 w-auto p-2"
           align="start"
         >
-          <Select onValueChange={handleSelect}>
+          <Select onValueChange={handleSelectPreset}>
             <SelectTrigger>
               <SelectValue placeholder="Select" />
             </SelectTrigger>

@@ -1,13 +1,24 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { NewGameDialog } from "./NewGameDialog"
 import { GameCard } from "./GameDayCard"
-export default async function GamesView({ params }: { params: Promise<{ slug: string }> }) {
+
+export default async function GamesView({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const { slug } = await params
+  const { from, to } = await searchParams
+  const fromDate = new Date(from as string)
+  const toDate = new Date(to as string)
+
   const games = await prisma.game.findMany({
     include: {
       participants: { select: { Person: { select: { firstName: true, lastName: true, nickName: true } } } },
     },
-    where: { Team: { slug } },
+    where: { Team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
     orderBy: { date: "desc" },
   })
 
