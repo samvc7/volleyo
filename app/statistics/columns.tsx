@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Column, ColumnDef } from "@tanstack/react-table"
+import { Column, ColumnDef, createColumnHelper } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { ColumnHeader } from "./columnHeader"
 import { cn } from "@/lib/utils"
@@ -53,9 +53,19 @@ export type Statistics = {
   setsPlayed: number
 }
 
+// TODO: better type return value
+const replaceEmptyToDash = (fn: (row: Statistics) => any) => {
+  return (row: Statistics) => {
+    const value = fn ? fn(row) : row
+    return value === null || value === undefined || value === "" ? "-" : value
+  }
+}
+
+const columnHelper = createColumnHelper<Statistics>()
+
 // research: Need to use invertSorting because sortDescFirst is not working
 export const columns: ColumnDef<Statistics>[] = [
-  {
+  columnHelper.display({
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -75,425 +85,487 @@ export const columns: ColumnDef<Statistics>[] = [
     enableHiding: false,
     // Need to define for pinning or we cannot get the proper size of the column
     size: 32,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <ColumnHeader
-          className="w-32"
-          column={column}
-          title="# Name"
-          tooltip="Player number & name"
-        />
-      )
+  }),
+  columnHelper.accessor(
+    replaceEmptyToDash(row => row.name),
+    {
+      id: "name",
+      header: ({ column }) => {
+        return (
+          <ColumnHeader
+            className="w-32"
+            column={column}
+            title="# Name"
+            tooltip="Player number & name"
+          />
+        )
+      },
     },
-  },
-  {
+  ),
+  columnHelper.group({
     header: "ATTACK",
     columns: [
-      {
-        accessorKey: "kills",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="K"
-            tooltip="Kills - Number of attacks which led to a point"
-          />
-        ),
-        invertSorting: true,
-      },
-      {
-        accessorKey: "attack_errors",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="AE"
-            tooltip="Errors - Number of attacks that ended in the other team winning the point (Out, net or blocked)"
-          />
-        ),
-        accessorFn: row => row.attackErrors,
-      },
-      {
-        accessorKey: "attack_attempts",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="TA"
-            tooltip="Total Attempts - Total attacks"
-          />
-        ),
-        invertSorting: true,
-        accessorFn: row => row.attackAttempts,
-      },
-      {
-        accessorKey: "attack_efficiency",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="Eff"
-            tooltip="Attack Efficiency - (Kills - Errors) / Total Attempts"
-          />
-        ),
-        invertSorting: true,
-        accessorFn: row => {
-          if (row.attackEfficiency) return row.attackEfficiency
-
-          const efficiency = (row.kills - row.attackErrors) / row.attackAttempts
-          return round2DecimalPlaces(efficiency, 2)
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.kills),
+        {
+          id: "kills",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="K"
+              tooltip="Kills - Number of attacks which led to a point"
+            />
+          ),
+          invertSorting: true,
         },
-      },
-      {
-        accessorKey: "kills_per_set",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="K/S"
-            tooltip="Kills per set"
-          />
-        ),
-        invertSorting: true,
-        accessorFn: row => {
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.attackErrors),
+        {
+          id: "attack_errors",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="AE"
+              tooltip="Errors - Number of attacks that ended in the other team winning the point (Out, net or blocked)"
+            />
+          ),
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.attackAttempts),
+        {
+          id: "attack_attempts",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="TA"
+              tooltip="Total Attempts - Total attacks"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
+          if (row.attackEfficiency) return row.attackEfficiency
+          const efficiency = (row.kills - row.attackErrors) / row.attackAttempts
+          const rounded = round2DecimalPlaces(efficiency, 2)
+          if (isNaN(rounded)) return row.attackEfficiency
+          return rounded
+        }),
+        {
+          id: "attack_efficiency",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="Eff"
+              tooltip="Attack Efficiency - (Kills - Errors) / Total Attempts"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.killsPerSet) return row.killsPerSet
 
           const killsPerSet = row.kills / row.setsPlayed
           return round2DecimalPlaces(killsPerSet, 2)
+        }),
+        {
+          id: "kills_per_set",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="K/S"
+              tooltip="Kills per set"
+            />
+          ),
+          invertSorting: true,
         },
-      },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "SERVE",
     columns: [
-      {
-        accessorKey: "serve_aces",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="SA"
-            tooltip="Serve Aces - Number of serves that led to a point"
-          />
-        ),
-        accessorFn: row => row.serveAces,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "serve_errors",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="SE"
-            tooltip="Serve Errors - Number of serves that went out or to the net"
-          />
-        ),
-        accessorFn: row => row.serveErrors,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "serve_attempts",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="TA"
-            tooltip="Total Attempts - Total serves"
-          />
-        ),
-        accessorFn: row => {
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.serveAces),
+        {
+          id: "serve_aces",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="SA"
+              tooltip="Serve Aces - Number of serves that led to a point"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.serveErrors),
+        {
+          id: "serve_errors",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="SE"
+              tooltip="Serve Errors - Number of serves that went out or to the net"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.serveAttempts) return row.serveAttempts
           return row.serveAces + row.serveErrors
+        }),
+        {
+          id: "serve_attempts",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="TA"
+              tooltip="Total Attempts - Total serves"
+            />
+          ),
+          invertSorting: true,
         },
-        invertSorting: true,
-      },
-      {
-        accessorKey: "serve_percentage",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="SP"
-            tooltip="Percentage - % of serves that are not errors"
-          />
-        ),
-        accessorFn: row => {
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.servePercentage) return row.servePercentage
 
           const percentageRaw = (row.serveAttempts - row.serveErrors) / row.serveAttempts
+          if (isNaN(percentageRaw)) return row.servePercentage
           return toPercentage(percentageRaw)
+        }),
+        {
+          id: "serve_percentage",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="SP"
+              tooltip="Percentage - % of serves that are not errors"
+            />
+          ),
+          invertSorting: true,
         },
-        invertSorting: true,
-      },
-      {
-        accessorKey: "serve_efficiency",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="Eff"
-            tooltip="Serve Efficiency - (Aces - Errors) / Total Attempts"
-          />
-        ),
-        accessorFn: row => {
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.serveEfficiency) return row.serveEfficiency
-
           const efficiency = (row.serveAces - row.serveErrors) / row.serveAttempts
+          if (isNaN(efficiency)) return row.serveEfficiency
           return round2DecimalPlaces(efficiency, 2)
+        }),
+        {
+          id: "serve_efficiency",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="Eff"
+              tooltip="Serve Efficiency - (Aces - Errors) / Total Attempts"
+            />
+          ),
+          invertSorting: true,
         },
-        invertSorting: true,
-      },
-      {
-        accessorKey: "serve_rating",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="Rating"
-            tooltip={
-              <>
-                <p>
-                  Lower is better. Serve Rating reflects the avarage pass rating that a server forces on the
-                  opponent.
-                </p>
-                <br />
-                <p>
-                  Serve Rating Breakdown: <br />
-                  0: Ace (opponent couldn't pass, pass rating 0). <br />
-                  1: Opponent passed a 1 (bad pass). <br />
-                  2: Opponent passed a 2 (ok pass). <br />
-                  3: Server error or Opponent passed a 3 (perfect pass).
-                </p>
-              </>
-            }
-          />
-        ),
-        accessorFn: row => row.serveRating,
-      },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.serveRating),
+        {
+          id: "serve_rating",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="Rating"
+              tooltip={
+                <>
+                  <p>
+                    Lower is better. Serve Rating reflects the avarage pass rating that a server forces on the
+                    opponent.
+                  </p>
+                  <br />
+                  <p>
+                    Serve Rating Breakdown: <br />
+                    0: Ace (opponent couldn't pass, pass rating 0). <br />
+                    1: Opponent passed a 1 (bad pass). <br />
+                    2: Opponent passed a 2 (ok pass). <br />
+                    3: Server error or Opponent passed a 3 (perfect pass).
+                  </p>
+                </>
+              }
+            />
+          ),
+        },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "SERVE RECEIVE",
     columns: [
-      {
-        accessorKey: "receive_perfect",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="3"
-            tooltip="Number of receptions that were rated at 3 (perfect)"
-          />
-        ),
-        accessorFn: row => row.receivePerfect,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "receive_positive",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="2"
-            tooltip="Number of receptions that were rated at 2 (ok)"
-          />
-        ),
-        accessorFn: row => row.receivePositive,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "receive_negative",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="1"
-            tooltip="Number of receptions that were rated at 1 (bad)"
-          />
-        ),
-        accessorFn: row => row.receiveNegative,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "receive_error",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="0"
-            tooltip="Number of receptions that were rated at 0 (error)"
-          />
-        ),
-        accessorFn: row => row.receiveError,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "receive_attempts",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="TA"
-            tooltip="Total Attempts - Total receptions"
-          />
-        ),
-        accessorFn: row => row.receiveAttempts,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "receive_percentage",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="Pass%"
-            tooltip="Average pass rating"
-          />
-        ),
-        accessorFn: row => {
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.receivePerfect),
+        {
+          id: "receive_perfect",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="3"
+              tooltip="Number of receptions that were rated at 3 (perfect)"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.receivePositive),
+        {
+          id: "receive_positive",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="2"
+              tooltip="Number of receptions that were rated at 2 (ok)"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.receiveNegative),
+        {
+          id: "receive_negative",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="1"
+              tooltip="Number of receptions that were rated at 1 (bad)"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.receiveError),
+        {
+          id: "receive_error",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="0"
+              tooltip="Number of receptions that were rated at 0 (error)"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.receiveAttempts),
+        {
+          id: "receive_attempts",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="TA"
+              tooltip="Total Attempts - Total receptions"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.receivePercentage) return row.receivePercentage
 
           const percentageRaw =
             (row.receivePerfect * 3 + row.receivePositive * 2 + row.receiveNegative) / row.receiveAttempts
+          if (isNaN(percentageRaw)) return row.receivePercentage
           return round2DecimalPlaces(percentageRaw, 2)
+        }),
+        {
+          id: "receive_percentage",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="Pass%"
+              tooltip="Average pass rating"
+            />
+          ),
+          invertSorting: true,
         },
-        invertSorting: true,
-      },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "SET",
     columns: [
-      {
-        accessorKey: "set_assists",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="Ast"
-            tooltip="Assists - Number of sets that led to a point"
-          />
-        ),
-        accessorFn: row => row.setAssists,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "sets_total",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="TA"
-            tooltip="Total Attempts - Total sets"
-          />
-        ),
-        accessorFn: row => row.setsTotal,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "set_errors",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="E"
-            tooltip="Set Errors - Number of sets that were called by the referee as a ball handling error."
-          />
-        ),
-        accessorFn: row => row.setErrors,
-        invertSorting: true,
-      },
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.setAssists),
+        {
+          id: "set_assists",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="Ast"
+              tooltip="Assists - Number of sets that led to a point"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.setsTotal),
+        {
+          id: "sets_total",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="TA"
+              tooltip="Total Attempts - Total sets"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.setErrors),
+        {
+          id: "set_errors",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="E"
+              tooltip="Set Errors - Number of sets that were called by the referee as a ball handling error."
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "DIG",
     columns: [
-      {
-        accessorKey: "digs",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="DS"
-            tooltip="Number of successful digs (continued play)"
-          />
-        ),
-        invertSorting: true,
-      },
-      {
-        accessorKey: "dig_errors",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="DE"
-            tooltip="Number of digs that resulted in a point for the other team"
-          />
-        ),
-        accessorFn: row => row.digErrors,
-        invertSorting: true,
-      },
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.digs),
+        {
+          id: "digs",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="DS"
+              tooltip="Number of successful digs (continued play)"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.digErrors),
+        {
+          id: "dig_errors",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="DE"
+              tooltip="Number of digs that resulted in a point for the other team"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "BLOCK",
     columns: [
-      {
-        accessorKey: "block_single",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="BS"
-            tooltip="Number of blocks resulting in a point when the player is the only blocker"
-          />
-        ),
-        accessorFn: row => row.blockSingle,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "block_multiple",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="BM"
-            tooltip="Number of blocks resulting in a point when the player is one of multiple blockers"
-          />
-        ),
-        accessorFn: row => row.blockMultiple,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "block_errors",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="BE"
-            tooltip="Number of blocks where the player was called for a net violation."
-          />
-        ),
-        accessorFn: row => row.blockErrors,
-        invertSorting: true,
-      },
-      {
-        accessorKey: "blocks_per_set",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="B/S"
-            tooltip="Blocks per set"
-          />
-        ),
-        accessorFn: row => {
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.blockSingle),
+        {
+          id: "block_single",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="BS"
+              tooltip="Number of blocks resulting in a point when the player is the only blocker"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.blockMultiple),
+        {
+          id: "block_multiple",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="BM"
+              tooltip="Number of blocks resulting in a point when the player is one of multiple blockers"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.blockErrors),
+        {
+          id: "block_errors",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="BE"
+              tooltip="Number of blocks where the player was called for a net violation."
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
+      columnHelper.accessor(
+        replaceEmptyToDash(row => {
           if (row.blocksPerSet) return row.blocksPerSet
 
           const blocksPerSet = (row.blockSingle + row.blockMultiple) / row.setsPlayed
           return round2DecimalPlaces(blocksPerSet, 2)
+        }),
+        {
+          id: "blocks_per_set",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="B/S"
+              tooltip="Blocks per set"
+            />
+          ),
+          invertSorting: true,
         },
-        invertSorting: true,
-      },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.group({
     header: "GENERAL",
     columns: [
-      {
-        accessorKey: "sets_played",
-        header: ({ column }) => (
-          <ColumnHeader
-            column={column}
-            title="SP"
-            tooltip="Number of sets played"
-          />
-        ),
-        accessorFn: row => row.setsPlayed,
-        invertSorting: true,
-      },
+      columnHelper.accessor(
+        replaceEmptyToDash(row => row.setsPlayed),
+        {
+          id: "sets_played",
+          header: ({ column }) => (
+            <ColumnHeader
+              column={column}
+              title="SP"
+              tooltip="Number of sets played"
+            />
+          ),
+          invertSorting: true,
+        },
+      ),
     ],
-  },
-  {
+  }),
+  columnHelper.display({
     id: "actions",
     cell: () => {
       return (
@@ -518,7 +590,7 @@ export const columns: ColumnDef<Statistics>[] = [
         </DropdownMenu>
       )
     },
-  },
+  }),
 ]
 
 const round2DecimalPlaces = (num: number, decimalPlaces: number) => {

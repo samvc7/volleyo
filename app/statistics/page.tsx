@@ -9,7 +9,7 @@ export default async function StatisticsPage() {
       <h1 className="text-3xl font-bold">Statistics</h1>
       <DataTable
         columns={columns}
-        data={data}
+        initialData={data}
       />
     </main>
   )
