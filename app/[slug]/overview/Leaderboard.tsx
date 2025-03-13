@@ -17,7 +17,8 @@ import {
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { ColumnHeader } from "../../statistics/columnHeader"
-import { getCommonPinningClasses, Statistics } from "../../statistics/columns"
+import { Statistics } from "@/app/statistics/columns"
+import { getCommonPinningClasses } from "@/app/statistics/columns/utils"
 import { ViewOptions } from "../../statistics/viewOptions"
 import {
   DropdownMenu,

@@ -1,5 +1,6 @@
 import { DataTable } from "@/app/statistics/data-table"
-import { columns, Statistics } from "@/app/statistics/columns"
+import { Statistics } from "./columns"
+import { columns } from "./columns"
 
 export default async function StatisticsPage() {
   const data = await getData()

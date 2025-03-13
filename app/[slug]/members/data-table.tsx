@@ -16,7 +16,7 @@ import {
   flexRender,
 } from "@tanstack/react-table"
 import { MoreHorizontal, Loader2 } from "lucide-react"
-import { getCommonPinningClasses } from "../../statistics/columns"
+import { getCommonPinningClasses } from "@/app/statistics/columns/utils"
 import { Pagination } from "../../statistics/pagination"
 import { ViewOptions } from "../../statistics/viewOptions"
 import { Button } from "@/components/ui/button"

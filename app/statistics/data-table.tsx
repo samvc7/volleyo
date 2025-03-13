@@ -12,15 +12,16 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
+  ColumnDef,
 } from "@tanstack/react-table"
 import { useState } from "react"
 import { Pagination } from "./pagination"
 import { ViewOptions } from "./viewOptions"
-import { getCommonPinningClasses } from "./columns"
+import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
 
 interface DataTableProps<TData, TValue> {
-  columns: any
+  columns: ColumnDef<TData, TValue>[]
   initialData: TData[]
 }
 
@@ -30,6 +31,7 @@ export function DataTable<TData, TValue>({ columns, initialData }: DataTableProp
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<TData[]>(initialData)
+  const [editingCell, setEditingCell] = useState<{ rowId: string; columnId: string }>()
 
   const table = useReactTable({
     data,
@@ -50,6 +52,10 @@ export function DataTable<TData, TValue>({ columns, initialData }: DataTableProp
       columnPinning: {
         left: ["select", "name"],
       },
+    },
+    meta: {
+      editingCell,
+      setEditingCell,
     },
   })
 
