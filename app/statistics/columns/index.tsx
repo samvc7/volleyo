@@ -24,8 +24,9 @@ export const columns: ColumnDef<Statistics>[] = [
   blockGroupColumn,
   generalGroupColumn,
   actionsColumn,
-] // Maybe use Zod schema here later
+]
 
+// Maybe use Zod schema here later
 export type Statistics = {
   id: string
   name: string

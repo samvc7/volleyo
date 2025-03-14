@@ -1,13 +1,14 @@
-import { ChangeEvent, FormEvent, useState } from "react"
+"use client"
 
+import { ChangeEvent, FormEvent, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-type UploadStatisticsProps<TData> = {
-  onDataChange: (data: TData[]) => void
+export type UploadStatisticsProps<TData> = {
+  onUploadData(data: TData[]): void
 }
 
-export const UploadStatisticsInput = <TData,>({ onDataChange }: UploadStatisticsProps<TData>) => {
+export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatisticsProps<TData>) => {
   const [file, setFile] = useState<File>()
 
   const fileReader = new FileReader()
@@ -40,7 +41,7 @@ export const UploadStatisticsInput = <TData,>({ onDataChange }: UploadStatistics
           })
 
           const parsedData = parseDataForTable<TData>(data)
-          onDataChange(parsedData)
+          onUploadData(parsedData)
         }
       }
 

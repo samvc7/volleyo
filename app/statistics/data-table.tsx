@@ -13,6 +13,7 @@ import {
   useReactTable,
   VisibilityState,
   ColumnDef,
+  RowData,
 } from "@tanstack/react-table"
 import { useState } from "react"
 import { Pagination } from "./pagination"
@@ -20,18 +21,41 @@ import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
 
+type EditingCell = {
+  rowId: string
+  columnId: string
+}
+
+declare module "@tanstack/react-table" {
+  interface TableMeta<TData extends RowData> {
+    editingCell?: EditingCell
+    setEditingCell?: ({ rowId, columnId }: EditingCell | undefined) => void
+    updateCell?: (rowId: string, columnId: string, value: string) => void
+  }
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   initialData: TData[]
 }
 
-export function DataTable<TData, TValue>({ columns, initialData }: DataTableProps<TData, TValue>) {
+export function DataTable<TData extends { id: string }, TValue>({
+  columns,
+  initialData,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<TData[]>(initialData)
   const [editingCell, setEditingCell] = useState<{ rowId: string; columnId: string }>()
+
+  const updateCell = (rowId: string, columnId: string, value: string) => {
+    setData(prevData => {
+      const newData = prevData.map(row => (row.id === rowId ? { ...row, [columnId]: value } : row))
+      return newData
+    })
+  }
 
   const table = useReactTable({
     data,
@@ -55,9 +79,14 @@ export function DataTable<TData, TValue>({ columns, initialData }: DataTableProp
     },
     meta: {
       editingCell,
-      setEditingCell,
+      setEditingCell: editingCell => setEditingCell(editingCell),
+      updateCell,
     },
   })
+
+  const handleUploadData = (data: TData[]) => {
+    setData(data)
+  }
 
   return (
     <>
@@ -69,7 +98,7 @@ export function DataTable<TData, TValue>({ columns, initialData }: DataTableProp
           className="max-w-sm"
         />
         <div className="flex gap-2 ml-auto">
-          <UploadStatisticsInput onDataChange={setData} />
+          <UploadStatisticsInput onUploadData={handleUploadData} />
           <ViewOptions table={table} />
         </div>
       </div>

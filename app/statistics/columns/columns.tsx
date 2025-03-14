@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { CellContext } from "@tanstack/react-table"
+import { Statistics } from "./"
 
 export const selectActionColumn = columnHelper.display({
   id: "select",
@@ -548,4 +551,54 @@ export const actionsColumn = columnHelper.display({
       </DropdownMenu>
     )
   },
+})
+
+const editableCell = ({ row, column, table, getValue }: CellContext<Statistics, any>) => {
+  const { editingCell, setEditingCell, updateCell } = table.options.meta || {}
+  const isEditingCurrentCell = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id
+
+  return isEditingCurrentCell ? (
+    <Input
+      autoFocus
+      defaultValue={getValue()}
+      onBlur={e => {
+        updateCell?.(row.original.id, column.id, e.target.value)
+        setEditingCell?.(undefined)
+      }}
+      onKeyDown={e => {
+        if (e.key === "Enter") {
+          updateCell?.(row.original.id, column.id, e.currentTarget.value)
+          setEditingCell?.(undefined)
+        }
+        if (e.key === "Escape") {
+          setEditingCell?.(undefined)
+        }
+      }}
+      className="max-w-sm"
+    />
+  ) : (
+    <span onClick={() => setEditingCell?.({ rowId: row.original.id, columnId: column.id })}>
+      {getValue()}
+    </span>
+  )
+}
+
+const dataColumns = [
+  nameColumn,
+  attackGroupColum,
+  serveGroupColumn,
+  receiveGroupColumn,
+  setsGroupColumn,
+  digGroupColumn,
+  blockGroupColumn,
+  generalGroupColumn,
+]
+
+dataColumns.forEach(column => {
+  if ("columns" in column && column.columns) {
+    column.columns.forEach(columnAccessor => {
+      columnAccessor.cell = (props: Parameters<typeof editableCell>[0]) => editableCell(props)
+    })
+  }
+  column.cell = (props: Parameters<typeof editableCell>[0]) => editableCell(props)
 })
