@@ -16,10 +16,10 @@ import {
 } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
-import { ColumnHeader } from "../../statistics/columnHeader"
-import { Statistics } from "@/app/statistics/columns"
-import { getCommonPinningClasses } from "@/app/statistics/columns/utils"
-import { ViewOptions } from "../../statistics/viewOptions"
+import { ColumnHeader } from "../../statistics/[slug]/columnHeader"
+import { Statistics } from "@/app/statistics/[slug]/columns"
+import { getCommonPinningClasses } from "@/app/statistics/[slug]/columns/utils"
+import { ViewOptions } from "../../statistics/[slug]/viewOptions"
 import {
   DropdownMenu,
   DropdownMenuContent,

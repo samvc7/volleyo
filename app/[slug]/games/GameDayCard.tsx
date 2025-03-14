@@ -11,12 +11,11 @@ type GameDayCardProps = {
   participants?: Pick<Person, "firstName" | "lastName" | "nickName">[]
 }
 
-export const GameCard = ({ id, title, date, description, participants }: GameDayCardProps) => {
+export const GameCard = ({ title, date, description, participants }: GameDayCardProps) => {
   return (
     <li>
       <Link
-        // TODO: add id as slug
-        href="/statistics"
+        href={`/statistics/${title.toLocaleLowerCase().replace(" ", "-")}`}
         legacyBehavior
         passHref
       >

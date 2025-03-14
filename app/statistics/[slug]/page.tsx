@@ -1,8 +1,9 @@
-import { DataTable } from "@/app/statistics/data-table"
+import { DataTable } from "@/app/statistics/[slug]/data-table"
 import { Statistics } from "./columns"
 import { columns } from "./columns"
 
-export default async function StatisticsPage() {
+export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const title = (await params).slug.replace("-", " ")
   const data = await getData()
 
   return (
