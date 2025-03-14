@@ -16,10 +16,8 @@ async function main() {
 
   const personRecords = []
   for (const person of persons) {
-    const record = await prisma.person.upsert({
-      where: { email: person.email },
-      update: {},
-      create: person,
+    const record = await prisma.person.create({
+      data: person,
     })
     personRecords.push(record)
   }
@@ -36,10 +34,10 @@ async function main() {
   })
 
   const games = [
-    { title: "Game 1", description: "Season Opener", date: new Date(2024, 0, 11) },
-    { title: "Game 2", description: "Tough Opponent", date: new Date(2024, 0, 12) },
-    { title: "Game 3", description: "Mid-season Battle", date: new Date(2024, 0, 13) },
-    { title: "Game 4", description: "Final Showdown", date: new Date(2024, 0, 14) },
+    { title: "Game 1", slug: "game-1", description: "Season Opener", date: new Date(2024, 0, 11) },
+    { title: "Game 2", slug: "game-2", description: "Tough Opponent", date: new Date(2024, 0, 12) },
+    { title: "Game 3", slug: "game-3", description: "Mid-season Battle", date: new Date(2024, 0, 13) },
+    { title: "Game 4", slug: "game-4", description: "Final Showdown", date: new Date(2024, 0, 14) },
   ]
 
   const sortedPlayers = [...personRecords].sort((a, b) => a.lastName.localeCompare(b.lastName))

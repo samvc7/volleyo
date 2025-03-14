@@ -59,14 +59,7 @@ export default async function GamesView({
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (
-            <GameCard
-              id={game.id}
-              key={game.id}
-              title={game.title}
-              date={game.date}
-              description={game.description}
-              participants={game.participants}
-            />
+            <GameCard game={game} />
           ))}
         </ul>
       ) : null}
@@ -80,14 +73,7 @@ export default async function GamesView({
       {pastGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4">
           {pastGames.map(game => (
-            <GameCard
-              id={game.id}
-              key={game.id}
-              title={game.title}
-              date={game.date}
-              description={game.description}
-              participants={game.participants}
-            />
+            <GameCard game={game} />
           ))}
         </ul>
       ) : null}
@@ -95,6 +81,6 @@ export default async function GamesView({
   )
 }
 
-type GameWithFormattedParticipants = Omit<Game, "participants"> & {
+export type GameWithFormattedParticipants = Omit<Game, "participants"> & {
   participants: Pick<Person, "firstName" | "lastName" | "nickName">[]
 }

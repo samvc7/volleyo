@@ -41,6 +41,7 @@ model TeamMembers {
 
 model Game {
   id           String             @id @default(cuid())
+  slug         String             @unique
   title        String
   score        String?
   description  String?

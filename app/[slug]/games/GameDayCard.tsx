@@ -1,21 +1,17 @@
 import Link from "next/link"
-import { Person } from "@prisma/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { parsePersonName } from "@/app/utils"
+import { GameWithFormattedParticipants } from "./page"
 
 type GameDayCardProps = {
-  id: string
-  title: string
-  date: Date
-  description?: string | null
-  participants?: Pick<Person, "firstName" | "lastName" | "nickName">[]
+  game: GameWithFormattedParticipants
 }
 
-export const GameCard = ({ title, date, description, participants }: GameDayCardProps) => {
+export const GameCard = ({ game: { title, slug, date, description, participants } }: GameDayCardProps) => {
   return (
     <li>
       <Link
-        href={`/statistics/${title.toLocaleLowerCase().replace(" ", "-")}`}
+        href={`/statistics/${slug}`}
         legacyBehavior
         passHref
       >

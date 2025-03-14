@@ -2,6 +2,7 @@
 
 import { prisma } from "@/prisma/singlePrismaClient"
 import { revalidatePath } from "next/cache"
+import slugify from "slugify"
 
 export const createGame = async (teamSlug: string, date: Date, formData: FormData) => {
   const title = formData.get("title") as string
@@ -16,6 +17,7 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
   await prisma.game.create({
     data: {
       title,
+      slug: slugify(title, { lower: true, strict: true }),
       description,
       date,
       ...(participants.length

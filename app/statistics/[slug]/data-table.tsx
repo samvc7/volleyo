@@ -36,12 +36,12 @@ declare module "@tanstack/react-table" {
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  initialData: TData[]
+  initialData?: TData[]
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
   columns,
-  initialData,
+  initialData = [],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
