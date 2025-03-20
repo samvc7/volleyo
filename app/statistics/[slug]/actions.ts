@@ -5,13 +5,13 @@ import { revalidatePath } from "next/cache"
 import { Statistics } from "./columns"
 import { Prisma } from "@prisma/client"
 
-export const createNewStatistics = async (data: Statistics[], gameId: string) => {
+export const saveStatistics = async (data: Statistics[], gameId: string) => {
   await Promise.all(
     data
       .filter(statistic => !statistic.name.includes("total"))
       .map(async statistic => {
         return prisma.$transaction(async tx => {
-          const persons = await findPersons(statistic.name)
+          const personId = await getPersonId(statistic)
 
           const { id, name, ...statisticPrismaPayload } = statistic
 
@@ -20,7 +20,7 @@ export const createNewStatistics = async (data: Statistics[], gameId: string) =>
             update: statisticPrismaPayload,
             create: {
               ...statisticPrismaPayload,
-              personId: persons[0].id,
+              personId,
               gameId,
             },
           })
@@ -31,8 +31,10 @@ export const createNewStatistics = async (data: Statistics[], gameId: string) =>
   revalidatePath("/statistics/[slug]", "page")
 }
 
-const findPersons = async (name: string) => {
-  const names = name.split(" ")
+const getPersonId = async (statistic: Statistics) => {
+  if (statistic.personId) return statistic.personId
+
+  const names = statistic.name.split(" ")
 
   const firstNamesQuery = names.slice(0, names.length - 1).map(name => {
     return { firstName: { contains: name } } as Prisma.PersonWhereInput
@@ -50,5 +52,5 @@ const findPersons = async (name: string) => {
     throw new Error(`Multiple persons found: ${name}`)
   }
 
-  return persons
+  return persons[0].id
 }

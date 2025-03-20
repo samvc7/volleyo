@@ -62,4 +62,7 @@ export type Statistics = {
   blockErrors?: number
   blocksPerSet?: number
   setsPlayed?: number
+  //
+  personId?: string
+  gameId?: string
 }

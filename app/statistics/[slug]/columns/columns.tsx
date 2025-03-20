@@ -573,7 +573,6 @@ export const actionsColumn = columnHelper.display({
 })
 
 const editableCell = ({ row, column, table, getValue }: CellContext<Statistics, any>) => {
-  console.log("🚀 ~ editableCell ~ column:", column, row)
   const { editingCell, setEditingCell, updateCell } = table.options.meta || {}
   const isEditingCurrentCell = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id
 

@@ -22,7 +22,7 @@ import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { createNewStatistics } from "./actions"
+import { saveStatistics } from "./actions"
 import { Statistics } from "./columns"
 
 type EditingCell = {
@@ -101,7 +101,7 @@ export function DataTable<TData extends Statistics, TValue>({
   }
 
   const handleSave = () => {
-    createNewStatistics(data, gameId)
+    saveStatistics(data, gameId)
     setHasUnsavedChanges(false)
   }
 

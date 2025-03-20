@@ -22,10 +22,13 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     return <h1>Game not found</h1>
   }
 
-  const statistics = game?.statistics.map(statistic => ({
-    ...statistic,
-    name: `${statistic.Person.firstName} ${statistic.Person.lastName}`,
-  })) as Statistics[]
+  const statistics = game?.statistics.map(statistic => {
+    const { Person, ...statisticData } = statistic
+    return {
+      ...statisticData,
+      name: `${statistic.Person.firstName} ${statistic.Person.lastName}`,
+    }
+  }) as Statistics[]
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
