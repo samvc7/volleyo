@@ -79,7 +79,7 @@ export const attackGroupColum = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.attackErrors),
       {
-        id: "attack_errors",
+        id: "attackErrors",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -92,7 +92,7 @@ export const attackGroupColum = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.attackAttempts),
       {
-        id: "attack_attempts",
+        id: "attackAttempts",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -119,7 +119,7 @@ export const attackGroupColum = columnHelper.group({
         return rounded
       }),
       {
-        id: "attack_efficiency",
+        id: "attackEfficiency",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -138,7 +138,7 @@ export const attackGroupColum = columnHelper.group({
         return round2DecimalPlaces(killsPerSet, 2)
       }),
       {
-        id: "kills_per_set",
+        id: "killsPerSet",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -158,7 +158,7 @@ export const serveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.serveAces),
       {
-        id: "serve_aces",
+        id: "serveAces",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -172,7 +172,7 @@ export const serveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.serveErrors),
       {
-        id: "serve_errors",
+        id: "serveErrors",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -189,7 +189,7 @@ export const serveGroupColumn = columnHelper.group({
         return row.serveAces + row.serveErrors
       }),
       {
-        id: "serve_attempts",
+        id: "serveAttempts",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -209,7 +209,7 @@ export const serveGroupColumn = columnHelper.group({
         return toPercentage(percentageRaw)
       }),
       {
-        id: "serve_percentage",
+        id: "servePercentage",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -229,7 +229,7 @@ export const serveGroupColumn = columnHelper.group({
         return round2DecimalPlaces(efficiency, 2)
       }),
       {
-        id: "serve_efficiency",
+        id: "serveEfficiency",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -243,7 +243,7 @@ export const serveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.serveRating),
       {
-        id: "serve_rating",
+        id: "serveRating",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -277,7 +277,7 @@ export const receiveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.receivePerfect),
       {
-        id: "receive_perfect",
+        id: "receivePerfect",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -291,7 +291,7 @@ export const receiveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.receivePositive),
       {
-        id: "receive_positive",
+        id: "receivePositive",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -305,7 +305,7 @@ export const receiveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.receiveNegative),
       {
-        id: "receive_negative",
+        id: "receiveNegative",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -319,7 +319,7 @@ export const receiveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.receiveError),
       {
-        id: "receive_error",
+        id: "receiveError",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -333,7 +333,7 @@ export const receiveGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.receiveAttempts),
       {
-        id: "receive_attempts",
+        id: "receiveAttempts",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -361,7 +361,7 @@ export const receiveGroupColumn = columnHelper.group({
         return round2DecimalPlaces(percentageRaw, 2)
       }),
       {
-        id: "receive_percentage",
+        id: "receivePercentage",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -381,7 +381,7 @@ export const setsGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.setAssists),
       {
-        id: "set_assists",
+        id: "setAssists",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -395,7 +395,7 @@ export const setsGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.setsTotal),
       {
-        id: "sets_total",
+        id: "setsTotal",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -409,7 +409,7 @@ export const setsGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.setErrors),
       {
-        id: "set_errors",
+        id: "setErrors",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -443,7 +443,7 @@ export const digGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.digErrors),
       {
-        id: "dig_errors",
+        id: "digErrors",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -463,7 +463,7 @@ export const blockGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.blockSingle),
       {
-        id: "block_single",
+        id: "blockSingle",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -477,7 +477,7 @@ export const blockGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.blockMultiple),
       {
-        id: "block_multiple",
+        id: "blockMultiple",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -491,7 +491,7 @@ export const blockGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.blockErrors),
       {
-        id: "block_errors",
+        id: "blockErrors",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -511,7 +511,7 @@ export const blockGroupColumn = columnHelper.group({
         return round2DecimalPlaces(blocksPerSet, 2)
       }),
       {
-        id: "blocks_per_set",
+        id: "blocksPerSet",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -531,7 +531,7 @@ export const generalGroupColumn = columnHelper.group({
     columnHelper.accessor(
       replaceEmptyToDash(row => row.setsPlayed),
       {
-        id: "sets_played",
+        id: "setsPlayed",
         header: ({ column }) => (
           <ColumnHeader
             column={column}
@@ -573,6 +573,7 @@ export const actionsColumn = columnHelper.display({
 })
 
 const editableCell = ({ row, column, table, getValue }: CellContext<Statistics, any>) => {
+  console.log("🚀 ~ editableCell ~ column:", column, row)
   const { editingCell, setEditingCell, updateCell } = table.options.meta || {}
   const isEditingCurrentCell = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id
 
