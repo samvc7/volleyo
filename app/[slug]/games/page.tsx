@@ -59,7 +59,10 @@ export default async function GamesView({
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (
-            <GameCard game={game} />
+            <GameCard
+              key={game.id}
+              game={game}
+            />
           ))}
         </ul>
       ) : null}
@@ -73,7 +76,10 @@ export default async function GamesView({
       {pastGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4">
           {pastGames.map(game => (
-            <GameCard game={game} />
+            <GameCard
+              key={game.id}
+              game={game}
+            />
           ))}
         </ul>
       ) : null}

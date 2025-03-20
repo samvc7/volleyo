@@ -2,14 +2,14 @@ import { PrismaClient } from "@prisma/client"
 const prisma = new PrismaClient()
 async function main() {
   const persons = [
-    { firstName: "Liam", lastName: "Anderson", email: "liam.anderson@example.com" },
-    { firstName: "Emma", lastName: "Johnson", email: "emma.johnson@example.com" },
-    { firstName: "Noah", lastName: "Williams", email: "noah.williams@example.com" },
-    { firstName: "Olivia", lastName: "Brown", email: "olivia.brown@example.com" },
-    { firstName: "William", lastName: "Garcia", email: "william.garcia@example.com" },
-    { firstName: "Sophia", lastName: "Martinez", email: "sophia.martinez@example.com" },
-    { firstName: "James", lastName: "Rodriguez", email: "james.rodriguez@example.com" },
-    { firstName: "Ava", lastName: "Davis", email: "ava.davis@example.com" },
+    { firstName: "Caroline", lastName: "Toberman", email: "caroline.toberman@example.com" },
+    { firstName: "Madison", lastName: "Maxwell", email: "madison.maxwell@example.com" },
+    { firstName: "Milani", lastName: "Lee", email: "milani.lee@example.com" },
+    { firstName: "Laurel", lastName: "Barsocchini", email: "laurel.barsocchini@example.com" },
+    { firstName: "Victoria", lastName: "Davis", email: "victoria.davis@example.com" },
+    { firstName: "Bridget", lastName: "Conley", email: "bridget.conley@example.com" },
+    { firstName: "Hannah", lastName: "Shaffer", email: "hannah.shaffer@example.com" },
+    { firstName: "Jaydin", lastName: "Watts", email: "jaydin.watts@example.com" },
     { firstName: "Benjamin", lastName: "Wilson", email: "benjamin.wilson@example.com" },
     { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" },
   ]

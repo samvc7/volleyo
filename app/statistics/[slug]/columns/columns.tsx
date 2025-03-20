@@ -40,7 +40,10 @@ export const selectActionColumn = columnHelper.display({
 })
 
 export const nameColumn = columnHelper.accessor(
-  replaceEmptyToDash(row => row.name),
+  replaceEmptyToDash(row => {
+    if (row.name.includes("total_a")) return "Team Total"
+    return row.name
+  }),
   {
     id: "name",
     header: ({ column }) => {
@@ -102,7 +105,14 @@ export const attackGroupColum = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.attackEfficiency) return row.attackEfficiency
+        if (
+          row.attackEfficiency ||
+          row.kills === undefined ||
+          row.attackErrors === undefined ||
+          row.attackAttempts === undefined
+        )
+          return row.attackEfficiency
+
         const efficiency = (row.kills - row.attackErrors) / row.attackAttempts
         const rounded = round2DecimalPlaces(efficiency, 2)
         if (isNaN(rounded)) return row.attackEfficiency
@@ -122,7 +132,7 @@ export const attackGroupColum = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.killsPerSet) return row.killsPerSet
+        if (row.killsPerSet || !row.kills || !row.setsPlayed) return row.killsPerSet
 
         const killsPerSet = row.kills / row.setsPlayed
         return round2DecimalPlaces(killsPerSet, 2)
@@ -175,7 +185,7 @@ export const serveGroupColumn = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.serveAttempts) return row.serveAttempts
+        if (row.serveAttempts || !row.serveAces || !row.serveErrors) return row.serveAttempts
         return row.serveAces + row.serveErrors
       }),
       {
@@ -192,7 +202,7 @@ export const serveGroupColumn = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.servePercentage) return row.servePercentage
+        if (row.servePercentage || !row.serveAttempts || !row.serveErrors) return row.servePercentage
 
         const percentageRaw = (row.serveAttempts - row.serveErrors) / row.serveAttempts
         if (isNaN(percentageRaw)) return row.servePercentage
@@ -212,7 +222,8 @@ export const serveGroupColumn = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.serveEfficiency) return row.serveEfficiency
+        if (row.serveEfficiency || !row.serveAces || !row.serveErrors || !row.serveAttempts)
+          return row.serveEfficiency
         const efficiency = (row.serveAces - row.serveErrors) / row.serveAttempts
         if (isNaN(efficiency)) return row.serveEfficiency
         return round2DecimalPlaces(efficiency, 2)
@@ -335,7 +346,14 @@ export const receiveGroupColumn = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.receivePercentage) return row.receivePercentage
+        if (
+          row.receivePercentage ||
+          !row.receivePerfect ||
+          !row.receivePositive ||
+          !row.receiveNegative ||
+          !row.receiveAttempts
+        )
+          return row.receivePercentage
 
         const percentageRaw =
           (row.receivePerfect * 3 + row.receivePositive * 2 + row.receiveNegative) / row.receiveAttempts
@@ -486,7 +504,8 @@ export const blockGroupColumn = columnHelper.group({
     ),
     columnHelper.accessor(
       replaceEmptyToDash(row => {
-        if (row.blocksPerSet) return row.blocksPerSet
+        if (row.blocksPerSet || !row.blockSingle || !row.blockMultiple || !row.setsPlayed)
+          return row.blocksPerSet
 
         const blocksPerSet = (row.blockSingle + row.blockMultiple) / row.setsPlayed
         return round2DecimalPlaces(blocksPerSet, 2)
@@ -583,6 +602,7 @@ const editableCell = ({ row, column, table, getValue }: CellContext<Statistics, 
   )
 }
 
+// Process columns
 const dataColumns = [
   nameColumn,
   attackGroupColum,

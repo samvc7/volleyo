@@ -50,46 +50,45 @@ export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatistics
   }
 
   const parseDataForTable = <TData,>(data: Record<string, string>[]): TData[] => {
-    const parsedData = data.map(row => {
-      return {
-        name: trimQuotes(row["Name"]),
-        kills: row["Attack K"],
-        attackErrors: row["Attack E"],
-        attackAttempts: row["Attack TA"],
-        attackEfficiency: row["Attack Atk%"],
-        killsPerSet: row["Attack K/S"],
-        serveAces: row["Serve SA"],
-        serveErrors: row["Serve SE"],
-        serveAttempts: row["Serve TA"],
-        servePercentage: row["Serve Pct"],
-        serveEfficiency: row["Serve Eff"],
-        serveRating: row["Serve Rtg."],
-        receivePerfect: row["Receive 3"],
-        receivePositive: row["Receive 2"],
-        receiveNegative: row["Receive 1"],
-        receiveError: row["Receive 0"],
-        receiveAttempts: row["Receive TA"],
-        receivePercentage: trimQuotes(row["Receive Pass%"]),
-        setAssists: row["Set Ast"],
-        setsTotal: row["Set TA"],
-        setErrors: row["Set E"],
-        digs: row["Dig DS"],
-        digErrors: row["Dig DE"],
-        blockSingle: row["Block BS"],
-        blockMultiple: row["Block BA"],
-        blockErrors: row["Block BE"],
-        blocksPerSet: row["Block B/S"],
-        setsPlayed: row["Sets Sets Played"],
-      } as TData
-    })
+    const parsedData = data
+      .filter(row => {
+        const name = trimQuotes(row["Name"])
+        return !!name && !name.includes("total")
+      })
+      .map((row, ix) => {
+        return {
+          id: ix.toString(),
+          name: trimQuotes(row["Name"]),
+          kills: convertToNumber(row["Attack K"]),
+          attackErrors: convertToNumber(row["Attack E"]),
+          attackAttempts: convertToNumber(row["Attack TA"]),
+          attackEfficiency: convertToNumber(row["Attack Atk%"]),
+          killsPerSet: convertToNumber(row["Attack K/S"]),
+          serveAces: convertToNumber(row["Serve SA"]),
+          serveErrors: convertToNumber(row["Serve SE"]),
+          serveAttempts: convertToNumber(row["Serve TA"]),
+          servePercentage: convertToNumber(row["Serve Pct"]),
+          serveEfficiency: convertToNumber(row["Serve Eff"]),
+          serveRating: convertToNumber(row["Serve Rtg."]),
+          receivePerfect: convertToNumber(row["Receive 3"]),
+          receivePositive: convertToNumber(row["Receive 2"]),
+          receiveNegative: convertToNumber(row["Receive 1"]),
+          receiveError: convertToNumber(row["Receive 0"]),
+          receiveAttempts: convertToNumber(row["Receive TA"]),
+          receivePercentage: convertToNumber(trimQuotes(row["Receive Pass%"])),
+          setAssists: convertToNumber(row["Set Ast"]),
+          setsTotal: convertToNumber(row["Set TA"]),
+          setErrors: convertToNumber(row["Set SE"]),
+          digs: convertToNumber(row["Dig DS"]),
+          digErrors: convertToNumber(row["Dig DE"]),
+          blockSingle: convertToNumber(row["Block BS"]),
+          blockMultiple: convertToNumber(row["Block BA"]),
+          blockErrors: convertToNumber(row["Block BE"]),
+          blocksPerSet: convertToNumber(row["Block B/S"]),
+          setsPlayed: convertToNumber(row["Sets Sets Played"]),
+        } as TData
+      })
     return parsedData
-  }
-
-  const trimQuotes = (value: string) => {
-    if (value.startsWith('"') && value.endsWith('"')) {
-      return value.slice(1, -1)
-    }
-    return value
   }
 
   return (
@@ -107,4 +106,15 @@ export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatistics
       </div>
     </form>
   )
+}
+
+const trimQuotes = (value: string) => {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    return value.slice(1, -1)
+  }
+  return value
+}
+
+const convertToNumber = (value: string) => {
+  return value ? Number(value) : undefined
 }

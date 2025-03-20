@@ -20,6 +20,10 @@ import { Pagination } from "./pagination"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { createNewStatistics } from "./actions"
+import { Statistics } from "./columns"
 
 type EditingCell = {
   rowId: string
@@ -29,32 +33,39 @@ type EditingCell = {
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
     editingCell?: EditingCell
-    setEditingCell?: ({ rowId, columnId }: EditingCell | undefined) => void
+    setEditingCell?: (editingCell: EditingCell | undefined) => void
     updateCell?: (rowId: string, columnId: string, value: string) => void
   }
 }
 
 interface DataTableProps<TData, TValue> {
+  gameId: string
   columns: ColumnDef<TData, TValue>[]
   initialData?: TData[]
 }
 
-export function DataTable<TData extends { id: string }, TValue>({
+export function DataTable<TData extends Statistics, TValue>({
+  gameId,
   columns,
   initialData = [],
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<TData[]>(initialData)
-  const [editingCell, setEditingCell] = useState<{ rowId: string; columnId: string }>()
+  const [editingCell, setEditingCell] = useState<EditingCell>()
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
+    const correctValueType = columnId === "name" ? value : Number(value)
     setData(prevData => {
-      const newData = prevData.map(row => (row.id === rowId ? { ...row, [columnId]: value } : row))
+      const newData = prevData.map(row => {
+        return row.id === rowId ? { ...row, [columnId]: correctValueType } : row
+      })
       return newData
     })
+    setHasUnsavedChanges(true)
   }
 
   const table = useReactTable({
@@ -86,18 +97,42 @@ export function DataTable<TData extends { id: string }, TValue>({
 
   const handleUploadData = (data: TData[]) => {
     setData(data)
+    setHasUnsavedChanges(true)
+  }
+
+  const handleSave = () => {
+    createNewStatistics(data, gameId)
+    setHasUnsavedChanges(false)
   }
 
   return (
     <>
-      <div className="flex items-center py-4">
+      <div className="flex items-center gap-4 py-4">
         <Input
           placeholder="Filter names ..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
+
+        {hasUnsavedChanges ? (
+          <Badge
+            className="text-orange-400 border-orange-400"
+            variant="outline"
+          >
+            Unsaved Changes
+          </Badge>
+        ) : null}
+
         <div className="flex gap-2 ml-auto">
+          {hasUnsavedChanges ? (
+            <Button
+              onClick={handleSave}
+              variant="outline"
+            >
+              Save
+            </Button>
+          ) : null}
           <UploadStatisticsInput onUploadData={handleUploadData} />
           <ViewOptions table={table} />
         </div>

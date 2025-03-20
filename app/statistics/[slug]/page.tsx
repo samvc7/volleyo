@@ -25,9 +25,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   const statistics = game?.statistics.map(statistic => ({
     ...statistic,
     name: `${statistic.Person.firstName} ${statistic.Person.lastName}`,
-  }))
-
-  const data = await getData()
+  })) as Statistics[]
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
@@ -35,6 +33,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
         {game.title} - {format(game.date, DATE_FORMAT)}
       </h1>
       <DataTable
+        gameId={game.id}
         columns={columns}
         initialData={statistics}
       />

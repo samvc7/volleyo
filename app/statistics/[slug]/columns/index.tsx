@@ -31,35 +31,35 @@ export type Statistics = {
   id: string
   name: string
   // attack
-  kills: number
-  attackErrors: number
-  attackAttempts: number
-  attackEfficiency: number
-  killsPerSet: number
+  kills?: number
+  attackErrors?: number
+  attackAttempts?: number
+  attackEfficiency?: number
+  killsPerSet?: number
   // serve
-  serveAces: number
-  serveErrors: number
-  serveAttempts: number
-  servePercentage: number
-  serveEfficiency: number
-  serveRating: number
+  serveAces?: number
+  serveErrors?: number
+  serveAttempts?: number
+  servePercentage?: number
+  serveEfficiency?: number
+  serveRating?: number
   // serve receive
-  receivePerfect: number
-  receivePositive: number
-  receiveNegative: number
-  receiveError: number
-  receiveAttempts: number
-  receivePercentage: number
+  receivePerfect?: number
+  receivePositive?: number
+  receiveNegative?: number
+  receiveError?: number
+  receiveAttempts?: number
+  receivePercentage?: number
   // sets
-  setAssists: number
-  setsTotal: number
-  setErrors: number
+  setAssists?: number
+  setsTotal?: number
+  setErrors?: number
   // digs
-  digs: number
-  digErrors: number
-  blockSingle: number
-  blockMultiple: number
-  blockErrors: number
-  blocksPerSet: number
-  setsPlayed: number
+  digs?: number
+  digErrors?: number
+  blockSingle?: number
+  blockMultiple?: number
+  blockErrors?: number
+  blocksPerSet?: number
+  setsPlayed?: number
 }
