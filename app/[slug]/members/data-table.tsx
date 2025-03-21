@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Person } from "@prisma/client"
-import { editMember, removeMember } from "./actions"
+import { removeMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
 import { AddTeamMemberDialog, EditTeamMemberDialog } from "./dialogs"

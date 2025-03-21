@@ -15,15 +15,16 @@ import {
   ColumnDef,
   RowData,
 } from "@tanstack/react-table"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Pagination } from "./pagination"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { saveStatistics } from "./actions"
 import { Statistics } from "./columns"
+import { toast } from "@/hooks/use-toast"
+import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 type EditingCell = {
   rowId: string
@@ -56,6 +57,7 @@ export function DataTable<TData extends Statistics, TValue>({
   const [data, setData] = useState<TData[]>(initialData)
   const [editingCell, setEditingCell] = useState<EditingCell>()
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
     const correctValueType = columnId === "name" ? value : Number(value)
@@ -101,8 +103,16 @@ export function DataTable<TData extends Statistics, TValue>({
   }
 
   const handleSave = () => {
-    saveStatistics(data, gameId)
-    setHasUnsavedChanges(false)
+    startTransition(async () => {
+      try {
+        await saveStatistics(data, gameId)
+        setHasUnsavedChanges(false)
+        toast({ title: "Successfully saved statistics" })
+      } catch (error) {
+        console.error(error)
+        toast({ title: "Could not save statistics. Please try again" })
+      }
+    })
   }
 
   return (
@@ -115,23 +125,14 @@ export function DataTable<TData extends Statistics, TValue>({
           className="max-w-sm"
         />
 
-        {hasUnsavedChanges ? (
-          <Badge
-            className="text-orange-400 border-orange-400"
-            variant="outline"
-          >
-            Unsaved Changes
-          </Badge>
-        ) : null}
-
         <div className="flex gap-2 ml-auto">
           {hasUnsavedChanges ? (
-            <Button
+            <ButtonWithLoading
+              label="Save"
+              loadingLabel={"Saving..."}
+              disabled={isPending}
               onClick={handleSave}
-              variant="outline"
-            >
-              Save
-            </Button>
+            />
           ) : null}
           <UploadStatisticsInput onUploadData={handleUploadData} />
           <ViewOptions table={table} />

@@ -26,8 +26,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { Check, ChevronsUpDown, Loader2, PlusCircle } from "lucide-react"
+import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
 import { createTeam } from "./actions"
+import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 type TeamSwitcherProps = {
   teams: Team[]
@@ -150,19 +151,12 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
             >
               Cancel
             </Button>
-            <Button
+            <ButtonWithLoading
+              label="Create"
+              loadingLabel="Creating..."
               disabled={isPending}
               type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create"
-              )}
-            </Button>
+            />
           </DialogFooter>
         </form>
       </DialogContent>

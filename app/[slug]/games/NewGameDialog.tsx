@@ -1,7 +1,7 @@
 "use client"
 
 import { ReactNode, useActionState, useState } from "react"
-import { Loader2, PlusCircle } from "lucide-react"
+import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -21,6 +21,7 @@ import { Person } from "@prisma/client"
 import { toast } from "@/hooks/use-toast"
 import { createGame } from "./actions"
 import { useParams } from "next/navigation"
+import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 type ParticipantsNamesAndID = Pick<Person, "id" | "firstName" | "lastName" | "nickName">
 
@@ -133,19 +134,12 @@ export const NewGameDialog = ({
             >
               Cancel
             </Button>
-            <Button
+            <ButtonWithLoading
+              label="Create"
+              loadingLabel="Creating..."
               disabled={isPending}
               type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create"
-              )}
-            </Button>
+            />
           </DialogFooter>
         </form>
       </DialogContent>

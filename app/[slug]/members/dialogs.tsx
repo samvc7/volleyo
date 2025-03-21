@@ -14,10 +14,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { PlusCircle, Loader2 } from "lucide-react"
+import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Person } from "@prisma/client"
+import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 export const AddTeamMemberDialog = () => {
   const { slug } = useParams() as { slug: string }
@@ -108,20 +109,12 @@ export const AddTeamMemberDialog = () => {
             >
               Cancel
             </Button>
-
-            <Button
+            <ButtonWithLoading
+              label="Create"
+              loadingLabel="Creating..."
               disabled={isPending}
               type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create"
-              )}
-            </Button>
+            />
           </DialogFooter>
         </form>
       </DialogContent>
@@ -210,19 +203,12 @@ export const EditTeamMemberDialog = ({ member, children }: { member: Person; chi
               Cancel
             </Button>
 
-            <Button
+            <ButtonWithLoading
+              label="Save"
+              loadingLabel="Editing..."
               disabled={isPending}
               type="submit"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Editing...
-                </>
-              ) : (
-                "Save"
-              )}
-            </Button>
+            />
           </DialogFooter>
         </form>
       </DialogContent>
