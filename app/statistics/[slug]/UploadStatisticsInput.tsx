@@ -1,51 +1,44 @@
 "use client"
 
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent } from "react"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 
 export type UploadStatisticsProps<TData> = {
   onUploadData(data: TData[]): void
 }
 
 export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatisticsProps<TData>) => {
-  const [file, setFile] = useState<File>()
-
   const fileReader = new FileReader()
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      setFile(e.target.files[0])
-    }
-  }
+      const uploadedFile = e.target.files[0]
 
-  const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+      if (uploadedFile) {
+        fileReader.onload = function (event) {
+          if (event.target) {
+            const csvOutput = event.target.result as string
+            // Split rows
+            const rows = csvOutput.split("\n")
+            // Extract headers
+            const headers = rows[0].split(",")
 
-    if (file) {
-      fileReader.onload = function (event) {
-        if (event.target) {
-          const csvOutput = event.target.result as string
-          // Split rows
-          const rows = csvOutput.split("\n")
-          // Extract headers
-          const headers = rows[0].split(",")
+            // Parse rows into an array of objects
+            const data = rows.slice(1).map(row => {
+              const values = row.split(",")
+              return headers.reduce((acc, header, index) => {
+                acc[header.trim()] = values[index]?.trim() || ""
+                return acc
+              }, {} as Record<string, string>)
+            })
 
-          // Parse rows into an array of objects
-          const data = rows.slice(1).map(row => {
-            const values = row.split(",")
-            return headers.reduce((acc, header, index) => {
-              acc[header.trim()] = values[index]?.trim() || ""
-              return acc
-            }, {} as Record<string, string>)
-          })
-
-          const parsedData = parseDataForTable<TData>(data)
-          onUploadData(parsedData)
+            const parsedData = parseDataForTable<TData>(data)
+            onUploadData(parsedData)
+          }
         }
-      }
 
-      fileReader.readAsText(file)
+        fileReader.readAsText(uploadedFile)
+      }
     }
   }
 
@@ -92,19 +85,14 @@ export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatistics
   }
 
   return (
-    <form onSubmit={handleOnSubmit}>
-      <div className="flex gap-2">
-        <Input
-          id="statistics"
-          name="statistics"
-          type="file"
-          accept=".csv"
-          required
-          onChange={handleOnChange}
-        />
-        {file ? <Button type="submit">Upload</Button> : null}
-      </div>
-    </form>
+    <Input
+      id="statistics"
+      name="statistics"
+      type="file"
+      accept=".csv"
+      required
+      onChange={handleOnChange}
+    />
   )
 }
 
