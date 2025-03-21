@@ -1,7 +1,7 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { NewGameDialog } from "./NewGameDialog"
 import { GameCard } from "./GameDayCard"
-import { Game, Person } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 
 export default async function GamesView({
@@ -17,9 +17,7 @@ export default async function GamesView({
   const toDate = new Date(to as string)
 
   const games = await prisma.game.findMany({
-    include: {
-      participants: { select: { Person: { select: { firstName: true, lastName: true, nickName: true } } } },
-    },
+    include: { statistics: true },
     where: { Team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
     orderBy: { date: "desc" },
   })
@@ -30,19 +28,12 @@ export default async function GamesView({
   })
 
   const today = new Date()
-  const [upcomingGames, pastGames] = games.reduce<
-    [GameWithFormattedParticipants[], GameWithFormattedParticipants[]]
-  >(
+  const [upcomingGames, pastGames] = games.reduce<[GameWithStatistic[], GameWithStatistic[]]>(
     ([upcoming, past], game) => {
-      const formattedGame = {
-        ...game,
-        participants: game.participants.map(p => p.Person),
-      }
-
       if (game.date >= today) {
-        upcoming.push(formattedGame)
+        upcoming.push(game)
       } else {
-        past.push(formattedGame)
+        past.push(game)
       }
 
       return [upcoming, past]
@@ -87,6 +78,4 @@ export default async function GamesView({
   )
 }
 
-export type GameWithFormattedParticipants = Omit<Game, "participants"> & {
-  participants: Pick<Person, "firstName" | "lastName" | "nickName">[]
-}
+export type GameWithStatistic = Prisma.GameGetPayload<{ include: { statistics: true } }>

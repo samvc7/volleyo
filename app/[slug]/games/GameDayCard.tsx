@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { parsePersonName } from "@/app/utils"
-import { GameWithFormattedParticipants } from "./page"
+import { Users } from "lucide-react"
+import { GameWithStatistic } from "./page"
 
 type GameDayCardProps = {
-  game: GameWithFormattedParticipants
+  game: GameWithStatistic
 }
 
-export const GameCard = ({ game: { title, slug, date, description, participants } }: GameDayCardProps) => {
+export const GameCard = ({ game: { title, slug, date, description, statistics } }: GameDayCardProps) => {
   return (
     <li>
       <Link
@@ -25,15 +25,9 @@ export const GameCard = ({ game: { title, slug, date, description, participants 
             </div>
             <CardDescription>{description}</CardDescription>
           </CardHeader>
-          <CardContent>
-            {participants?.length ? (
-              <>
-                <h2>Participants:</h2>
-                <p>{participants?.map(participant => parsePersonName(participant)).join(", ")}</p>
-              </>
-            ) : (
-              <h2>No participants yet.</h2>
-            )}
+          <CardContent className="flex items-center gap-1">
+            <Users size={16} />
+            {statistics.length}
           </CardContent>
         </Card>
       </Link>

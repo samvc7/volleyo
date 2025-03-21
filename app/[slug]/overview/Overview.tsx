@@ -19,9 +19,6 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   const defaultToDate = new Date()
 
   const games = await prisma.game.findMany({
-    include: {
-      participants: { select: { Person: { select: { firstName: true, lastName: true, nickName: true } } } },
-    },
     where: {
       Team: { slug: teamSlug },
       score: { not: null, notIn: [""] },

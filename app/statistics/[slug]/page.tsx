@@ -26,7 +26,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     const { Person, ...statisticData } = statistic
     return {
       ...statisticData,
-      name: `${statistic.Person.firstName} ${statistic.Person.lastName}`,
+      name: `${Person.firstName} ${Person.lastName}`,
     }
   }) as Statistics[]
 

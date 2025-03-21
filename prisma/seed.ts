@@ -40,26 +40,14 @@ async function main() {
     { title: "Game 4", slug: "game-4", description: "Final Showdown", date: new Date(2024, 0, 14) },
   ]
 
-  const sortedPlayers = [...personRecords].sort((a, b) => a.lastName.localeCompare(b.lastName))
-
-  await Promise.all(
-    games.map(async (game, index) => {
-      const excludedPlayersCount = index === 0 ? 2 : 1
-      const selectedPlayers = sortedPlayers.slice(0, sortedPlayers.length - excludedPlayersCount)
-
-      await prisma.game.create({
-        data: {
-          ...game,
-          teamId: team.id,
-          participants: {
-            create: selectedPlayers.map(player => ({
-              personId: player.id,
-            })),
-          },
-        },
-      })
-    }),
-  )
+  games.forEach(async game => {
+    await prisma.game.create({
+      data: {
+        ...game,
+        teamId: team.id,
+      },
+    })
+  })
 
   console.log("Seed data inserted successfully")
 }

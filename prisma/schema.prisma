@@ -9,15 +9,14 @@ datasource db {
 }
 
 model Person {
-  id                 String             @id @default(cuid())
-  email              String?
-  firstName          String             @map("first_name")
-  lastName           String             @map("last_name")
-  nickName           String?            @map("nick_name")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  team               TeamMembers[]
-  gameParticipations GameParticipants[]
-  statistics         Statistics[]
+  id         String        @id @default(cuid())
+  email      String?
+  firstName  String        @map("first_name")
+  lastName   String        @map("last_name")
+  nickName   String?       @map("nick_name")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  team       TeamMembers[]
+  statistics Statistics[]
 }
 
 model Team {
@@ -40,25 +39,15 @@ model TeamMembers {
 }
 
 model Game {
-  id           String             @id @default(cuid())
-  slug         String             @unique
-  title        String
-  score        String?
-  description  String?
-  date         DateTime
-  participants GameParticipants[]
-  Team         Team?              @relation(fields: [teamId], references: [id])
-  teamId       String?
-  statistics   Statistics[]
-}
-
-model GameParticipants {
-  Person   Person @relation(fields: [personId], references: [id])
-  personId String
-  Game     Game   @relation(fields: [gameId], references: [id])
-  gameId   String
-
-  @@id([personId, gameId])
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  score       String?
+  description String?
+  date        DateTime
+  Team        Team?        @relation(fields: [teamId], references: [id])
+  teamId      String?
+  statistics  Statistics[]
 }
 
 model Statistics {
