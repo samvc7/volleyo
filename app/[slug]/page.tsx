@@ -10,8 +10,9 @@ export default async function Teams({
 }) {
   const { slug } = await params
   const { from, to } = await searchParams
-  const fromDate = new Date(from as string)
-  const toDate = new Date(to as string)
+
+  const fromDate = from ? new Date(from as string) : undefined
+  const toDate = to ? new Date(to as string) : undefined
 
   return (
     <Overview

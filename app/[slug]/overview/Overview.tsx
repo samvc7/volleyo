@@ -6,28 +6,29 @@ import { BarChartMultiple } from "./BarChartMultiple"
 import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
 import { Game } from "@prisma/client"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { subDays } from "date-fns"
 
 type OverviewProps = {
   teamSlug: string
-  fromDateFilter: Date
-  toDateFilter: Date
+  fromDateFilter?: Date
+  toDateFilter?: Date
 }
 
 export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
-  const defaultFromDate = subDays(new Date(), 30)
-  const defaultToDate = new Date()
-
   const games = await prisma.game.findMany({
     where: {
       Team: { slug: teamSlug },
-      score: { not: null, notIn: [""] },
-      ...(fromDateFilter && toDateFilter
-        ? { AND: { date: { gte: defaultFromDate, lte: defaultToDate } } }
+      // score: { not: null, notIn: [""] },
+      ...(!!fromDateFilter && !!toDateFilter
+        ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } }
         : {}),
     },
+    include: { statistics: true },
     orderBy: { date: "desc" },
   })
+
+  if (games.length === 0) {
+    return <h1>No Games found.</h1>
+  }
 
   const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(games)
 

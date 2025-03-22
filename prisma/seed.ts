@@ -34,10 +34,34 @@ async function main() {
   })
 
   const games = [
-    { title: "Game 1", slug: "game-1", description: "Season Opener", date: new Date(2024, 0, 11) },
-    { title: "Game 2", slug: "game-2", description: "Tough Opponent", date: new Date(2024, 0, 12) },
-    { title: "Game 3", slug: "game-3", description: "Mid-season Battle", date: new Date(2024, 0, 13) },
-    { title: "Game 4", slug: "game-4", description: "Final Showdown", date: new Date(2024, 0, 14) },
+    {
+      title: "Game 1",
+      slug: "game-1",
+      description: "Season Opener",
+      date: new Date(2024, 12, 11),
+      score: "25-20",
+    },
+    {
+      title: "Game 2",
+      slug: "game-2",
+      description: "Tough Opponent",
+      date: new Date(2024, 12, 12),
+      score: "25-22",
+    },
+    {
+      title: "Game 3",
+      slug: "game-3",
+      description: "Mid-season Battle",
+      date: new Date(2024, 12, 13),
+      score: "18-25",
+    },
+    {
+      title: "Game 4",
+      slug: "game-4",
+      description: "Final Showdown",
+      date: new Date(2024, 12, 14),
+      score: "25-20",
+    },
   ]
 
   games.forEach(async game => {
