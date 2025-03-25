@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { format, subDays } from "date-fns"
+import { format, getYear, isWithinInterval, set, subDays } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 import { cn } from "@/lib/utils"
@@ -9,16 +9,18 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DATE_FORMAT, DATE_ISO_FORMAT } from "./utils"
+import { DATE_FORMAT, DATE_ISO_FORMAT, getCurrentSemesterRange } from "./utils"
 import { usePathname, useRouter } from "next/navigation"
 
 export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivElement>) {
   const router = useRouter()
   const pathname = usePathname()
   const shouldRender = !pathname.includes("members")
+
+  const [from, to] = getCurrentSemesterRange()
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: subDays(new Date(), 30),
-    to: new Date(),
+    from,
+    to,
   })
 
   useEffect(() => {
