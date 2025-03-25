@@ -4,8 +4,9 @@ import { LineChartScore } from "./LineChartScore"
 import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
 import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
-import { Game } from "@prisma/client"
 import { prisma } from "@/prisma/singlePrismaClient"
+import { GameWithStatistic } from "../games/page"
+import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
 
 type OverviewProps = {
   teamSlug: string
@@ -14,14 +15,41 @@ type OverviewProps = {
 }
 
 export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
+  const gameWhereQuery = {
+    Team: { slug: teamSlug },
+    score: { not: null, notIn: [""] },
+    ...(!!fromDateFilter && !!toDateFilter
+      ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } }
+      : {}),
+  }
+
+  const statistics = (
+    await prisma.statistics.aggregate({
+      where: { Game: gameWhereQuery },
+      _sum: {
+        kills: true,
+        attackErrors: true,
+        attackAttempts: true,
+        serveAces: true,
+        serveErrors: true,
+        serveAttempts: true,
+        receivePerfect: true,
+        receivePositive: true,
+        receiveNegative: true,
+        receiveError: true,
+        receiveAttempts: true,
+        digs: true,
+        digErrors: true,
+        blockSingle: true,
+        blockMultiple: true,
+        blockErrors: true,
+        setsPlayed: true,
+      },
+    })
+  )._sum
+
   const games = await prisma.game.findMany({
-    where: {
-      Team: { slug: teamSlug },
-      // score: { not: null, notIn: [""] },
-      ...(!!fromDateFilter && !!toDateFilter
-        ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } }
-        : {}),
-    },
+    where: gameWhereQuery,
     include: { statistics: true },
     orderBy: { date: "desc" },
   })
@@ -31,6 +59,18 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   }
 
   const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(games)
+
+  const {
+    totalKills,
+    totalKillsPerSet,
+    totalAttackEfficiency,
+    totalDigs,
+    totalBlocks,
+    totalReceivePercentage,
+    totalAces,
+    totalServeErrors,
+    totalServeEfficiency,
+  } = calculateTotalStatistics(statistics)
 
   return (
     <>
@@ -43,7 +83,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
           <CardContent>
             <div className="text-2xl font-bold">Total Games: {totalGames}</div>
             <p className="text-xs text-muted-foreground">
-              Win Percentage: {winPercentage}, Wins: {wins}, Loses: {loses}
+              Win Percentage: {winPercentage}%, Wins: {wins}, Loses: {loses}
             </p>
           </CardContent>
         </Card>
@@ -54,8 +94,10 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
             <SwordsIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Efficiency: 0.35</div>
-            <p className="text-xs text-muted-foreground">Total Kills: 780, Kills per Set: 12.5</p>
+            <div className="text-2xl font-bold">Efficiency: {totalAttackEfficiency}</div>
+            <p className="text-xs text-muted-foreground">
+              Total Kills: {totalKills}, Kills per Set: {totalKillsPerSet}
+            </p>
           </CardContent>
         </Card>
 
@@ -65,8 +107,10 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
             <ShieldIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Receive Efficiency: 0.35</div>
-            <p className="text-xs text-muted-foreground">Digs: 465, Blocks: 92</p>
+            <div className="text-2xl font-bold">Receive Percentage: {totalReceivePercentage}%</div>
+            <p className="text-xs text-muted-foreground">
+              Digs: {totalDigs}, Blocks: {totalBlocks}
+            </p>
           </CardContent>
         </Card>
 
@@ -76,8 +120,10 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
             <CrosshairIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Efficiency: 89%</div>
-            <p className="text-xs text-muted-foreground">Aces: 105, Errors: 47</p>
+            <div className="text-2xl font-bold">Efficiency: {totalServeEfficiency}%</div>
+            <p className="text-xs text-muted-foreground">
+              Aces: {totalAces}, Errors: {totalServeErrors}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -95,7 +141,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   )
 }
 
-const calculateGamesOverview = (games: Game[]) => {
+const calculateGamesOverview = (games: GameWithStatistic[]) => {
   let wins = 0
   let loses = 0
 
@@ -111,5 +157,54 @@ const calculateGamesOverview = (games: Game[]) => {
   })
 
   const winPercentage = games.length > 0 ? Math.ceil((wins / games.length) * 10000) / 100 : 0
-  return { wins, loses, winPercentage: `${winPercentage}%`, totalGames: games.length }
+  const totalGames = games.length
+
+  return {
+    wins,
+    loses,
+    winPercentage,
+    totalGames,
+  }
 }
+
+const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
+  const totalKills = statistics.kills ?? 0
+  const totalErrors = statistics.attackErrors ?? 0
+  const totalSetsPlayed = statistics.setsPlayed ?? 0
+  const totalAttackAttempts = statistics.attackAttempts ?? 0
+
+  const totalDigs = statistics.digs ?? 0
+  const totalBlocks = (statistics.blockSingle ?? 0) + (statistics.blockMultiple ?? 0)
+  const totalReceivePerfect = statistics.receivePerfect ?? 0
+  const totalReceivePositive = statistics.receivePositive ?? 0
+  const totalReceiveNegative = statistics.receiveNegative ?? 0
+  const totalReceiveAttempts = statistics.receiveAttempts ?? 0
+
+  const totalAces = statistics.serveAces ?? 0
+  const totalServeErrors = statistics.serveErrors ?? 0
+  const totalServeAttempts = statistics.serveAttempts ?? 0
+
+  const totalKillsPerSet = totalKills / totalSetsPlayed
+  const totalAttackEfficiency = round2DecimalPlaces((totalKills - totalErrors) / totalAttackAttempts, 2)
+
+  const totalReceivePercentage = round2DecimalPlaces(
+    (totalReceivePerfect * 3 + totalReceivePositive * 2 + totalReceiveNegative) / totalReceiveAttempts,
+    2,
+  )
+
+  const totalServeEfficiency = round2DecimalPlaces((totalAces - totalServeErrors) / totalServeAttempts, 2)
+
+  return {
+    totalKills,
+    totalKillsPerSet,
+    totalAttackEfficiency,
+    totalDigs,
+    totalBlocks,
+    totalReceivePercentage,
+    totalAces,
+    totalServeErrors,
+    totalServeEfficiency,
+  }
+}
+
+type StatisticsAggregate = NonNullable<Awaited<ReturnType<typeof prisma.statistics.aggregate>>["_sum"]>
