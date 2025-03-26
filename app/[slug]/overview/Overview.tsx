@@ -20,7 +20,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   const hasDateFilter = !!fromDateFilter && !!toDateFilter
   const gameWhereQuery = {
     Team: { slug: teamSlug },
-    score: { not: null, notIn: [""] },
+    AND: { teamScore: { not: null }, opponentScore: { not: null } },
     ...(hasDateFilter ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } } : {}),
   }
 

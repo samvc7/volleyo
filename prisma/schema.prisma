@@ -39,15 +39,16 @@ model TeamMembers {
 }
 
 model Game {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  title       String
-  score       String?
-  description String?
-  date        DateTime
-  Team        Team?        @relation(fields: [teamId], references: [id])
-  teamId      String?
-  statistics  Statistics[]
+  id            String       @id @default(cuid())
+  slug          String       @unique
+  title         String
+  teamScore     Int?
+  opponentScore Int?
+  description   String?
+  date          DateTime
+  Team          Team?        @relation(fields: [teamId], references: [id])
+  teamId        String?
+  statistics    Statistics[]
 }
 
 model Statistics {
