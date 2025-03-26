@@ -30,63 +30,11 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Pagination } from "./Pagination"
 
-export type LeaderboardPlayer = Pick<
-  Statistics,
-  "id" | "name" | "kills" | "attackEfficiency" | "serveAces" | "digs" | "setsTotal"
-> & { blocks: number }
-
-export const leaderboardPlayers: LeaderboardPlayer[] = [
-  {
-    id: "m5gr84i9",
-    name: "#7 Monserrat",
-    kills: 18,
-    attackEfficiency: 0.31,
-    blocks: 6,
-    serveAces: 4,
-    digs: 15,
-    setsTotal: 5,
-  },
-  {
-    id: "3u1reuv4",
-    name: "#12 Silas",
-    kills: 22,
-    attackEfficiency: 0.32,
-    blocks: 10,
-    serveAces: 6,
-    digs: 24,
-    setsTotal: 3,
-  },
-  {
-    id: "derv1ws0",
-    name: "#9 Carmella",
-    kills: 12,
-    attackEfficiency: 0.32,
-    blocks: 3,
-    serveAces: 5,
-    digs: 14,
-    setsTotal: 7,
-  },
-  {
-    id: "5kma53ae",
-    name: "#4 Kathlyn",
-    kills: 25,
-    attackEfficiency: 0.4,
-    blocks: 3,
-    serveAces: 7,
-    digs: 5,
-    setsTotal: 27,
-  },
-  {
-    id: "bhqecj4p",
-    name: "#5 Laurie",
-    kills: 30,
-    attackEfficiency: 0.45,
-    blocks: 4,
-    serveAces: 9,
-    digs: 18,
-    setsTotal: 12,
-  },
-]
+export type LeaderboardPlayer = Pick<Statistics, "name" | "kills" | "serveAces" | "digs" | "setAssists"> & {
+  playerId: string
+  blocks: number
+  score: number
+}
 
 export const columns: ColumnDef<LeaderboardPlayer>[] = [
   {
@@ -113,19 +61,7 @@ export const columns: ColumnDef<LeaderboardPlayer>[] = [
     invertSorting: true,
   },
   {
-    accessorKey: "attack_efficiency",
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title="Eff"
-        tooltip="Attack Efficiency - (Kills - Errors) / Total Attempts"
-      />
-    ),
-    invertSorting: true,
-    accessorFn: row => row.attackEfficiency,
-  },
-  {
-    accessorKey: "serve_aces",
+    accessorKey: "serveAces",
     header: ({ column }) => (
       <ColumnHeader
         column={column}
@@ -141,7 +77,7 @@ export const columns: ColumnDef<LeaderboardPlayer>[] = [
     header: ({ column }) => (
       <ColumnHeader
         column={column}
-        title="BS"
+        title="B"
         tooltip="Number of blocks resulting in a point when the player is the only blocker or one of multiple"
       />
     ),
@@ -159,15 +95,15 @@ export const columns: ColumnDef<LeaderboardPlayer>[] = [
     invertSorting: true,
   },
   {
-    accessorKey: "sets_total",
+    accessorKey: "setAssists",
     header: ({ column }) => (
       <ColumnHeader
         column={column}
-        title="TA"
-        tooltip="Total Attempts - Total sets"
+        title="Ast"
+        tooltip="Assists - Number of sets that led to a point"
       />
     ),
-    accessorFn: row => row.setsTotal,
+    accessorFn: row => row.setAssists,
     invertSorting: true,
   },
   {

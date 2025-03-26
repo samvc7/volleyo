@@ -3,7 +3,7 @@ import { CrosshairIcon, ShieldIcon, SwordsIcon, VolleyballIcon } from "lucide-re
 import { LineChartScore } from "./LineChartScore"
 import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
-import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
+import { columns, Leaderboard } from "./Leaderboard"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { GameWithStatistic } from "../games/page"
 import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
@@ -56,6 +56,59 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     orderBy: { date: "asc" },
     ...(hasDateFilter ? { take: 30 } : {}),
   })
+
+  const leaderBoardStatistics = await prisma.statistics.groupBy({
+    by: ["personId"],
+    where: { Game: gameWhereQuery },
+    _sum: {
+      kills: true,
+      attackAttempts: true,
+      serveAces: true,
+      blockSingle: true,
+      blockMultiple: true,
+      digs: true,
+      setAssists: true,
+    },
+  })
+
+  const leaderBoardPlayers = await prisma.person.findMany({
+    where: {
+      id: { in: leaderBoardStatistics.map(data => data.personId) },
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      nickName: true,
+    },
+  })
+
+  const leaderBoardData = leaderBoardStatistics.map(statisitc => {
+    const player = leaderBoardPlayers.find(player => player.id === statisitc.personId)
+
+    // TODO: handle not found player
+
+    const kills = statisitc._sum.kills ?? 0
+    const serveAces = statisitc._sum.serveAces ?? 0
+    const blocks = (statisitc._sum.blockSingle ?? 0) + (statisitc._sum.blockMultiple ?? 0)
+    const digs = statisitc._sum.digs ?? 0
+    const setAssists = statisitc._sum.setAssists ?? 0
+
+    const score = kills * 1.5 + serveAces * 1.2 + blocks + digs * 0.75 + setAssists * 0.75
+
+    return {
+      playerId: player?.id ?? "",
+      name: player?.nickName ?? `${player?.firstName} ${player?.lastName}`,
+      kills,
+      blocks,
+      serveAces,
+      digs,
+      setAssists,
+      score,
+    }
+  })
+
+  const top5Players = leaderBoardData.sort((a, b) => b.score - a.score).slice(0, 5)
 
   if (games.length === 0) {
     return <h1>No Games found.</h1>
@@ -175,7 +228,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
         <BarChartMultiple chartData={attackChartData} />
         <Leaderboard
           columns={columns}
-          data={leaderboardPlayers}
+          data={top5Players}
         />
       </div>
     </>
