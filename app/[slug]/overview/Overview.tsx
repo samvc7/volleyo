@@ -17,12 +17,11 @@ type OverviewProps = {
 }
 
 export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
+  const hasDateFilter = !!fromDateFilter && !!toDateFilter
   const gameWhereQuery = {
     Team: { slug: teamSlug },
     score: { not: null, notIn: [""] },
-    ...(!!fromDateFilter && !!toDateFilter
-      ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } }
-      : {}),
+    ...(hasDateFilter ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } } : {}),
   }
 
   const statistics = (
@@ -47,6 +46,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
         blockErrors: true,
         setsPlayed: true,
       },
+      ...(hasDateFilter ? { take: 30 } : {}),
     })
   )._sum
 
@@ -54,6 +54,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     where: gameWhereQuery,
     include: { statistics: true },
     orderBy: { date: "asc" },
+    ...(hasDateFilter ? { take: 30 } : {}),
   })
 
   if (games.length === 0) {

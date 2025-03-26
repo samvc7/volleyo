@@ -18,10 +18,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
   const shouldRender = !pathname.includes("members")
 
   const [from, to] = getCurrentSemesterRange()
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from,
-    to,
-  })
+  const [date, setDate] = React.useState<DateRange | undefined>()
 
   useEffect(() => {
     if (date?.from && date?.to) {
@@ -37,6 +34,9 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
     const date = new Date()
 
     switch (value) {
+      case "current-semester":
+        setDate({ from, to })
+        break
       case "week":
         setDate({ from: subDays(date, 7), to: date })
         break
@@ -84,6 +84,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
+              <SelectItem value="current-semester">Current Semester</SelectItem>
               <SelectItem value="week">Week</SelectItem>
               <SelectItem value="month">Month</SelectItem>
               <SelectItem value="year">Year</SelectItem>
