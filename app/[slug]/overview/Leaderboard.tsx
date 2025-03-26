@@ -27,8 +27,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Pagination } from "./Pagination"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export type LeaderboardPlayer = Pick<Statistics, "name" | "kills" | "serveAces" | "digs" | "setAssists"> & {
   playerId: string
@@ -224,9 +223,6 @@ export function Leaderboard<TData, TValue>({ columns, data }: DataTableProps<TDa
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter className="justify-end">
-        <Pagination table={table} />
-      </CardFooter>
     </Card>
   )
 }
