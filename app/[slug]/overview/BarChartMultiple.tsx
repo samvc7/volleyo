@@ -1,31 +1,30 @@
 "use client"
-
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+import { GameWithStatistic } from "../games/page"
+import { format } from "date-fns"
+import { DATE_FORMAT, DATE_ISO_FORMAT } from "@/app/utils"
 
 const chartConfig = {
-  desktop: {
+  attempts: {
     label: "Attacks",
     color: "hsl(var(--chart-2))",
   },
-  mobile: {
+  errors: {
     label: "Errors",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
 
-export function BarChartMultiple() {
+export function BarChartMultiple({ games }: { games: GameWithStatistic[] }) {
+  const chartData = games.map(game => ({
+    date: format(game.date, DATE_ISO_FORMAT),
+    attempts: game.statistics.reduce((acc, curr) => acc + (curr.attackAttempts ?? 0), 0),
+    errors: game.statistics.reduce((acc, curr) => acc + (curr.attackErrors ?? 0), 0),
+  }))
+
   return (
     <Card>
       <CardHeader>
@@ -40,34 +39,29 @@ export function BarChartMultiple() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="date"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={value => value.slice(0, 3)}
+              tickFormatter={value => format(new Date(value), DATE_FORMAT)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
             <Bar
-              dataKey="desktop"
-              fill="var(--color-desktop)"
+              dataKey="attempts"
+              fill="var(--color-attempts)"
               radius={4}
             />
             <Bar
-              dataKey="mobile"
-              fill="var(--color-mobile)"
+              dataKey="errors"
+              fill="var(--color-errors)"
               radius={4}
             />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-      </CardFooter>
     </Card>
   )
 }

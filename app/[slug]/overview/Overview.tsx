@@ -51,7 +51,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   const games = await prisma.game.findMany({
     where: gameWhereQuery,
     include: { statistics: true },
-    orderBy: { date: "desc" },
+    orderBy: { date: "asc" },
   })
 
   if (games.length === 0) {
@@ -129,9 +129,9 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
       </div>
 
       <div className="grid gap-4 grid-cols-2">
-        <LineChartScore />
-        <StackedBarChartErrors />
-        <BarChartMultiple />
+        <LineChartScore games={games} />
+        <StackedBarChartErrors games={games} />
+        <BarChartMultiple games={games} />
         <Leaderboard
           columns={columns}
           data={leaderboardPlayers}
@@ -169,7 +169,7 @@ const calculateGamesOverview = (games: GameWithStatistic[]) => {
 
 const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
   const totalKills = statistics.kills ?? 0
-  const totalErrors = statistics.attackErrors ?? 0
+  const totalAttackErrors = statistics.attackErrors ?? 0
   const totalSetsPlayed = statistics.setsPlayed ?? 0
   const totalAttackAttempts = statistics.attackAttempts ?? 0
 
@@ -185,7 +185,7 @@ const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
   const totalServeAttempts = statistics.serveAttempts ?? 0
 
   const totalKillsPerSet = totalKills / totalSetsPlayed
-  const totalAttackEfficiency = round2DecimalPlaces((totalKills - totalErrors) / totalAttackAttempts, 2)
+  const totalAttackEfficiency = round2DecimalPlaces((totalKills - totalAttackErrors) / totalAttackAttempts, 2)
 
   const totalReceivePercentage = round2DecimalPlaces(
     (totalReceivePerfect * 3 + totalReceivePositive * 2 + totalReceiveNegative) / totalReceiveAttempts,

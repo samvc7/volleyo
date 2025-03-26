@@ -4,27 +4,30 @@ import { Bar, BarChart, XAxis } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-const chartData = [
-  { date: "2024-07-15", running: 450, swimming: 300 },
-  { date: "2024-07-16", running: 380, swimming: 420 },
-  { date: "2024-07-17", running: 520, swimming: 120 },
-  { date: "2024-07-18", running: 140, swimming: 550 },
-  { date: "2024-07-19", running: 600, swimming: 350 },
-  { date: "2024-07-20", running: 480, swimming: 400 },
-]
+import { GameWithStatistic } from "../games/page"
+import { format } from "date-fns"
+import { DATE_FORMAT, DATE_ISO_FORMAT } from "@/app/utils"
 
 const chartConfig = {
-  running: {
+  attack: {
     label: "Attack",
     color: "hsl(var(--chart-1))",
   },
-  swimming: {
+  receive: {
     label: "Receive",
     color: "hsl(var(--chart-4))",
   },
 } satisfies ChartConfig
 
-export function StackedBarChartErrors() {
+export function StackedBarChartErrors({ games }: { games: GameWithStatistic[] }) {
+  const chartData = games.map(game => {
+    return {
+      date: format(game.date, DATE_ISO_FORMAT),
+      attack: game.statistics.reduce((acc, stat) => acc + (stat.attackErrors ?? 0), 0),
+      receive: game.statistics.reduce((acc, stat) => acc + (stat.receiveError ?? 0), 0),
+    }
+  })
+
   return (
     <Card>
       <CardHeader>
@@ -43,21 +46,19 @@ export function StackedBarChartErrors() {
               tickMargin={10}
               axisLine={false}
               tickFormatter={value => {
-                return new Date(value).toLocaleDateString("en-US", {
-                  weekday: "short",
-                })
+                return format(new Date(value), DATE_FORMAT)
               }}
             />
             <Bar
-              dataKey="running"
+              dataKey="attack"
               stackId="a"
-              fill="var(--color-running)"
+              fill="var(--color-attack)"
               radius={[0, 0, 4, 4]}
             />
             <Bar
-              dataKey="swimming"
+              dataKey="receive"
               stackId="a"
-              fill="var(--color-swimming)"
+              fill="var(--color-receive)"
               radius={[4, 4, 0, 0]}
             />
             <ChartTooltip
@@ -85,7 +86,7 @@ export function StackedBarChartErrors() {
                         <div className="mt-1.5 flex basis-full items-center border-t pt-1.5 text-xs font-medium text-foreground">
                           Total
                           <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                            {item.payload.running + item.payload.swimming}
+                            {item.payload.attack + item.payload.receive}
                             <span className="font-normal text-muted-foreground">errors</span>
                           </div>
                         </div>
