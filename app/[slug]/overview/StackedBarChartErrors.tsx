@@ -4,9 +4,8 @@ import { Bar, BarChart, XAxis } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { GameWithStatistic } from "../games/page"
 import { format } from "date-fns"
-import { DATE_FORMAT, DATE_ISO_FORMAT } from "@/app/utils"
+import { DATE_FORMAT } from "@/app/utils"
 
 const chartConfig = {
   attack: {
@@ -19,15 +18,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function StackedBarChartErrors({ games }: { games: GameWithStatistic[] }) {
-  const chartData = games.map(game => {
-    return {
-      date: format(game.date, DATE_ISO_FORMAT),
-      attack: game.statistics.reduce((acc, stat) => acc + (stat.attackErrors ?? 0), 0),
-      receive: game.statistics.reduce((acc, stat) => acc + (stat.receiveError ?? 0), 0),
-    }
-  })
-
+export function StackedBarChartErrors({
+  chartData,
+}: {
+  chartData: { date: string; attack: number; receive: number }[]
+}) {
   return (
     <Card>
       <CardHeader>

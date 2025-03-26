@@ -7,6 +7,8 @@ import { columns, Leaderboard, leaderboardPlayers } from "./Leaderboard"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { GameWithStatistic } from "../games/page"
 import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
+import { format } from "date-fns"
+import { DATE_ISO_FORMAT } from "@/app/utils"
 
 type OverviewProps = {
   teamSlug: string
@@ -72,6 +74,44 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     totalServeEfficiency,
   } = calculateTotalStatistics(statistics)
 
+  const scoresChartData = games.map(game => ({
+    date: format(game.date, DATE_ISO_FORMAT),
+    scores: game.statistics.reduce((acc, curr) => {
+      const kills = curr.kills ?? 0
+      const blocks = (curr.blockSingle ?? 0) + (curr.blockMultiple ?? 0)
+      const aces = curr.serveAces ?? 0
+      const scores = kills + blocks + aces
+
+      return acc + scores
+    }, 0),
+    errors: game.statistics.reduce((acc, curr) => {
+      const attackErrors = curr.attackErrors ?? 0
+      const serveErrors = curr.serveErrors ?? 0
+      const receiveErrors = curr.receiveError ?? 0
+      const setErrors = curr.setErrors ?? 0
+      const digErrors = curr.digErrors ?? 0
+      const blockErrors = curr.blockErrors ?? 0
+
+      const errors = attackErrors + serveErrors + receiveErrors + setErrors + digErrors + blockErrors
+
+      return acc + errors
+    }, 0),
+  }))
+
+  const errorsChartData = games.map(game => {
+    return {
+      date: format(game.date, DATE_ISO_FORMAT),
+      attack: game.statistics.reduce((acc, stat) => acc + (stat.attackErrors ?? 0), 0),
+      receive: game.statistics.reduce((acc, stat) => acc + (stat.receiveError ?? 0), 0),
+    }
+  })
+
+  const attackChartData = games.map(game => ({
+    date: format(game.date, DATE_ISO_FORMAT),
+    attempts: game.statistics.reduce((acc, curr) => acc + (curr.attackAttempts ?? 0), 0),
+    errors: game.statistics.reduce((acc, curr) => acc + (curr.attackErrors ?? 0), 0),
+  }))
+
   return (
     <>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
@@ -129,9 +169,9 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
       </div>
 
       <div className="grid gap-4 grid-cols-2">
-        <LineChartScore games={games} />
-        <StackedBarChartErrors games={games} />
-        <BarChartMultiple games={games} />
+        <LineChartScore chartData={scoresChartData} />
+        <StackedBarChartErrors chartData={errorsChartData} />
+        <BarChartMultiple chartData={attackChartData} />
         <Leaderboard
           columns={columns}
           data={leaderboardPlayers}

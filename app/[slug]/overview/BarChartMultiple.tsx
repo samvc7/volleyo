@@ -3,9 +3,8 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { GameWithStatistic } from "../games/page"
 import { format } from "date-fns"
-import { DATE_FORMAT, DATE_ISO_FORMAT } from "@/app/utils"
+import { DATE_FORMAT } from "@/app/utils"
 
 const chartConfig = {
   attempts: {
@@ -18,13 +17,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function BarChartMultiple({ games }: { games: GameWithStatistic[] }) {
-  const chartData = games.map(game => ({
-    date: format(game.date, DATE_ISO_FORMAT),
-    attempts: game.statistics.reduce((acc, curr) => acc + (curr.attackAttempts ?? 0), 0),
-    errors: game.statistics.reduce((acc, curr) => acc + (curr.attackErrors ?? 0), 0),
-  }))
-
+export function BarChartMultiple({
+  chartData,
+}: {
+  chartData: { date: string; attempts: number; errors: number }[]
+}) {
   return (
     <Card>
       <CardHeader>

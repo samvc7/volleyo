@@ -5,8 +5,7 @@ import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { GameWithStatistic } from "../games/page"
-import { DATE_ISO_FORMAT } from "@/app/utils"
+import { DATE_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
 
 const chartConfig = {
@@ -20,41 +19,23 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-type LineChartScoreProps = {
-  games: GameWithStatistic[]
+type ScoresChartData = {
+  date: string
+  scores: number
+  errors: number
 }
 
-export function LineChartScore({ games }: LineChartScoreProps) {
+type LineChartScoreProps = {
+  chartData: ScoresChartData[]
+}
+
+export function LineChartScore({ chartData }: LineChartScoreProps) {
   const [activeChart, setActiveChart] = React.useState<keyof typeof chartConfig>("scores")
-
-  const data = games.map(game => ({
-    date: format(game.date, DATE_ISO_FORMAT),
-    scores: game.statistics.reduce((acc, curr) => {
-      const kills = curr.kills ?? 0
-      const blocks = (curr.blockSingle ?? 0) + (curr.blockMultiple ?? 0)
-      const aces = curr.serveAces ?? 0
-      const scores = kills + blocks + aces
-
-      return acc + scores
-    }, 0),
-    errors: game.statistics.reduce((acc, curr) => {
-      const attackErrors = curr.attackErrors ?? 0
-      const serveErrors = curr.serveErrors ?? 0
-      const receiveErrors = curr.receiveError ?? 0
-      const setErrors = curr.setErrors ?? 0
-      const digErrors = curr.digErrors ?? 0
-      const blockErrors = curr.blockErrors ?? 0
-
-      const errors = attackErrors + serveErrors + receiveErrors + setErrors + digErrors + blockErrors
-
-      return acc + errors
-    }, 0),
-  }))
 
   const total = React.useMemo(
     () => ({
-      scores: data.reduce((acc, curr) => acc + curr.scores, 0),
-      errors: data.reduce((acc, curr) => acc + curr.errors, 0),
+      scores: chartData.reduce((acc, curr) => acc + curr.scores, 0),
+      errors: chartData.reduce((acc, curr) => acc + curr.errors, 0),
     }),
     [],
   )
@@ -92,7 +73,7 @@ export function LineChartScore({ games }: LineChartScoreProps) {
         >
           <LineChart
             accessibilityLayer
-            data={data}
+            data={chartData}
             margin={{
               left: 12,
               right: 12,
@@ -106,11 +87,7 @@ export function LineChartScore({ games }: LineChartScoreProps) {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={value => {
-                const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })
+                return format(new Date(value), DATE_FORMAT)
               }}
             />
             <ChartTooltip
@@ -119,11 +96,7 @@ export function LineChartScore({ games }: LineChartScoreProps) {
                   className="w-[150px]"
                   nameKey={activeChart}
                   labelFormatter={value => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
+                    return format(new Date(value), DATE_FORMAT)
                   }}
                 />
               }
