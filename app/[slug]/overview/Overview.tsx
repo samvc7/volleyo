@@ -54,7 +54,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     where: gameWhereQuery,
     include: { statistics: true },
     orderBy: { date: "asc" },
-    ...(hasDateFilter ? { take: 30 } : {}),
+    ...(!hasDateFilter ? { take: 30 } : {}),
   })
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
@@ -240,10 +240,9 @@ const calculateGamesOverview = (games: GameWithStatistic[]) => {
   let loses = 0
 
   games.forEach(game => {
-    if (!game.score) return
+    if (!game.teamScore || !game.opponentScore) return
 
-    const [ourScore, enemyScore] = game.score.split("-").map(Number)
-    if (ourScore > enemyScore) {
+    if (game.teamScore > game.opponentScore) {
       wins++
     } else {
       loses++
