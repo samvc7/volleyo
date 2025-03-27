@@ -118,13 +118,15 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const {
     totalKills,
-    totalKillsPerSet,
+    totalAttackErrors,
+    totalAttackAttempts,
     totalAttackEfficiency,
     totalDigs,
     totalBlocks,
     totalReceivePercentage,
     totalAces,
     totalServeErrors,
+    totalServeAttempts,
     totalServeEfficiency,
   } = calculateTotalStatistics(statistics)
 
@@ -190,7 +192,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
           <CardContent>
             <div className="text-2xl font-bold">Efficiency: {totalAttackEfficiency}</div>
             <p className="text-xs text-muted-foreground">
-              Total Kills: {totalKills}, Kills per Set: {totalKillsPerSet}
+              Kills: {totalKills}, Errors: {totalAttackErrors}, Attempts: {totalAttackAttempts}
             </p>
           </CardContent>
         </Card>
@@ -214,9 +216,9 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
             <CrosshairIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Efficiency: {totalServeEfficiency}%</div>
+            <div className="text-2xl font-bold">Efficiency: {totalServeEfficiency}</div>
             <p className="text-xs text-muted-foreground">
-              Aces: {totalAces}, Errors: {totalServeErrors}
+              Aces: {totalAces}, Errors: {totalServeErrors}, Attempts: {totalServeAttempts}
             </p>
           </CardContent>
         </Card>
@@ -263,7 +265,6 @@ const calculateGamesOverview = (games: GameWithStatistic[]) => {
 const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
   const totalKills = statistics.kills ?? 0
   const totalAttackErrors = statistics.attackErrors ?? 0
-  const totalSetsPlayed = statistics.setsPlayed ?? 0
   const totalAttackAttempts = statistics.attackAttempts ?? 0
 
   const totalDigs = statistics.digs ?? 0
@@ -277,7 +278,6 @@ const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
   const totalServeErrors = statistics.serveErrors ?? 0
   const totalServeAttempts = statistics.serveAttempts ?? 0
 
-  const totalKillsPerSet = totalKills / totalSetsPlayed
   const totalAttackEfficiency = round2DecimalPlaces((totalKills - totalAttackErrors) / totalAttackAttempts, 2)
 
   const totalReceivePercentage = round2DecimalPlaces(
@@ -289,13 +289,15 @@ const calculateTotalStatistics = (statistics: StatisticsAggregate) => {
 
   return {
     totalKills,
-    totalKillsPerSet,
+    totalAttackErrors,
+    totalAttackAttempts,
     totalAttackEfficiency,
     totalDigs,
     totalBlocks,
     totalReceivePercentage,
     totalAces,
     totalServeErrors,
+    totalServeAttempts,
     totalServeEfficiency,
   }
 }
