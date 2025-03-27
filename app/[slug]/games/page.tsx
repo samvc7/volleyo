@@ -1,6 +1,6 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { NewGameDialog } from "./NewGameDialog"
-import { GameCard } from "./GameDayCard"
+import { GameCardLink } from "./GameDayCard"
 import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 
@@ -50,10 +50,9 @@ export default async function GamesView({
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (
-            <GameCard
-              key={game.id}
-              game={game}
-            />
+            <li key={game.id}>
+              <GameCardLink game={game} />
+            </li>
           ))}
         </ul>
       ) : null}
@@ -67,10 +66,9 @@ export default async function GamesView({
       {pastGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4">
           {pastGames.map(game => (
-            <GameCard
-              key={game.id}
-              game={game}
-            />
+            <li key={game.id}>
+              <GameCardLink game={game} />
+            </li>
           ))}
         </ul>
       ) : null}
