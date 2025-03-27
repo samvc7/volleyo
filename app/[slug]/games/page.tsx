@@ -1,6 +1,6 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { NewGameDialog } from "./NewGameDialog"
-import { GameCardLink } from "./GameDayCard"
+import { GameCardLink } from "./GameCard"
 import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 
