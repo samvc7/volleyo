@@ -46,6 +46,12 @@ export const games = [
     teamScore: 25,
     opponentScore: 20,
   },
+  {
+    title: "Game 5",
+    slug: "game-5",
+    description: "Playoffs",
+    date: new Date(),
+  },
 ]
 
 export const gameStatistics = [
