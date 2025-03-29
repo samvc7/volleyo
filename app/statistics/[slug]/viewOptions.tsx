@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Table } from "@tanstack/react-table"
-import { Settings2 } from "lucide-react"
+import { Eye } from "lucide-react"
 
 interface ViewOptionsProps<TData> {
   table: Table<TData>
@@ -21,10 +21,10 @@ export function ViewOptions<TData>({ table }: ViewOptionsProps<TData>) {
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-10 lg:flex"
+          className="h-10"
         >
-          <Settings2 />
-          View
+          <Eye className="h-4 w-4 mr-2" />
+          Columns
         </Button>
       </DropdownMenuTrigger>
 

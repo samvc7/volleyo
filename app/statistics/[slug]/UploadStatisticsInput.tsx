@@ -2,6 +2,8 @@
 
 import { ChangeEvent } from "react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Upload } from "lucide-react"
 
 export type UploadStatisticsProps<TData> = {
   onUploadData(data: TData[]): void
@@ -85,14 +87,28 @@ export const UploadStatisticsInput = <TData,>({ onUploadData }: UploadStatistics
   }
 
   return (
-    <Input
-      id="statistics"
-      name="statistics"
-      type="file"
-      accept=".csv"
-      required
-      onChange={handleOnChange}
-    />
+    <div>
+      <label htmlFor="statistics">
+        <Button
+          variant="outline"
+          className="h-10"
+          asChild
+        >
+          <div>
+            <Upload className="h-4 w-4 mr-2" />
+            Import CSV
+          </div>
+        </Button>
+      </label>
+      <Input
+        id="statistics"
+        name="statistics"
+        type="file"
+        accept=".csv"
+        className="hidden"
+        onChange={handleOnChange}
+      />
+    </div>
   )
 }
 

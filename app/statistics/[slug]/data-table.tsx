@@ -117,14 +117,18 @@ export function DataTable<TData extends Statistics, TValue>({
   return (
     <>
       <div className="flex items-center gap-4 py-4">
-        <Input
-          placeholder="Filter names ..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Filter names ..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
+            className="w-full sm:w-64"
+          />
+          <ViewOptions table={table} />
+        </div>
 
         <div className="flex gap-2 ml-auto">
+          <UploadStatisticsInput onUploadData={handleUploadData} />
           {hasUnsavedChanges ? (
             <ButtonWithLoading
               label="Save"
@@ -133,8 +137,6 @@ export function DataTable<TData extends Statistics, TValue>({
               onClick={handleSave}
             />
           ) : null}
-          <UploadStatisticsInput onUploadData={handleUploadData} />
-          <ViewOptions table={table} />
         </div>
       </div>
       <div className="rounded-md border">
