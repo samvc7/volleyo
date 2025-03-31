@@ -48,6 +48,7 @@ export const NewGameDialog = ({
     try {
       createGameWithDateAndTeamSlug(formData)
       setShowDialog(false)
+      setSelectedDate(undefined)
       toast({ title: "New game created" })
     } catch (error) {
       console.error(error)
@@ -107,13 +108,39 @@ export const NewGameDialog = ({
                 placeholder="Describe this game with useful information like address, game format, etc."
               />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <DatePicker
+                  id="date"
+                  name="date"
+                  date={selectedDate}
+                  onDateChange={setSelectedDate}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="time">Time</Label>
+                <Input
+                  id="time"
+                  type="time"
+                  onChange={data => {
+                    const [hours, minutes] = data.target.value.split(":")
+                    setSelectedDate(prev => {
+                      if (!prev) return prev
+                      console.log("🚀 ~ prev:", prev)
+                      prev.setHours(parseInt(hours), parseInt(minutes))
+                      return prev
+                    })
+                  }}
+                />
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
-              <DatePicker
-                id="date"
-                name="date"
-                date={selectedDate}
-                onDateChange={setSelectedDate}
+              <Label htmlFor="location">Location</Label>
+
+              <Input
+                id="location"
+                name="location"
               />
             </div>
             <div className="space-y-2">

@@ -22,8 +22,8 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
       date,
       ...(participants.length
         ? {
-            participants: {
-              create: participants.map(id => ({ Person: { connect: { id } } })),
+            statistics: {
+              create: participants.map(id => ({ personId: id })),
             },
           }
         : {}),
