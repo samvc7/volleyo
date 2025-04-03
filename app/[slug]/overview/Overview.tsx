@@ -19,14 +19,14 @@ type OverviewProps = {
 export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
   const hasDateFilter = !!fromDateFilter && !!toDateFilter
   const gameWhereQuery = {
-    Team: { slug: teamSlug },
+    team: { slug: teamSlug },
     AND: { teamScore: { not: null }, opponentScore: { not: null } },
     ...(hasDateFilter ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } } : {}),
   }
 
   const statistics = (
     await prisma.statistics.aggregate({
-      where: { Game: gameWhereQuery },
+      where: { game: gameWhereQuery },
       _sum: {
         kills: true,
         attackErrors: true,
@@ -59,7 +59,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
     by: ["personId"],
-    where: { Game: gameWhereQuery },
+    where: { game: gameWhereQuery },
     _sum: {
       kills: true,
       attackAttempts: true,
@@ -83,16 +83,16 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     },
   })
 
-  const leaderBoardData = leaderBoardStatistics.map(statisitc => {
-    const player = leaderBoardPlayers.find(player => player.id === statisitc.personId)
+  const leaderBoardData = leaderBoardStatistics.map(statistic => {
+    const player = leaderBoardPlayers.find(player => player.id === statistic.personId)
 
     // TODO: handle not found player
 
-    const kills = statisitc._sum.kills ?? 0
-    const serveAces = statisitc._sum.serveAces ?? 0
-    const blocks = (statisitc._sum.blockSingle ?? 0) + (statisitc._sum.blockMultiple ?? 0)
-    const digs = statisitc._sum.digs ?? 0
-    const setAssists = statisitc._sum.setAssists ?? 0
+    const kills = statistic._sum.kills ?? 0
+    const serveAces = statistic._sum.serveAces ?? 0
+    const blocks = (statistic._sum.blockSingle ?? 0) + (statistic._sum.blockMultiple ?? 0)
+    const digs = statistic._sum.digs ?? 0
+    const setAssists = statistic._sum.setAssists ?? 0
 
     const score = kills * 1.5 + serveAces * 1.2 + blocks + digs * 0.75 + setAssists * 0.75
 

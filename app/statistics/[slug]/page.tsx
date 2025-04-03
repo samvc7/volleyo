@@ -11,7 +11,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     include: {
       statistics: {
         include: {
-          Person: { select: { firstName: true, lastName: true } },
+          person: { select: { firstName: true, lastName: true } },
         },
       },
     },
@@ -22,10 +22,10 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   }
 
   const statistics = game?.statistics.map(statistic => {
-    const { Person, ...statisticData } = statistic
+    const { person, ...statisticData } = statistic
     return {
       ...statisticData,
-      name: `${Person.firstName} ${Person.lastName}`,
+      name: `${person.firstName} ${person.lastName}`,
     }
   }) as Statistics[]
 

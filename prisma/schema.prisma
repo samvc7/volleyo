@@ -30,11 +30,12 @@ model Team {
 }
 
 model TeamMembers {
-  Person    Person    @relation(fields: [personId], references: [id])
-  personId  String
-  Team      Team      @relation(fields: [teamId], references: [id])
-  teamId    String
-  removedAt DateTime? @map("removed_at")
+  person      Person    @relation(fields: [personId], references: [id])
+  personId    String
+  team        Team      @relation(fields: [teamId], references: [id])
+  teamId      String
+  memberSince DateTime? @default(now()) @map("created_at")
+  removedAt   DateTime? @map("removed_at")
 
   @@id([personId, teamId])
 }
@@ -43,15 +44,14 @@ model Game {
   id            String       @id @default(cuid())
   slug          String       @unique
   title         String
-  teamName      String
-  opponentName  String
-  teamScore     Int?
-  opponentScore Int?
   description   String?
   location      String?
   date          DateTime
-  Team          Team?        @relation(fields: [teamId], references: [id])
+  team          Team?        @relation(fields: [teamId], references: [id])
   teamId        String?
+  opponentName  String?
+  teamScore     Int?
+  opponentScore Int?
   statistics    Statistics[]
 }
 
@@ -85,9 +85,9 @@ model Statistics {
   blocksPerSet      Float? @map("blocks_per_set")
   setsPlayed        Int?   @map("sets_played")
 
-  Person   Person @relation(fields: [personId], references: [id])
+  person   Person @relation(fields: [personId], references: [id])
   personId String
-  Game     Game   @relation(fields: [gameId], references: [id])
+  game     Game   @relation(fields: [gameId], references: [id])
   gameId   String
 
   @@unique([personId, gameId])

@@ -15,7 +15,7 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
     ...(nickName ? { nickName } : {}),
     team: {
       create: {
-        Team: {
+        team: {
           connect: {
             slug: teamSlug,
           },

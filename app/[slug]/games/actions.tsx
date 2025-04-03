@@ -29,7 +29,7 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
             },
           }
         : {}),
-      Team: { connect: { slug: teamSlug } },
+      team: { connect: { slug: teamSlug } },
     },
   })
 

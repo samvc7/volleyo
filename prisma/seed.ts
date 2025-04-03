@@ -33,7 +33,7 @@ async function main() {
 
             return {
               ...stats,
-              Person: {
+              person: {
                 connect: {
                   id: personRecords.find(person => person.firstName === statistic.name.split(" ")[0])?.id,
                 },

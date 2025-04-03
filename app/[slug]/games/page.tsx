@@ -17,13 +17,13 @@ export default async function GamesView({
   const toDate = new Date(to as string)
 
   const games = await prisma.game.findMany({
-    include: { statistics: true },
-    where: { Team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
+    include: { statistics: true, team: true },
+    where: { team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
     orderBy: { date: "desc" },
   })
 
   const members = await prisma.person.findMany({
-    where: { team: { some: { Team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
+    where: { team: { some: { team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
     select: { id: true, firstName: true, lastName: true, nickName: true },
   })
 
