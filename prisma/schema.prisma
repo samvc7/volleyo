@@ -43,6 +43,8 @@ model Game {
   id            String       @id @default(cuid())
   slug          String       @unique
   title         String
+  teamName      String
+  opponentName  String
   teamScore     Int?
   opponentScore Int?
   description   String?

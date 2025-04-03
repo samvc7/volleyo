@@ -7,6 +7,7 @@ import slugify from "slugify"
 export const createGame = async (teamSlug: string, date: Date, formData: FormData) => {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
+  const location = formData.get("location") as string
   const participants =
     formData
       .get("participants")
@@ -20,6 +21,7 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
       slug: slugify(title, { lower: true, strict: true }),
       description,
       date,
+      location,
       ...(participants.length
         ? {
             statistics: {
@@ -32,4 +34,22 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
   })
 
   revalidatePath("/[slug]/games", "page")
+}
+
+export const updateGame = async (gameId: string, date: Date, formData: FormData) => {
+  const title = formData.get("title") as string
+  const description = formData.get("description") as string
+  const location = formData.get("location") as string
+
+  await prisma.game.update({
+    where: { id: gameId },
+    data: {
+      title,
+      description,
+      date,
+      location,
+    },
+  })
+
+  revalidatePath("statistics/[slug]", "page")
 }

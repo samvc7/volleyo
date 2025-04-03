@@ -1,7 +1,7 @@
 "use client"
 
-import { ReactNode, useActionState, useState } from "react"
-import { PlusCircle } from "lucide-react"
+import { useActionState, useState } from "react"
+import { SquarePen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -15,27 +15,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { DatePicker } from "./DatePicker"
-import { MultiSelect } from "@/components/ui/multi-select"
-import { Person } from "@prisma/client"
+
+import { Game } from "@prisma/client"
 import { toast } from "@/hooks/use-toast"
-import { createGame } from "./actions"
-import { useParams } from "next/navigation"
+
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { DatePicker } from "@/app/[slug]/games/DatePicker"
+import { updateGame } from "./actions"
 
-type ParticipantsNamesAndID = Pick<Person, "id" | "firstName" | "lastName" | "nickName">
+type EditGameDialogProps = {
+  game: Game
+}
 
-export const NewGameDialog = ({
-  participants,
-  children,
-}: {
-  participants: ParticipantsNamesAndID[]
-  children: ReactNode
-}) => {
-  const { slug } = useParams() as { slug: string }
-
+export const EditGameDialog = ({ game }: EditGameDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date>()
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(game.date)
+  console.log("🚀 ~ EditGameDialog ~ selectedDate:", selectedDate)
 
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     if (!selectedDate) {
@@ -43,16 +38,15 @@ export const NewGameDialog = ({
       return null
     }
 
-    const createGameWithDateAndTeamSlug = createGame.bind(null, slug, selectedDate)
+    const updateGameWithIdAndDate = updateGame.bind(null, game.id, selectedDate)
 
     try {
-      createGameWithDateAndTeamSlug(formData)
+      updateGameWithIdAndDate(formData)
       setShowDialog(false)
-      setSelectedDate(undefined)
-      toast({ title: "New game created" })
+      toast({ title: "Saved game" })
     } catch (error) {
       console.error(error)
-      return "Could not create new game. Please try again"
+      return "Could not save game. Please try again"
     }
 
     return null
@@ -68,26 +62,23 @@ export const NewGameDialog = ({
         asChild
       >
         <Button
-          variant={"outline"}
+          variant="ghost"
           aria-expanded={showDialog}
-          aria-label="Create Game"
+          aria-label="Edit Game"
+          className="h-8 w-8 p-0 ml-auto"
           onClick={() => {
             setShowDialog(true)
           }}
-          className="ml-auto"
         >
-          <PlusCircle className="h-5 w-5" />
-          Create Game
+          <span className="sr-only">Edit game</span>
+          <SquarePen className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      {children}
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Game</DialogTitle>
-          <DialogDescription>
-            Add a new tournament, single game, training, tuneup etc. to manage statistics.
-          </DialogDescription>
+          <DialogTitle>Edit Game</DialogTitle>
+          <DialogDescription>Make changes to the game information.</DialogDescription>
         </DialogHeader>
 
         <form action={formAction}>
@@ -97,6 +88,7 @@ export const NewGameDialog = ({
               <Input
                 id="title"
                 name="title"
+                defaultValue={game.title}
                 required
               />
             </div>
@@ -105,6 +97,7 @@ export const NewGameDialog = ({
               <Textarea
                 id="description"
                 name="description"
+                defaultValue={game.description ?? undefined}
                 placeholder="Describe this game with useful information like address, game format, etc."
               />
             </div>
@@ -114,7 +107,7 @@ export const NewGameDialog = ({
                 <DatePicker
                   id="date"
                   name="date"
-                  date={selectedDate}
+                  date={selectedDate ? selectedDate : new Date(game.date)}
                   onDateChange={setSelectedDate}
                 />
               </div>
@@ -123,10 +116,11 @@ export const NewGameDialog = ({
                 <Input
                   id="time"
                   type="time"
+                  defaultValue={selectedDate ? selectedDate.toTimeString().slice(0, 5) : ""}
                   onChange={data => {
                     const [hours, minutes] = data.target.value.split(":")
                     setSelectedDate(prev => {
-                      if (!prev) return prev
+                      if (!prev || !hours || !minutes) return prev
                       prev.setHours(parseInt(hours), parseInt(minutes))
                       return prev
                     })
@@ -140,17 +134,54 @@ export const NewGameDialog = ({
               <Input
                 id="location"
                 name="location"
+                defaultValue={game.location ?? undefined}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="participants">Participants</Label>
-              <MultiSelect
-                id="participants"
-                name="participants"
-                options={parseParticipants(participants)}
-                onValueChange={() => {}}
-              />
+
+            {/* <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="my-team">My Team</Label>
+                <Input
+                  id="my-team"
+                  name="my-team"
+                  defaultValue={"My Team"}
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="opponent">Opponent</Label>
+                <Input
+                  id="opponent"
+                  name="opponent"
+                  defaultValue={"insert opponent name"}
+                />
+              </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="home-score">Home Score</Label>
+                <Input
+                  id="home-score"
+                  name="home-score"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={game.teamScore ?? undefined}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="away-score">Away Score</Label>
+                <Input
+                  id="away-score"
+                  name="away-score"
+                  type="number"
+                  min={0}
+                  max={100}
+                  defaultValue={game.opponentScore ?? undefined}
+                />
+              </div>
+            </div> */}
           </div>
 
           <DialogFooter>
@@ -161,8 +192,8 @@ export const NewGameDialog = ({
               Cancel
             </Button>
             <ButtonWithLoading
-              label="Create"
-              loadingLabel="Creating..."
+              label="Save"
+              loadingLabel="Saving..."
               disabled={isPending}
               type="submit"
             />
@@ -171,11 +202,4 @@ export const NewGameDialog = ({
       </DialogContent>
     </Dialog>
   )
-}
-
-const parseParticipants = (participants: ParticipantsNamesAndID[]) => {
-  return participants.map(p => ({
-    value: p.id,
-    label: p.nickName ? p.nickName : `${p.firstName} ${p.lastName}`,
-  }))
 }

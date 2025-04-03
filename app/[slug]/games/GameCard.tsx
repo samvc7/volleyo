@@ -1,12 +1,12 @@
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { SquarePen, Users } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Users } from "lucide-react"
 import { GameWithStatistic } from "./page"
 import { Game } from "@prisma/client"
-import { DATE_FORMAT } from "@/app/utils"
+import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { EditGameDialog } from "./EditGameDialog"
 
 type GameCardLinkProps = {
   game: GameWithStatistic
@@ -49,31 +49,24 @@ export const GameCard = ({ game, participantsCount, isEditable = false, classNam
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>{game.title}</CardTitle>
-          {isEditable ? (
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Edit game</span>
-              <SquarePen className="h-4 w-4" />
-            </Button>
-          ) : null}
+          {isEditable ? <EditGameDialog game={game} /> : null}
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 items-start gap-4 h-full">
           <div>
             <div className="text-sm text-muted-foreground">
-              <div>📅 {format(game.date, DATE_FORMAT)}</div>
-              <div>📍 TBA</div>
-              <p>{game.description}</p>
-            </div>
-            {participantsCount !== undefined ? (
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Users size={16} />
-                {participantsCount}
+              <div>
+                📅 {format(game.date, DATE_FORMAT)} ⏰ {format(game.date, TIME_FORMAT)}
               </div>
-            ) : null}
+              <div>📍 {game.location || "TBA"}</div>
+              {participantsCount !== undefined ? (
+                <div className="flex items-center gap-1">
+                  <Users size={14} />
+                  {participantsCount}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <div className="flex justify-center gap-6 h-full">
@@ -88,6 +81,7 @@ export const GameCard = ({ game, participantsCount, isEditable = false, classNam
             </div>
           </div>
         </div>
+        <CardDescription>{game.description}</CardDescription>
       </CardContent>
     </Card>
   )

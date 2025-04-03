@@ -6,6 +6,7 @@ export const parsePersonName = (person: Pick<Person, "firstName" | "lastName" | 
 }
 
 export const DATE_FORMAT = "dd.MM.yy"
+export const TIME_FORMAT = "HH:mm"
 export const DATE_ISO_FORMAT = "yyyy-MM-dd"
 
 export function getCurrentSemesterRange(): [Date, Date] {

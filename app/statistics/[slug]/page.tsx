@@ -2,8 +2,6 @@ import { DataTable } from "@/app/statistics/[slug]/data-table"
 import { Statistics } from "./columns"
 import { columns } from "./columns"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { format } from "date-fns"
-import { DATE_FORMAT } from "@/app/utils"
 import { GameCard } from "@/app/[slug]/games/GameCard"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -33,9 +31,6 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <h1 className="text-3xl font-bold">
-        {game.title} - {format(game.date, DATE_FORMAT)}
-      </h1>
       <GameCard
         game={game}
         participantsCount={game.statistics.length}
