@@ -40,6 +40,9 @@ export const updateGame = async (gameId: string, date: Date, formData: FormData)
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const location = formData.get("location") as string
+  const teamScore = formData.get("team-score") as string
+  const opponentName = formData.get("opponent") as string
+  const opponentScore = formData.get("opponent-score") as string
 
   await prisma.game.update({
     where: { id: gameId },
@@ -48,6 +51,9 @@ export const updateGame = async (gameId: string, date: Date, formData: FormData)
       description,
       date,
       location,
+      teamScore: teamScore ? parseInt(teamScore) : null,
+      opponentName,
+      opponentScore: opponentScore ? parseInt(opponentScore) : null,
     },
   })
 

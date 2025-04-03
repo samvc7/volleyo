@@ -22,9 +22,10 @@ import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { DatePicker } from "@/app/[slug]/games/DatePicker"
 import { updateGame } from "./actions"
+import { GameWithRelations } from "./page"
 
 type EditGameDialogProps = {
-  game: Game
+  game: GameWithRelations
 }
 
 export const EditGameDialog = ({ game }: EditGameDialogProps) => {
@@ -137,13 +138,13 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
               />
             </div>
 
-            {/* <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="my-team">My Team</Label>
+                <Label htmlFor="team">Team</Label>
                 <Input
-                  id="my-team"
-                  name="my-team"
-                  defaultValue={"My Team"}
+                  id="team"
+                  name="team"
+                  defaultValue={game.team?.name ?? "Team"}
                   disabled
                 />
               </div>
@@ -152,17 +153,17 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                 <Input
                   id="opponent"
                   name="opponent"
-                  defaultValue={"insert opponent name"}
+                  defaultValue={game.opponentName ?? undefined}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="home-score">Home Score</Label>
+                <Label htmlFor="team-score">Team Score</Label>
                 <Input
-                  id="home-score"
-                  name="home-score"
+                  id="team-score"
+                  name="team-score"
                   type="number"
                   min={0}
                   max={100}
@@ -170,17 +171,17 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="away-score">Away Score</Label>
+                <Label htmlFor="opponent-score">Opponent Score</Label>
                 <Input
-                  id="away-score"
-                  name="away-score"
+                  id="opponent-score"
+                  name="opponent-score"
                   type="number"
                   min={0}
                   max={100}
                   defaultValue={game.opponentScore ?? undefined}
                 />
               </div>
-            </div> */}
+            </div>
           </div>
 
           <DialogFooter>

@@ -1,12 +1,12 @@
 import { EditGameDialog } from "@/app/[slug]/games/EditGameDialog"
 import { Score } from "@/app/[slug]/games/GameCard"
+import { GameWithRelations } from "@/app/[slug]/games/page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Game } from "@prisma/client"
 import { format } from "date-fns"
 
 type GameDetailsCardProps = {
-  game: Game
+  game: GameWithRelations
   className?: string
 }
 
@@ -27,6 +27,8 @@ export const GameDetailsCard = ({ game, className }: GameDetailsCardProps) => {
       </CardHeader>
       <CardContent>
         <Score
+          teamName={game.team?.name}
+          opponentName={game.opponentName}
           teamScore={game.teamScore}
           opponentScore={game.opponentScore}
         />

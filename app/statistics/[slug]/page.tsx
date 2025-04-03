@@ -14,6 +14,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
           person: { select: { firstName: true, lastName: true } },
         },
       },
+      team: true,
     },
   })
 

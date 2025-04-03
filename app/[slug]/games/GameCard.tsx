@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users } from "lucide-react"
-import { GameWithStatistic } from "./page"
+import { GameWithRelations } from "./page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
 type GameCardLinkProps = {
-  game: GameWithStatistic
+  game: GameWithRelations
 }
 
 export const GameCardLink = ({ game }: GameCardLinkProps) => {
@@ -17,7 +17,7 @@ export const GameCardLink = ({ game }: GameCardLinkProps) => {
       legacyBehavior
       passHref
     >
-      <Card>
+      <Card className="hover:bg-slate-100 dark:hover:bg-slate-50 cursor-pointer">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>{game.title}</CardTitle>
@@ -39,6 +39,8 @@ export const GameCardLink = ({ game }: GameCardLinkProps) => {
             </div>
 
             <Score
+              teamName={game.team?.name}
+              opponentName={game.opponentName}
               teamScore={game.teamScore}
               opponentScore={game.opponentScore}
             />
@@ -50,9 +52,13 @@ export const GameCardLink = ({ game }: GameCardLinkProps) => {
 }
 
 export const Score = ({
+  teamName,
+  opponentName,
   teamScore,
   opponentScore,
 }: {
+  teamName?: string
+  opponentName: string | null
   teamScore: number | null
   opponentScore: number | null
 }) => {
@@ -62,12 +68,12 @@ export const Score = ({
   return (
     <div className="flex justify-center gap-6 h-full">
       <div className="text-center">
-        <h3 className="font-semibold">Team Score</h3>
+        <h3 className="font-semibold">{teamName || "Team"}</h3>
         <div className={cn("text-5xl font-bold", winLoseColor)}>{teamScore}</div>
       </div>
       <div className="font-semibold">vs</div>
       <div className="text-center">
-        <h3 className="font-semibold">Opponent Score</h3>
+        <h3 className="font-semibold">{opponentName || "Opponent"}</h3>
         <div className={cn("text-5xl font-bold", winLoseColor)}>{opponentScore}</div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export default async function GamesView({
   })
 
   const today = new Date()
-  const [upcomingGames, pastGames] = games.reduce<[GameWithStatistic[], GameWithStatistic[]]>(
+  const [upcomingGames, pastGames] = games.reduce<[GameWithRelations[], GameWithRelations[]]>(
     ([upcoming, past], game) => {
       if (game.date >= today) {
         upcoming.push(game)
@@ -76,4 +76,4 @@ export default async function GamesView({
   )
 }
 
-export type GameWithStatistic = Prisma.GameGetPayload<{ include: { statistics: true } }>
+export type GameWithRelations = Prisma.GameGetPayload<{ include: { statistics: true; team?: true } }>

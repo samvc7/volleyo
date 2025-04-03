@@ -5,10 +5,10 @@ import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
 import { columns, Leaderboard } from "./Leaderboard"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { GameWithStatistic } from "../games/page"
 import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
 import { format } from "date-fns"
 import { DATE_ISO_FORMAT } from "@/app/utils"
+import { Game } from "@prisma/client"
 
 type OverviewProps = {
   teamSlug: string
@@ -237,7 +237,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   )
 }
 
-const calculateGamesOverview = (games: GameWithStatistic[]) => {
+const calculateGamesOverview = (games: Game[]) => {
   let wins = 0
   let loses = 0
 
