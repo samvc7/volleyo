@@ -2,7 +2,7 @@ import { DataTable } from "@/app/statistics/[slug]/data-table"
 import { Statistics } from "./columns"
 import { columns } from "./columns"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { GameCard } from "@/app/[slug]/games/GameCard"
+import { GameDetailsCard } from "./GameDetailsCard"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const slug = (await params).slug
@@ -31,11 +31,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <GameCard
-        game={game}
-        participantsCount={game.statistics.length}
-        isEditable
-      />
+      <GameDetailsCard game={game} />
       <DataTable
         gameId={game.id}
         columns={columns}
