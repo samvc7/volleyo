@@ -48,7 +48,7 @@ export const AddTeamMemberDialog = () => {
         asChild
       >
         <Button
-          className="h-8"
+          className="h-10"
           variant={"outline"}
           size="sm"
           aria-expanded={showDialog}

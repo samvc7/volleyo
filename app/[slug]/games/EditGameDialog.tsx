@@ -30,7 +30,6 @@ type EditGameDialogProps = {
 export const EditGameDialog = ({ game }: EditGameDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(game.date)
-  console.log("🚀 ~ EditGameDialog ~ selectedDate:", selectedDate)
 
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     if (!selectedDate) {

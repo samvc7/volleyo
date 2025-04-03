@@ -7,7 +7,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -16,7 +15,6 @@ import {
   RowData,
 } from "@tanstack/react-table"
 import { useState, useTransition } from "react"
-import { Pagination } from "./pagination"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
@@ -73,7 +71,6 @@ export function DataTable<TData extends Statistics, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -191,8 +188,6 @@ export function DataTable<TData extends Statistics, TValue>({
           </TableBody>
         </Table>
       </div>
-
-      <Pagination table={table} />
     </>
   )
 }
