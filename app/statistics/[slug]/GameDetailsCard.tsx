@@ -1,20 +1,26 @@
+"use client"
+
+import { useState } from "react"
 import { EditGameDialog } from "@/app/[slug]/games/EditGameDialog"
 import { Score } from "@/app/[slug]/games/GameCard"
 import { GameWithRelations } from "@/app/[slug]/games/page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
+import { ChevronUp, ChevronDown } from "lucide-react"
 
 type GameDetailsCardProps = {
   game: GameWithRelations
-  className?: string
 }
 
-export const GameDetailsCard = ({ game, className }: GameDetailsCardProps) => {
+export const GameDetailsCard = ({ game }: GameDetailsCardProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   return (
-    <Card className={className}>
+    <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex justify-between">
           <div className="flex flex-col gap-2">
             <CardTitle>{game.title}</CardTitle>
             <CardDescription>
@@ -22,23 +28,36 @@ export const GameDetailsCard = ({ game, className }: GameDetailsCardProps) => {
               {game.location || "TBA"}
             </CardDescription>
           </div>
+
           <EditGameDialog game={game} />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(prev => !prev)}
+            className="h-8 w-8"
+          >
+            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            <span className="sr-only">{isCollapsed ? "Expand" : "Collapse"}</span>
+          </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <Score
-          teamName={game.team?.name}
-          opponentName={game.opponentName}
-          teamScore={game.teamScore}
-          opponentScore={game.opponentScore}
-        />
-        {game.description && (
-          <div className="mt-4">
-            <h3 className="font-semibold">Description</h3>
-            <p className="text-sm">{game.description}</p>
-          </div>
-        )}
-      </CardContent>
+      {!isCollapsed && (
+        <CardContent>
+          <Score
+            teamName={game.team?.name}
+            opponentName={game.opponentName}
+            teamScore={game.teamScore}
+            opponentScore={game.opponentScore}
+          />
+          {game.description && (
+            <div className="mt-4">
+              <h3 className="font-semibold">Description</h3>
+              <p className="text-sm">{game.description}</p>
+            </div>
+          )}
+        </CardContent>
+      )}
     </Card>
   )
 }
