@@ -49,10 +49,10 @@ export const NewGameDialog = ({
       createGameWithDateAndTeamSlug(formData)
       setShowDialog(false)
       setSelectedDate(undefined)
-      toast({ title: "New game created" })
+      toast({ title: "New game added" })
     } catch (error) {
       console.error(error)
-      return "Could not create new game. Please try again"
+      return "Could not add new game. Please try again"
     }
 
     return null
@@ -70,21 +70,21 @@ export const NewGameDialog = ({
         <Button
           variant={"outline"}
           aria-expanded={showDialog}
-          aria-label="Create Game"
+          aria-label="Add Game"
           onClick={() => {
             setShowDialog(true)
           }}
           className="ml-auto"
         >
           <PlusCircle className="h-5 w-5" />
-          Create Game
+          Add Game
         </Button>
       </DialogTrigger>
       {children}
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create Game</DialogTitle>
+          <DialogTitle>Add Game</DialogTitle>
           <DialogDescription>
             Add a new tournament, single game, training, tuneup etc. to manage statistics.
           </DialogDescription>
@@ -161,8 +161,8 @@ export const NewGameDialog = ({
               Cancel
             </Button>
             <ButtonWithLoading
-              label="Create"
-              loadingLabel="Creating..."
+              label="Save"
+              loadingLabel="Saving..."
               disabled={isPending}
               type="submit"
             />
