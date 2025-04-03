@@ -16,6 +16,7 @@ import { MoreHorizontal } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { CellContext } from "@tanstack/react-table"
 import { Statistics } from "."
+import { Badge } from "@/components/ui/badge"
 
 export const selectActionColumn = columnHelper.display({
   id: "select",
@@ -53,6 +54,24 @@ export const nameColumn = columnHelper.accessor(
           column={column}
           title="# Name"
           tooltip="Player number & name"
+        />
+      )
+    },
+  },
+)
+
+export const positionColumn = columnHelper.accessor(
+  replaceEmptyToDash(row => {
+    return row.positions?.map(position => <Badge variant="outline">{position}</Badge>)
+  }),
+  {
+    id: "positions",
+    header: ({ column }) => {
+      return (
+        <ColumnHeader
+          column={column}
+          title="Positions"
+          tooltip="Player positions"
         />
       )
     },

@@ -45,6 +45,6 @@ export const getCommonPinningClasses = <TData>(column: Column<TData>): string =>
 export const replaceEmptyToDash = (fn: (row: Statistics) => any) => {
   return (row: Statistics) => {
     const value = fn ? fn(row) : row
-    return value === null || value === undefined || value === "" ? "-" : value
+    return value === null || value === undefined || value === "" || value.length === 0 ? "-" : value
   }
 }

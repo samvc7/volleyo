@@ -8,6 +8,14 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Position {
+  OUTSIDE_HITTER
+  OPPOSITE
+  MIDDLE_BLOCKER
+  SETTER
+  LIBERO
+}
+
 model Person {
   id         String        @id @default(cuid())
   email      String?
@@ -85,10 +93,11 @@ model Statistics {
   blocksPerSet      Float? @map("blocks_per_set")
   setsPlayed        Int?   @map("sets_played")
 
-  person   Person @relation(fields: [personId], references: [id])
-  personId String
-  game     Game   @relation(fields: [gameId], references: [id])
-  gameId   String
+  positions Position[]
+  person    Person     @relation(fields: [personId], references: [id])
+  personId  String
+  game      Game       @relation(fields: [gameId], references: [id])
+  gameId    String
 
   @@unique([personId, gameId])
 }

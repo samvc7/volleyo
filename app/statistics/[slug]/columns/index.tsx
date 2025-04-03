@@ -6,16 +6,19 @@ import {
   digGroupColumn,
   generalGroupColumn,
   nameColumn,
+  positionColumn,
   receiveGroupColumn,
   selectActionColumn,
   serveGroupColumn,
   setsGroupColumn,
 } from "./columns"
+import { Position } from "@prisma/client"
 
 // research: Need to use invertSorting because sortDescFirst is not working
 export const columns: ColumnDef<Statistics>[] = [
   selectActionColumn,
   nameColumn,
+  positionColumn,
   attackGroupColum,
   serveGroupColumn,
   receiveGroupColumn,
@@ -30,6 +33,7 @@ export const columns: ColumnDef<Statistics>[] = [
 export type Statistics = {
   id: string
   name: string
+  positions?: Position[]
   // attack
   kills?: number
   attackErrors?: number
@@ -62,7 +66,7 @@ export type Statistics = {
   blockErrors?: number
   blocksPerSet?: number
   setsPlayed?: number
-  //
+  // relations
   personId?: string
   gameId?: string
 }
