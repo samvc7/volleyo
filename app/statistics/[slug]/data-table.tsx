@@ -22,6 +22,8 @@ import { saveStatistics } from "./actions"
 import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { AddPlayerDialog } from "./AddPlayerDialog"
+import { Person } from "@prisma/client"
 
 type EditingCell = {
   rowId: string
@@ -38,12 +40,14 @@ declare module "@tanstack/react-table" {
 
 interface DataTableProps<TData, TValue> {
   gameId: string
+  membersNotParticipating: Person[]
   columns: ColumnDef<TData, TValue>[]
   initialData?: TData[]
 }
 
 export function DataTable<TData extends Statistics, TValue>({
   gameId,
+  membersNotParticipating,
   columns,
   initialData = [],
 }: DataTableProps<TData, TValue>) {
@@ -125,6 +129,12 @@ export function DataTable<TData extends Statistics, TValue>({
         </div>
 
         <div className="flex gap-2 ml-auto">
+          {membersNotParticipating.length > 0 ? (
+            <AddPlayerDialog
+              gameId={gameId}
+              membersNotParticipating={membersNotParticipating}
+            />
+          ) : null}
           <UploadStatisticsInput onUploadData={handleUploadData} />
           {hasUnsavedChanges ? (
             <ButtonWithLoading

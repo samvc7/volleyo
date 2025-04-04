@@ -343,7 +343,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         )}
         <input
           type="hidden"
-          name="participants"
+          name={props.name}
           value={selectedValues}
         />
       </Popover>

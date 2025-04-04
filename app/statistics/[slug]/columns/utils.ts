@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils"
 import { Column, createColumnHelper } from "@tanstack/react-table"
 import { Statistics } from "."
+import { Position } from "@prisma/client"
 
 export const columnHelper = createColumnHelper<Statistics>()
 
@@ -47,4 +48,28 @@ export const replaceEmptyToDash = (fn: (row: Statistics) => any) => {
     const value = fn ? fn(row) : row
     return value === null || value === undefined || value === "" || value.length === 0 ? "-" : value
   }
+}
+
+export const positionLongLabels: Record<Position, string> = {
+  OUTSIDE_HITTER: "Outside Hitter",
+  OPPOSITE: "Opposite",
+  MIDDLE_BLOCKER: "Middle Blocker",
+  SETTER: "Setter",
+  LIBERO: "Libero",
+}
+
+export const positionShortLabels: Record<Position, string> = {
+  OUTSIDE_HITTER: "OH",
+  OPPOSITE: "DIA",
+  MIDDLE_BLOCKER: "MB",
+  SETTER: "S",
+  LIBERO: "L",
+}
+
+export const positionBadgeColors: Record<Position, string> = {
+  OUTSIDE_HITTER: "border-sky-500 text-sky-600",
+  OPPOSITE: "border-indigo-500 text-indigo-600",
+  MIDDLE_BLOCKER: "border-rose-500 text-rose-600",
+  SETTER: "border-emerald-500 text-emerald-600",
+  LIBERO: "border-amber-500 text-amber-600",
 }

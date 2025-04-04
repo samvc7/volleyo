@@ -17,11 +17,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "./DatePicker"
 import { MultiSelect } from "@/components/ui/multi-select"
-import { Person } from "@prisma/client"
+import { Person, Position } from "@prisma/client"
 import { toast } from "@/hooks/use-toast"
 import { createGame } from "./actions"
 import { useParams } from "next/navigation"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { positionShortLabels } from "@/app/statistics/[slug]/columns/utils"
 
 type ParticipantsNamesAndID = Pick<Person, "id" | "firstName" | "lastName" | "nickName">
 
@@ -136,19 +137,9 @@ export const NewGameDialog = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-
               <Input
                 id="location"
                 name="location"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="participants">Participants</Label>
-              <MultiSelect
-                id="participants"
-                name="participants"
-                options={parseParticipants(participants)}
-                onValueChange={() => {}}
               />
             </div>
           </div>
@@ -171,11 +162,4 @@ export const NewGameDialog = ({
       </DialogContent>
     </Dialog>
   )
-}
-
-const parseParticipants = (participants: ParticipantsNamesAndID[]) => {
-  return participants.map(p => ({
-    value: p.id,
-    label: p.nickName ? p.nickName : `${p.firstName} ${p.lastName}`,
-  }))
 }

@@ -3,7 +3,7 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { revalidatePath } from "next/cache"
 import { Statistics } from "./columns"
-import { Prisma } from "@prisma/client"
+import { Position, Prisma } from "@prisma/client"
 
 export const saveStatistics = async (data: Statistics[], gameId: string) => {
   await Promise.all(
@@ -27,6 +27,25 @@ export const saveStatistics = async (data: Statistics[], gameId: string) => {
         })
       }),
   )
+
+  revalidatePath("/statistics/[slug]", "page")
+}
+
+export const addPlayer = async (gameId: string, formData: FormData) => {
+  const personId = formData.get("member") as string
+  const positions = (formData
+    .get("positions")
+    ?.toString()
+    .split(",")
+    .filter(p => p.trim().length) || []) as Position[]
+
+  await prisma.statistics.create({
+    data: {
+      personId,
+      gameId,
+      positions,
+    },
+  })
 
   revalidatePath("/statistics/[slug]", "page")
 }

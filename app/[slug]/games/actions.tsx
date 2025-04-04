@@ -8,12 +8,6 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const location = formData.get("location") as string
-  const participants =
-    formData
-      .get("participants")
-      ?.toString()
-      .split(",")
-      .filter(p => p.trim().length) || []
 
   await prisma.game.create({
     data: {
@@ -22,13 +16,6 @@ export const createGame = async (teamSlug: string, date: Date, formData: FormDat
       description,
       date,
       location,
-      ...(participants.length
-        ? {
-            statistics: {
-              create: participants.map(id => ({ personId: id })),
-            },
-          }
-        : {}),
       team: { connect: { slug: teamSlug } },
     },
   })

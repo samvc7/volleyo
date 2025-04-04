@@ -2,7 +2,14 @@
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnHeader } from "../columnHeader"
-import { columnHelper, replaceEmptyToDash, round2DecimalPlaces, toPercentage } from "./utils"
+import {
+  columnHelper,
+  positionBadgeColors,
+  positionShortLabels,
+  replaceEmptyToDash,
+  round2DecimalPlaces,
+  toPercentage,
+} from "./utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { CellContext } from "@tanstack/react-table"
 import { Statistics } from "."
 import { Badge } from "@/components/ui/badge"
+import { Position } from "@prisma/client"
 
 export const selectActionColumn = columnHelper.display({
   id: "select",
@@ -61,9 +69,7 @@ export const nameColumn = columnHelper.accessor(
 )
 
 export const positionColumn = columnHelper.accessor(
-  replaceEmptyToDash(row => {
-    return row.positions?.map(position => <Badge variant="outline">{position}</Badge>)
-  }),
+  replaceEmptyToDash(row => row.positions),
   {
     id: "positions",
     header: ({ column }) => {
@@ -73,6 +79,24 @@ export const positionColumn = columnHelper.accessor(
           title="Positions"
           tooltip="Player positions"
         />
+      )
+    },
+    cell: data => {
+      if (data.getValue().includes("-")) return data.getValue()
+      return (
+        <div className="flex flex-wrap gap-1">
+          {data.getValue().map((value: Position) => {
+            return (
+              <Badge
+                key={`${data.cell.id}-${value}`}
+                variant="outline"
+                className={positionBadgeColors[value]}
+              >
+                {positionShortLabels[value]}
+              </Badge>
+            )
+          })}
+        </div>
       )
     },
   },

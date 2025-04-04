@@ -30,11 +30,19 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     }
   }) as Statistics[]
 
+  const membersNotParticipating = await prisma.person.findMany({
+    where: {
+      team: { some: { team: { slug: game.team?.slug }, removedAt: null } },
+      statistics: { none: { gameId: game.id } },
+    },
+  })
+
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <GameDetailsCard game={game} />
       <DataTable
         gameId={game.id}
+        membersNotParticipating={membersNotParticipating}
         columns={columns}
         initialData={statistics}
       />
