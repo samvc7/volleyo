@@ -18,6 +18,7 @@ export const PositionsMultiSelect = (props: Partial<MultiSelectProps>) => {
       placeholder="Select positions"
       onValueChange={onValueChange}
       onSelectionDone={onSelectionDone}
+      className="min-w-64"
       {...restProps}
     />
   )
