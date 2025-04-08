@@ -46,7 +46,7 @@ export default async function GamesView({
   }
 
   return (
-    <NewGameDialog participants={members}>
+    <NewGameDialog>
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (

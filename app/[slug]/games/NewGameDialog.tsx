@@ -16,23 +16,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "./DatePicker"
-import { MultiSelect } from "@/components/ui/multi-select"
-import { Person, Position } from "@prisma/client"
+import { Person } from "@prisma/client"
 import { toast } from "@/hooks/use-toast"
 import { createGame } from "./actions"
 import { useParams } from "next/navigation"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
-import { positionShortLabels } from "@/app/statistics/[slug]/columns/utils"
 
 type ParticipantsNamesAndID = Pick<Person, "id" | "firstName" | "lastName" | "nickName">
 
-export const NewGameDialog = ({
-  participants,
-  children,
-}: {
-  participants: ParticipantsNamesAndID[]
-  children: ReactNode
-}) => {
+export const NewGameDialog = ({ children }: { children: ReactNode }) => {
   const { slug } = useParams() as { slug: string }
 
   const [showDialog, setShowDialog] = useState(false)

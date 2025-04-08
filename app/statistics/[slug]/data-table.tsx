@@ -24,6 +24,8 @@ import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
 import { Person } from "@prisma/client"
+import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip"
+import { TooltipContent, TooltipProvider } from "@radix-ui/react-tooltip"
 
 type EditingCell = {
   rowId: string
@@ -35,6 +37,7 @@ declare module "@tanstack/react-table" {
     editingCell?: EditingCell
     setEditingCell?: (editingCell: EditingCell | undefined) => void
     updateCell?: (rowId: string, columnId: string, value: string) => void
+    updatePositionsCell?: (rowId: string, columnId: string, value: string[]) => void
   }
 }
 
@@ -71,6 +74,16 @@ export function DataTable<TData extends Statistics, TValue>({
     setHasUnsavedChanges(true)
   }
 
+  const updatePositionsCell = (rowId: string, columnId: string, value: string[]) => {
+    setData(prevData => {
+      const newData = prevData.map(row => {
+        return row.id === rowId ? { ...row, [columnId]: value } : row
+      })
+      return newData
+    })
+    setHasUnsavedChanges(true)
+  }
+
   const table = useReactTable({
     data,
     columns,
@@ -94,6 +107,7 @@ export function DataTable<TData extends Statistics, TValue>({
       editingCell,
       setEditingCell: editingCell => setEditingCell(editingCell),
       updateCell,
+      updatePositionsCell,
     },
   })
 
@@ -129,12 +143,11 @@ export function DataTable<TData extends Statistics, TValue>({
         </div>
 
         <div className="flex gap-2 ml-auto">
-          {membersNotParticipating.length > 0 ? (
-            <AddPlayerDialog
-              gameId={gameId}
-              membersNotParticipating={membersNotParticipating}
-            />
-          ) : null}
+          <AddPlayerDialog
+            gameId={gameId}
+            membersNotParticipating={membersNotParticipating}
+            disabled={membersNotParticipating.length === 0}
+          />
           <UploadStatisticsInput onUploadData={handleUploadData} />
           {hasUnsavedChanges ? (
             <ButtonWithLoading

@@ -41,7 +41,7 @@ const multiSelectVariants = cva(
 /**
  * Props for MultiSelect component
  */
-interface MultiSelectProps
+export interface MultiSelectProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
   /**
@@ -62,6 +62,12 @@ interface MultiSelectProps
    * Receives an array of the new selected values.
    */
   onValueChange: (value: string[]) => void
+
+  /**
+   * Callback function triggered when the selection is done.
+   * Receives an array of the final selected values.
+   */
+  onSelectionDone?: (finalValues: string[]) => void
 
   /** The default selected values when the component mounts. */
   defaultValue?: string[]
@@ -109,6 +115,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     {
       options,
       onValueChange,
+      onSelectionDone,
       variant,
       defaultValue = [],
       placeholder = "Select options",
@@ -124,6 +131,14 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const [selectedValues, setSelectedValues] = React.useState<string[]>(defaultValue)
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false)
     const [isAnimating, setIsAnimating] = React.useState(false)
+    const [isInitialOpen, setIsInitialOpen] = React.useState(true)
+
+    React.useEffect(() => {
+      setIsInitialOpen(false)
+      if (!isPopoverOpen && !isInitialOpen) {
+        onSelectionDone?.(selectedValues)
+      }
+    }, [isPopoverOpen])
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
@@ -147,6 +162,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     const handleClear = () => {
       setSelectedValues([])
       onValueChange([])
+      onSelectionDone?.([])
     }
 
     const handleTogglePopover = () => {

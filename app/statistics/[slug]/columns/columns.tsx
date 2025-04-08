@@ -25,6 +25,7 @@ import { CellContext } from "@tanstack/react-table"
 import { Statistics } from "."
 import { Badge } from "@/components/ui/badge"
 import { Position } from "@prisma/client"
+import { PositionsMultiSelect } from "../PositionsMultiSelect"
 
 export const selectActionColumn = columnHelper.display({
   id: "select",
@@ -81,24 +82,7 @@ export const positionColumn = columnHelper.accessor(
         />
       )
     },
-    cell: data => {
-      if (data.getValue().includes("-")) return data.getValue()
-      return (
-        <div className="flex flex-wrap gap-1">
-          {data.getValue().map((value: Position) => {
-            return (
-              <Badge
-                key={`${data.cell.id}-${value}`}
-                variant="outline"
-                className={positionBadgeColors[value]}
-              >
-                {positionShortLabels[value]}
-              </Badge>
-            )
-          })}
-        </div>
-      )
-    },
+    cell: data => editablePositionCell(data),
   },
 )
 
@@ -639,9 +623,62 @@ const editableCell = ({ row, column, table, getValue }: CellContext<Statistics, 
       className="max-w-sm"
     />
   ) : (
-    <span onClick={() => setEditingCell?.({ rowId: row.original.id, columnId: column.id })}>
+    <span
+      onClick={() => {
+        return setEditingCell?.({ rowId: row.original.id, columnId: column.id })
+      }}
+    >
       {getValue()}
     </span>
+  )
+}
+
+const editablePositionCell = ({ cell, row, column, table, getValue }: CellContext<Statistics, any>) => {
+  const { editingCell, setEditingCell, updatePositionsCell } = table.options.meta || {}
+  const isEditingCurrentCell = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id
+
+  if (isEditingCurrentCell) {
+    return (
+      <PositionsMultiSelect
+        autoFocus
+        defaultValue={getValue() === "-" ? [] : getValue()}
+        onSelectionDone={value => {
+          updatePositionsCell?.(row.original.id, column.id, value)
+          setEditingCell?.(undefined)
+        }}
+      />
+    )
+  }
+
+  if (getValue().includes("-")) {
+    return (
+      <span
+        onClick={() => {
+          return setEditingCell?.({ rowId: row.original.id, columnId: column.id })
+        }}
+      >
+        {getValue()}
+      </span>
+    )
+  }
+
+  return (
+    <div
+      onClick={() => setEditingCell?.({ rowId: row.original.id, columnId: column.id })}
+      className="flex flex-wrap gap-1"
+    >
+      {getValue().map((value: Position) => {
+        return (
+          <Badge
+            key={`${cell.id}-${value}`}
+            variant="outline"
+            className={positionBadgeColors[value]}
+          >
+            {positionShortLabels[value]}
+          </Badge>
+        )
+      })}
+    </div>
   )
 }
 

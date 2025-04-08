@@ -16,17 +16,17 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
-import { MultiSelect } from "@/components/ui/multi-select"
-import { Person, Position } from "@prisma/client"
-import { positionShortLabels } from "./columns/utils"
+import { Person } from "@prisma/client"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PositionsMultiSelect } from "./PositionsMultiSelect"
 
 type AddPlayerDialogProps = {
   gameId: string
   membersNotParticipating: Person[]
+  disabled?: boolean
 }
 
-export const AddPlayerDialog = ({ gameId, membersNotParticipating }: AddPlayerDialogProps) => {
+export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
   const addPlayerWithGameId = addPlayer.bind(null, gameId)
@@ -61,6 +61,7 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating }: AddPlayerDi
           onClick={() => {
             setShowDialog(true)
           }}
+          disabled={disabled}
         >
           <PlusCircle className="h-5 w-5" />
           Add Player
@@ -95,12 +96,7 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating }: AddPlayerDi
 
             <div className="space-y-2">
               <Label htmlFor="positions">Positions</Label>
-              <MultiSelect
-                id="positions"
-                name="positions"
-                options={parseToPositionSelect()}
-                onValueChange={() => {}}
-              />
+              <PositionsMultiSelect />
             </div>
           </div>
 
@@ -122,11 +118,4 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating }: AddPlayerDi
       </DialogContent>
     </Dialog>
   )
-}
-
-const parseToPositionSelect = () => {
-  return Object.values(Position).map(p => ({
-    value: p,
-    label: positionShortLabels[p],
-  }))
 }
