@@ -24,8 +24,6 @@ import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
 import { Person } from "@prisma/client"
-import { Tooltip, TooltipTrigger } from "@/components/ui/tooltip"
-import { TooltipContent, TooltipProvider } from "@radix-ui/react-tooltip"
 
 type EditingCell = {
   rowId: string
