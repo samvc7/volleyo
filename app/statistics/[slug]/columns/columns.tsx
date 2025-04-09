@@ -142,7 +142,7 @@ export const attackGroupColum = columnHelper.group({
 
         const efficiency = (row.kills - row.attackErrors) / row.attackAttempts
         const rounded = round2DecimalPlaces(efficiency, 2)
-        if (isNaN(rounded)) return row.attackEfficiency
+        if (!isFinite(rounded)) return row.attackEfficiency
         return rounded
       }),
       {
@@ -162,6 +162,7 @@ export const attackGroupColum = columnHelper.group({
         if (row.killsPerSet || !row.kills || !row.setsPlayed) return row.killsPerSet
 
         const killsPerSet = row.kills / row.setsPlayed
+        if (Number.isFinite(killsPerSet)) return row.killsPerSet
         return round2DecimalPlaces(killsPerSet, 2)
       }),
       {
@@ -232,7 +233,7 @@ export const serveGroupColumn = columnHelper.group({
         if (row.servePercentage || !row.serveAttempts || !row.serveErrors) return row.servePercentage
 
         const percentageRaw = (row.serveAttempts - row.serveErrors) / row.serveAttempts
-        if (isNaN(percentageRaw)) return row.servePercentage
+        if (!Number.isFinite(percentageRaw)) return row.servePercentage
         return toPercentage(percentageRaw)
       }),
       {
@@ -252,7 +253,7 @@ export const serveGroupColumn = columnHelper.group({
         if (row.serveEfficiency || !row.serveAces || !row.serveErrors || !row.serveAttempts)
           return row.serveEfficiency
         const efficiency = (row.serveAces - row.serveErrors) / row.serveAttempts
-        if (isNaN(efficiency)) return row.serveEfficiency
+        if (!Number.isFinite(efficiency)) return row.serveEfficiency
         return round2DecimalPlaces(efficiency, 2)
       }),
       {
@@ -384,7 +385,7 @@ export const receiveGroupColumn = columnHelper.group({
 
         const percentageRaw =
           (row.receivePerfect * 3 + row.receivePositive * 2 + row.receiveNegative) / row.receiveAttempts
-        if (isNaN(percentageRaw)) return row.receivePercentage
+        if (!Number.isFinite(percentageRaw)) return row.receivePercentage
         return round2DecimalPlaces(percentageRaw, 2)
       }),
       {

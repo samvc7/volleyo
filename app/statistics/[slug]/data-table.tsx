@@ -62,7 +62,15 @@ export function DataTable<TData extends Statistics, TValue>({
   const [isPending, startTransition] = useTransition()
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
-    const correctValueType = columnId === "name" ? value : Number(value)
+    let correctValueType
+    if (value === "-") {
+      correctValueType = undefined
+    } else if (columnId === "name") {
+      correctValueType = value
+    } else {
+      correctValueType = Number(value)
+    }
+
     setData(prevData => {
       const newData = prevData.map(row => {
         return row.id === rowId ? { ...row, [columnId]: correctValueType } : row
