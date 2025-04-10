@@ -3,6 +3,7 @@ import { NewGameDialog } from "./NewGameDialog"
 import { GameCardLink } from "./GameCard"
 import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
+import { Volleyball } from "lucide-react"
 
 export default async function GamesView({
   params,
@@ -22,11 +23,6 @@ export default async function GamesView({
     orderBy: { date: "desc" },
   })
 
-  const members = await prisma.person.findMany({
-    where: { team: { some: { team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
-    select: { id: true, firstName: true, lastName: true, nickName: true },
-  })
-
   const today = new Date()
   const [upcomingGames, pastGames] = games.reduce<[GameWithRelations[], GameWithRelations[]]>(
     ([upcoming, past], game) => {
@@ -42,11 +38,24 @@ export default async function GamesView({
   )
 
   if (!games.length) {
-    return <h1>No Games yet.</h1>
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
+        <div className="mb-4 rounded-full bg-muted p-6">
+          {<Volleyball className="h-12 w-12 text-muted-foreground" />}
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight">No games yet.</h2>
+        <p className="text-muted-foreground max-w-md mt-2 mb-6">
+          You haven't added any games yet. Start planning your games and document statistics by adding new
+          games.
+        </p>
+        <NewGameDialog />
+      </div>
+    )
   }
 
   return (
-    <NewGameDialog>
+    <>
+      <NewGameDialog triggerClassName="ml-auto" />
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (
@@ -72,7 +81,7 @@ export default async function GamesView({
           ))}
         </ul>
       ) : null}
-    </NewGameDialog>
+    </>
   )
 }
 

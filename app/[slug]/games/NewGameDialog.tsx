@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode, useActionState, useState } from "react"
+import { useActionState, useState } from "react"
 import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,21 +16,23 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "./DatePicker"
-import { Person } from "@prisma/client"
 import { toast } from "@/hooks/use-toast"
 import { createGame } from "./actions"
 import { useParams } from "next/navigation"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
-type ParticipantsNamesAndID = Pick<Person, "id" | "firstName" | "lastName" | "nickName">
+type NewGameDialogProps = {
+  triggerClassName?: string
+  forceRedirect?: boolean
+}
 
-export const NewGameDialog = ({ children }: { children: ReactNode }) => {
+export const NewGameDialog = ({ triggerClassName }: NewGameDialogProps) => {
   const { slug } = useParams() as { slug: string }
 
   const [showDialog, setShowDialog] = useState(false)
   const [selectedDate, setSelectedDate] = useState<Date>()
 
-  const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+  const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     if (!selectedDate) {
       console.error("No date selected")
       return null
@@ -67,13 +69,12 @@ export const NewGameDialog = ({ children }: { children: ReactNode }) => {
           onClick={() => {
             setShowDialog(true)
           }}
-          className="ml-auto"
+          className={triggerClassName}
         >
           <PlusCircle className="h-5 w-5" />
           Add Game
         </Button>
       </DialogTrigger>
-      {children}
 
       <DialogContent>
         <DialogHeader>

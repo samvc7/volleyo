@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CrosshairIcon, ShieldIcon, SwordsIcon, VolleyballIcon } from "lucide-react"
+import { CrosshairIcon, ShieldIcon, SwordsIcon, Volleyball, VolleyballIcon } from "lucide-react"
 import { LineChartScore } from "./LineChartScore"
 import { StackedBarChartErrors } from "./StackedBarChartErrors"
 import { BarChartMultiple } from "./BarChartMultiple"
@@ -9,6 +9,8 @@ import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
 import { format } from "date-fns"
 import { DATE_ISO_FORMAT } from "@/app/utils"
 import { Game } from "@prisma/client"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 type OverviewProps = {
   teamSlug: string
@@ -111,7 +113,25 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   const top5Players = leaderBoardData.sort((a, b) => b.score - a.score).slice(0, 5)
 
   if (games.length === 0) {
-    return <h1>No Games found.</h1>
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
+        <div className="mb-4 rounded-full bg-muted p-6">
+          {<Volleyball className="h-12 w-12 text-muted-foreground" />}
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight">No statistics yet.</h2>
+        <p className="text-muted-foreground max-w-md mt-2 mb-6">
+          There are no games found and therefor no statistics to show. Start planning your games by adding new
+          games and document statistics.
+        </p>
+        <Link
+          href={`/${teamSlug}/games`}
+          legacyBehavior
+          passHref
+        >
+          <Button variant="outline">Go to Games</Button>
+        </Link>
+      </div>
+    )
   }
 
   const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(games)
