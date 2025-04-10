@@ -24,6 +24,7 @@ import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
 import { Person } from "@prisma/client"
+import { ConfirmSaveDialog } from "./ConfirmSaveDialog"
 
 type EditingCell = {
   rowId: string
@@ -60,6 +61,7 @@ export function DataTable<TData extends Statistics, TValue>({
   const [editingCell, setEditingCell] = useState<EditingCell>()
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isFileImported, setIsFileImported] = useState(false)
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
     let correctValueType
@@ -120,13 +122,15 @@ export function DataTable<TData extends Statistics, TValue>({
   const handleUploadData = (data: TData[]) => {
     setData(data)
     setHasUnsavedChanges(true)
+    setIsFileImported(true)
   }
 
   const handleSave = () => {
     startTransition(async () => {
       try {
-        await saveStatistics(data, gameId)
+        await saveStatistics(data, gameId, isFileImported)
         setHasUnsavedChanges(false)
+        setIsFileImported(false)
         toast({ title: "Successfully saved statistics" })
       } catch (error) {
         console.error(error)
@@ -156,12 +160,22 @@ export function DataTable<TData extends Statistics, TValue>({
           />
           <UploadStatisticsInput onUploadData={handleUploadData} />
           {hasUnsavedChanges ? (
-            <ButtonWithLoading
-              label="Save"
-              loadingLabel={"Saving..."}
-              disabled={isPending}
-              onClick={handleSave}
-            />
+            isFileImported ? (
+              <ConfirmSaveDialog onConfirmAction={handleSave}>
+                <ButtonWithLoading
+                  label="Save"
+                  loadingLabel={"Saving..."}
+                  disabled={isPending}
+                />
+              </ConfirmSaveDialog>
+            ) : (
+              <ButtonWithLoading
+                label="Save"
+                loadingLabel={"Saving..."}
+                disabled={isPending}
+                onClick={handleSave}
+              />
+            )
           ) : null}
         </div>
       </div>

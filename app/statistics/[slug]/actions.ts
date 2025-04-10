@@ -5,7 +5,11 @@ import { revalidatePath } from "next/cache"
 import { Statistics } from "./columns"
 import { Position, Prisma } from "@prisma/client"
 
-export const saveStatistics = async (data: Statistics[], gameIdFallback: string) => {
+export const saveStatistics = async (
+  data: Statistics[],
+  gameIdFallback: string,
+  deleteCurrentStatistics?: boolean,
+) => {
   await Promise.all(
     data
       .filter(statistic => !statistic.name.includes("total"))
@@ -16,7 +20,7 @@ export const saveStatistics = async (data: Statistics[], gameIdFallback: string)
           const correctPersonId = personId ?? (await getPersonId(statistic))
           const correctGameId = gameId ?? gameIdFallback
 
-          await tx.statistics.deleteMany({ where: { gameId: correctGameId } })
+          if (deleteCurrentStatistics) await tx.statistics.deleteMany({ where: { gameId: correctGameId } })
 
           await tx.statistics.upsert({
             where: { personId_gameId: { personId: correctPersonId, gameId: correctGameId } },
