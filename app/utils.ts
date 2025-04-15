@@ -1,8 +1,8 @@
-import { Person } from "@prisma/client"
+import { Member } from "@prisma/client"
 import { isWithinInterval } from "date-fns"
 
-export const parsePersonName = (person: Pick<Person, "firstName" | "lastName" | "nickName">) => {
-  return person.nickName ? person.nickName : `${person.firstName} ${person.lastName}`
+export const parseMemberName = (member: Pick<Member, "firstName" | "lastName" | "nickName">) => {
+  return member.nickName ? member.nickName : `${member.firstName} ${member.lastName}`
 }
 
 export const DATE_FORMAT = "dd.MM.yy"

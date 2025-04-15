@@ -15,23 +15,23 @@ export const saveStatistics = async (
       .filter(statistic => !statistic.name.includes("total"))
       .map(async statistic => {
         return prisma.$transaction(async tx => {
-          const { id, name, personId, gameId, ...statisticPrismaPayload } = statistic
+          const { id, name, memberId, gameId, ...statisticPrismaPayload } = statistic
 
-          const correctPersonId = personId ?? (await getPersonId(statistic))
+          const correctmemberId = memberId ?? (await getMemberId(statistic))
           const correctGameId = gameId ?? gameIdFallback
 
           if (deleteCurrentStatistics) await tx.statistics.deleteMany({ where: { gameId: correctGameId } })
 
           await tx.statistics.upsert({
-            where: { personId_gameId: { personId: correctPersonId, gameId: correctGameId } },
+            where: { memberId_gameId: { memberId: correctmemberId, gameId: correctGameId } },
             update: {
               ...statisticPrismaPayload,
-              personId: correctPersonId,
+              memberId: correctmemberId,
               gameId: correctGameId,
             },
             create: {
               ...statisticPrismaPayload,
-              personId: correctPersonId,
+              memberId: correctmemberId,
               gameId: correctGameId,
             },
           })
@@ -43,7 +43,7 @@ export const saveStatistics = async (
 }
 
 export const addPlayer = async (gameId: string, formData: FormData) => {
-  const personId = formData.get("member") as string
+  const memberId = formData.get("member") as string
   const positions = (formData
     .get("positions")
     ?.toString()
@@ -52,7 +52,7 @@ export const addPlayer = async (gameId: string, formData: FormData) => {
 
   await prisma.statistics.create({
     data: {
-      personId,
+      memberId,
       gameId,
       positions,
     },
@@ -61,26 +61,26 @@ export const addPlayer = async (gameId: string, formData: FormData) => {
   revalidatePath("/statistics/[slug]", "page")
 }
 
-const getPersonId = async (statistic: Statistics) => {
-  if (statistic.personId) return statistic.personId
+const getMemberId = async (statistic: Statistics) => {
+  if (statistic.memberId) return statistic.memberId
 
   const names = statistic.name.split(" ")
 
   const firstNamesQuery = names.slice(0, names.length - 1).map(name => {
-    return { firstName: { contains: name } } as Prisma.PersonWhereInput
+    return { firstName: { contains: name } } as Prisma.MemberWhereInput
   })
 
-  const persons = await prisma.person.findMany({
+  const members = await prisma.member.findMany({
     where: { lastName: names[names.length - 1], AND: [...firstNamesQuery] },
   })
 
-  if (!persons || persons.length === 0) {
-    throw new Error(`Person not found: ${name}`)
+  if (!members || members.length === 0) {
+    throw new Error(`Member not found: ${name}`)
   }
 
-  if (persons.length > 1) {
-    throw new Error(`Multiple persons found: ${name}`)
+  if (members.length > 1) {
+    throw new Error(`Multiple members found: ${name}`)
   }
 
-  return persons[0].id
+  return members[0].id
 }

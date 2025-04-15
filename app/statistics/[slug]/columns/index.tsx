@@ -67,6 +67,6 @@ export type Statistics = {
   blocksPerSet?: number
   setsPlayed?: number
   // relations
-  personId?: string
+  memberId?: string
   gameId?: string
 }

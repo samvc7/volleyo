@@ -16,36 +16,89 @@ enum Position {
   LIBERO
 }
 
-model Person {
-  id         String        @id @default(cuid())
+enum UserRole {
+  USER
+  GUEST
+}
+
+enum TeamRole {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id       String   @id @default(cuid())
+  email    String   @unique
+  password String?
+  role     UserRole @default(USER)
+  member   Member?  @relation(fields: [memberId], references: [id])
+  memberId String   @unique
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Member {
+  id         String       @id @default(cuid())
   email      String?
-  firstName  String        @map("first_name")
-  lastName   String        @map("last_name")
-  nickName   String?       @map("nick_name")
-  createdAt  DateTime      @default(now()) @map("created_at")
+  firstName  String       @map("first_name")
+  lastName   String       @map("last_name")
+  nickName   String?      @map("nick_name")
+  createdAt  DateTime     @default(now()) @map("created_at")
   birthday   DateTime?
-  team       TeamMembers[]
+  user       User?        @relation
+  team       TeamMember[]
   statistics Statistics[]
 }
 
 model Team {
-  id          String        @id @default(cuid())
-  slug        String        @unique
+  id          String       @id @default(cuid())
+  slug        String       @unique
   name        String
   description String?
-  members     TeamMembers[]
+  members     TeamMember[]
   games       Game[]
 }
 
-model TeamMembers {
-  person      Person    @relation(fields: [personId], references: [id])
-  personId    String
-  team        Team      @relation(fields: [teamId], references: [id])
+model TeamMember {
+  member      Member     @relation(fields: [memberId], references: [id])
+  memberId    String
+  team        Team       @relation(fields: [teamId], references: [id])
   teamId      String
-  memberSince DateTime? @default(now()) @map("created_at")
-  removedAt   DateTime? @map("removed_at")
+  roles       TeamRole[]
+  memberSince DateTime?  @default(now()) @map("created_at")
+  removedAt   DateTime?  @map("removed_at")
 
-  @@id([personId, teamId])
+  @@id([memberId, teamId])
+  @@map("TeamMember")
 }
 
 model Game {
@@ -94,10 +147,10 @@ model Statistics {
   setsPlayed        Int?   @map("sets_played")
 
   positions Position[]
-  person    Person     @relation(fields: [personId], references: [id])
-  personId  String
+  member    Member     @relation(fields: [memberId], references: [id])
+  memberId  String
   game      Game       @relation(fields: [gameId], references: [id])
   gameId    String
 
-  @@unique([personId, gameId])
+  @@unique([memberId, gameId])
 }

@@ -1,51 +1,58 @@
-import { Person, PrismaClient } from "@prisma/client"
-import { games, gameStatistics, persons } from "./seedData"
+import { Member, PrismaClient } from "@prisma/client"
+import { games, gameStatistics, members } from "./seedData"
 
 const prisma = new PrismaClient()
 async function main() {
-  const personRecords: Person[] = []
-  for (const person of persons) {
-    const record = await prisma.person.create({
-      data: person,
-    })
-    personRecords.push(record)
-  }
+  await prisma.$transaction(async tx => {
+    const memberRecords: Member[] = []
+    for (const member of members) {
+      const record = await tx.member.create({
+        data: member,
+      })
+      memberRecords.push(record)
+    }
 
-  const team = await prisma.team.create({
-    data: {
-      name: "Alpha Squad",
-      description: "Elite volleyball team",
-      slug: "alpha-squad",
-      members: {
-        create: personRecords.map(person => ({ personId: person.id })),
-      },
-    },
-  })
-
-  games.forEach(async (game, ix) => {
-    await prisma.game.create({
+    const team = await tx.team.create({
       data: {
-        ...game,
-        teamId: team.id,
-        statistics: {
-          create: gameStatistics[ix].map(statistic => {
-            const { name, ...stats } = statistic
-
-            return {
-              ...stats,
-              person: {
-                connect: {
-                  id: personRecords.find(person => person.firstName === statistic.name.split(" ")[0])?.id,
-                },
-              },
-            }
-          }),
+        name: "Alpha Squad",
+        description: "Elite volleyball team",
+        slug: "alpha-squad",
+        members: {
+          create: memberRecords.map(member => ({ memberId: member.id })),
         },
       },
     })
-  })
 
-  console.log("Seed data inserted successfully")
+    for (let ix = 0; ix < games.length; ix++) {
+      const game = games[ix]
+      const stats = gameStatistics[ix]
+      await tx.game.create({
+        data: {
+          ...game,
+          teamId: team.id,
+          statistics: stats
+            ? {
+                create: gameStatistics[ix].map(statistic => {
+                  const { name, ...stats } = statistic
+
+                  return {
+                    ...stats,
+                    member: {
+                      connect: {
+                        id: memberRecords.find(member => member.firstName === statistic.name.split(" ")[0])
+                          ?.id,
+                      },
+                    },
+                  }
+                }),
+              }
+            : undefined,
+        },
+      })
+    }
+
+    console.log("Seed data inserted successfully")
+  })
 }
 main()
   .then(async () => {

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { Person } from "@prisma/client"
+import { Member } from "@prisma/client"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 export const AddTeamMemberDialog = () => {
@@ -122,7 +122,7 @@ export const AddTeamMemberDialog = () => {
   )
 }
 
-export const EditTeamMemberDialog = ({ member, children }: { member: Person; children: ReactNode }) => {
+export const EditTeamMemberDialog = ({ member, children }: { member: Member; children: ReactNode }) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
   const editMemberWithId = editMember.bind(null, member.id)

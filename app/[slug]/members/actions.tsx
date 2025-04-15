@@ -22,9 +22,9 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
         },
       },
     },
-  } satisfies Prisma.PersonCreateInput
+  } satisfies Prisma.MemberCreateInput
 
-  await prisma.person.create({
+  await prisma.member.create({
     data,
   })
 
@@ -40,9 +40,9 @@ export const editMember = async (id: string, formData: FormData) => {
     firstName: formData.get("firstName") as string,
     lastName: formData.get("lastName") as string,
     ...(nickName ? { nickName } : {}),
-  } satisfies Prisma.PersonUpdateInput
+  } satisfies Prisma.MemberUpdateInput
 
-  await prisma.person.update({
+  await prisma.member.update({
     data,
     where: { id },
   })
@@ -57,9 +57,9 @@ export const removeMember = async (teamSlug: string, id: string) => {
   })
   if (!teamId) throw new Error("Team not found")
 
-  await prisma.teamMembers.update({
+  await prisma.teamMember.update({
     data: { removedAt: new Date() },
-    where: { personId_teamId: { personId: id, teamId: teamId.id } },
+    where: { memberId_teamId: { memberId: id, teamId: teamId.id } },
   })
 
   revalidatePath("/[slug]/members", "page")

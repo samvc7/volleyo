@@ -16,13 +16,13 @@ import { Button } from "@/components/ui/button"
 import { PlusCircle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
-import { Person } from "@prisma/client"
+import { Member } from "@prisma/client"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PositionsMultiSelect } from "./PositionsMultiSelect"
 
 type AddPlayerDialogProps = {
   gameId: string
-  membersNotParticipating: Person[]
+  membersNotParticipating: Member[]
   disabled?: boolean
 }
 

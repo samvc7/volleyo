@@ -60,7 +60,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   })
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
-    by: ["personId"],
+    by: ["memberId"],
     where: { game: gameWhereQuery },
     _sum: {
       kills: true,
@@ -73,9 +73,9 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     },
   })
 
-  const leaderBoardPlayers = await prisma.person.findMany({
+  const leaderBoardPlayers = await prisma.member.findMany({
     where: {
-      id: { in: leaderBoardStatistics.map(data => data.personId) },
+      id: { in: leaderBoardStatistics.map(data => data.memberId) },
     },
     select: {
       id: true,
@@ -86,7 +86,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   })
 
   const leaderBoardData = leaderBoardStatistics.map(statistic => {
-    const player = leaderBoardPlayers.find(player => player.id === statistic.personId)
+    const player = leaderBoardPlayers.find(player => player.id === statistic.memberId)
 
     // TODO: handle not found player
 

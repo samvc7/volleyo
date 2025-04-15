@@ -5,7 +5,7 @@ import { AddTeamMemberDialog } from "./dialogs"
 
 export default async function TeamMembersView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const teamMembers = await prisma.person.findMany({
+  const teamMembers = await prisma.member.findMany({
     where: { team: { some: { team: { slug } } }, AND: { team: { some: { removedAt: null } } } },
   })
 

@@ -11,7 +11,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     include: {
       statistics: {
         include: {
-          person: { select: { firstName: true, lastName: true } },
+          member: { select: { firstName: true, lastName: true } },
         },
       },
       team: true,
@@ -23,14 +23,14 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   }
 
   const statistics = game?.statistics.map(statistic => {
-    const { person, ...statisticData } = statistic
+    const { member, ...statisticData } = statistic
     return {
       ...statisticData,
-      name: `${person.firstName} ${person.lastName}`,
+      name: `${member.firstName} ${member.lastName}`,
     }
   }) as Statistics[]
 
-  const membersNotParticipating = await prisma.person.findMany({
+  const membersNotParticipating = await prisma.member.findMany({
     where: {
       team: { some: { team: { slug: game.team?.slug }, removedAt: null } },
       statistics: { none: { gameId: game.id } },

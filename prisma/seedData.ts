@@ -1,6 +1,6 @@
 import { subDays } from "date-fns"
 
-export const persons = [
+export const members = [
   { firstName: "Caroline", lastName: "Toberman", email: "caroline.toberman@example.com" },
   { firstName: "Madison", lastName: "Maxwell", email: "madison.maxwell@example.com" },
   { firstName: "Milani", lastName: "Lee", email: "milani.lee@example.com" },

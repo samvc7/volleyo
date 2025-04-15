@@ -31,13 +31,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Person } from "@prisma/client"
+import { Member } from "@prisma/client"
 import { removeMember } from "./actions"
 import { useToast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
 import { AddTeamMemberDialog, EditTeamMemberDialog } from "./dialogs"
 
-export const columns: ColumnDef<Person>[] = [
+export const columns: ColumnDef<Member>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -195,7 +195,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   )
 }
 
-const MemberActions = ({ member }: { member: Person }) => {
+const MemberActions = ({ member }: { member: Member }) => {
   const { slug } = useParams() as { slug: string }
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()

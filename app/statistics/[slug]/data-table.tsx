@@ -23,7 +23,7 @@ import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
-import { Person } from "@prisma/client"
+import { Member } from "@prisma/client"
 import { ConfirmSaveDialog } from "./ConfirmSaveDialog"
 
 type EditingCell = {
@@ -42,7 +42,7 @@ declare module "@tanstack/react-table" {
 
 interface DataTableProps<TData, TValue> {
   gameId: string
-  membersNotParticipating: Person[]
+  membersNotParticipating: Member[]
   columns: ColumnDef<TData, TValue>[]
   initialData?: TData[]
 }
