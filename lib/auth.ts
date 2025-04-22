@@ -3,7 +3,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 // import GoogleProvider from "next-auth/providers/google"
 // import FacebookProvider from "next-auth/providers/facebook"
-import { AuthOptions } from "next-auth"
+import NextAuth, { AuthOptions, getServerSession } from "next-auth"
 import { compare } from "bcrypt"
 import { prisma } from "@/prisma/singlePrismaClient"
 
@@ -25,6 +25,7 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("🚀 ~ authorize ~ credentials:", credentials)
         if (!credentials?.email || !credentials?.password) return null
 
         const user = await prisma.user.findUnique({
@@ -52,6 +53,12 @@ export const authOptions: AuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/login",
   },
+}
+
+export default NextAuth(authOptions)
+
+export const getAuthSession = () => {
+  return getServerSession(authOptions)
 }

@@ -6,11 +6,18 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/compon
 import { OverviewLink } from "./navigations/OverviewLink"
 import { GamesLink } from "./navigations/GamesLink"
 import { MembersLink } from "./navigations/MembersLink"
+import { getAuthSession } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function Layout({
   params,
   children,
 }: Readonly<{ params: Promise<{ slug: string }>; children: ReactNode }>) {
+  const session = await getAuthSession()
+  if (!session) {
+    redirect("/login")
+  }
+
   const { slug } = await params
   const teams = await prisma.team.findMany()
   // TODO: not found team with slug

@@ -11,6 +11,7 @@ export const members = [
   { firstName: "Jaydin", lastName: "Watts", email: "jaydin.watts@example.com" },
   { firstName: "Benjamin", lastName: "Wilson", email: "benjamin.wilson@example.com" },
   { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" },
+  { firstName: "Ad", lastName: "Min", email: "admin@example.com" },
 ]
 
 export const games = [
