@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { cn } from "../lib/utils"
 import "./globals.css"
-import { MainNav } from "./MainNav"
+import { MainNav } from "./nav/MainNav"
 import { Toaster } from "@/components/ui/toaster"
 import Providers from "./providers"
 
