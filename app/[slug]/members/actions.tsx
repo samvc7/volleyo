@@ -13,7 +13,7 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
     firstName: formData.get("firstName") as string,
     lastName: formData.get("lastName") as string,
     ...(nickName ? { nickName } : {}),
-    team: {
+    teams: {
       create: {
         team: {
           connect: {

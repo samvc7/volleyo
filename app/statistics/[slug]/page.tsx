@@ -39,7 +39,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
   const membersNotParticipating = await prisma.member.findMany({
     where: {
-      team: { some: { team: { slug: game.team?.slug }, removedAt: null } },
+      teams: { some: { team: { slug: game.team?.slug }, removedAt: null } },
       statistics: { none: { gameId: game.id } },
     },
   })

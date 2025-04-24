@@ -1,15 +1,16 @@
 "use client"
 
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { signIn } from "next-auth/react"
+import Link from "next/link"
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("")
+  const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
@@ -18,7 +19,7 @@ export default function LoginForm() {
     e.preventDefault()
 
     const res = await signIn("credentials", {
-      email,
+      identifier,
       password,
       redirect: false,
     })
@@ -42,12 +43,12 @@ export default function LoginForm() {
           className="space-y-4"
         >
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="identifier">Email or Username</Label>
             <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              id="identifier"
+              type="text"
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
               required
             />
           </div>
@@ -69,6 +70,16 @@ export default function LoginForm() {
             Login
           </Button>
         </form>
+
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          Don’t have an account?{" "}
+          <Link
+            href="/register"
+            className="text-blue-600 hover:underline"
+          >
+            Register
+          </Link>
+        </p>
       </CardContent>
     </Card>
   )
