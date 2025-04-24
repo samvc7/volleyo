@@ -12,12 +12,9 @@ export default async function Home() {
   }
 
   const teams = await prisma.team.findMany({
+    where: { members: { some: { member: { userId: session.user.id } } } },
     select: { slug: true, name: true, description: true, id: true },
   })
-
-  if (teams.length === 0) {
-    return <h1>No teams found.</h1>
-  }
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">

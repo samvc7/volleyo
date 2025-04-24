@@ -19,7 +19,9 @@ export default async function Layout({
   }
 
   const { slug } = await params
-  const teams = await prisma.team.findMany()
+  const teams = await prisma.team.findMany({
+    where: { members: { some: { member: { userId: session.user.id } } } },
+  })
   // TODO: not found team with slug
   const selectedTeam = (await prisma.team.findUnique({ where: { slug } })) ?? undefined
 
