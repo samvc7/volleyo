@@ -2,9 +2,14 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { columns, DataTable } from "./data-table"
 import { Users } from "lucide-react"
 import { AddTeamMemberDialog } from "./dialogs"
+import { getAuthSession } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function TeamMembersView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const session = await getAuthSession()
+  if (session?.user.teamRoles[slug] !== "ADMIN") return redirect("/forbidden")
+
   const teamMembers = await prisma.member.findMany({
     where: { teams: { some: { team: { slug } } }, AND: { teams: { some: { removedAt: null } } } },
   })

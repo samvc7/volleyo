@@ -44,13 +44,17 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     },
   })
 
+  const isAdmin = session.user.teamRoles[game.team?.slug ?? ""] === "ADMIN"
+
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <GameDetailsCard game={game} />
       <DataTable
         gameId={game.id}
+        teamSlug={game.team?.slug ?? ""}
         membersNotParticipating={membersNotParticipating}
         columns={columns}
+        isAdmin={isAdmin}
         initialData={statistics}
       />
     </main>

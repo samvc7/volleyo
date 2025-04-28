@@ -8,6 +8,7 @@ import { GamesLink } from "./navigations/GamesLink"
 import { MembersLink } from "./navigations/MembersLink"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { Permission } from "@/components/ui/custom/Permission"
 
 export default async function Layout({
   params,
@@ -42,9 +43,11 @@ export default async function Layout({
               <GamesLink href={`/${slug}/games`} />
             </NavigationMenuItem>
 
-            <NavigationMenuItem className="space-x-1">
-              <MembersLink href={`/${slug}/members`} />
-            </NavigationMenuItem>
+            <Permission teamSlug={slug}>
+              <NavigationMenuItem className="space-x-1">
+                <MembersLink href={`/${slug}/members`} />
+              </NavigationMenuItem>
+            </Permission>
           </NavigationMenuList>
         </NavigationMenu>
         <DatePickerWithRange className="ml-auto" />

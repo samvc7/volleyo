@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import {
-  actionsColumn,
+  // actionsColumn,
   attackGroupColum,
   blockGroupColumn,
   digGroupColumn,
@@ -26,7 +26,7 @@ export const columns: ColumnDef<Statistics>[] = [
   digGroupColumn,
   blockGroupColumn,
   generalGroupColumn,
-  actionsColumn,
+  // actionsColumn,
 ]
 
 // Maybe use Zod schema here later

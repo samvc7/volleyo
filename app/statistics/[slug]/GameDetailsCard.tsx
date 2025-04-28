@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
 import { ChevronUp, ChevronDown } from "lucide-react"
+import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 
 type GameDetailsCardProps = {
   game: GameWithRelations
@@ -29,7 +30,9 @@ export const GameDetailsCard = ({ game }: GameDetailsCardProps) => {
             </CardDescription>
           </div>
 
-          <EditGameDialog game={game} />
+          <PermissionClient teamSlug={game.team?.slug || ""}>
+            <EditGameDialog game={game} />
+          </PermissionClient>
 
           <Button
             variant="ghost"

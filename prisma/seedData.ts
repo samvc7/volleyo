@@ -1,3 +1,4 @@
+import { TeamRole } from "@prisma/client"
 import { subDays } from "date-fns"
 
 export const members = [
@@ -17,6 +18,7 @@ export const adminMember = {
   firstName: "Ad",
   lastName: "Min",
   email: "admin@example.com",
+  role: TeamRole.ADMIN,
 }
 
 export const games = [

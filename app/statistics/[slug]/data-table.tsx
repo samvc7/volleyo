@@ -23,8 +23,9 @@ import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
-import { Member } from "@prisma/client"
+import { Member, Team } from "@prisma/client"
 import { ConfirmSaveDialog } from "./ConfirmSaveDialog"
+import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 
 type EditingCell = {
   rowId: string
@@ -42,15 +43,19 @@ declare module "@tanstack/react-table" {
 
 interface DataTableProps<TData, TValue> {
   gameId: string
+  teamSlug: Team["slug"]
   membersNotParticipating: Member[]
   columns: ColumnDef<TData, TValue>[]
+  isAdmin?: boolean
   initialData?: TData[]
 }
 
 export function DataTable<TData extends Statistics, TValue>({
   gameId,
+  teamSlug,
   membersNotParticipating,
   columns,
+  isAdmin,
   initialData = [],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
@@ -111,12 +116,16 @@ export function DataTable<TData extends Statistics, TValue>({
         left: ["select", "name"],
       },
     },
-    meta: {
-      editingCell,
-      setEditingCell: editingCell => setEditingCell(editingCell),
-      updateCell,
-      updatePositionsCell,
-    },
+    ...(isAdmin
+      ? {
+          meta: {
+            editingCell,
+            setEditingCell: editingCell => setEditingCell(editingCell),
+            updateCell,
+            updatePositionsCell,
+          },
+        }
+      : {}),
   })
 
   const handleUploadData = (data: TData[]) => {
@@ -152,32 +161,34 @@ export function DataTable<TData extends Statistics, TValue>({
           <ViewOptions table={table} />
         </div>
 
-        <div className="flex gap-2 ml-auto">
-          <AddPlayerDialog
-            gameId={gameId}
-            membersNotParticipating={membersNotParticipating}
-            disabled={membersNotParticipating.length === 0}
-          />
-          <UploadStatisticsInput onUploadData={handleUploadData} />
-          {hasUnsavedChanges ? (
-            isFileImported ? (
-              <ConfirmSaveDialog onConfirmAction={handleSave}>
+        <PermissionClient teamSlug={teamSlug}>
+          <div className="flex gap-2 ml-auto">
+            <AddPlayerDialog
+              gameId={gameId}
+              membersNotParticipating={membersNotParticipating}
+              disabled={membersNotParticipating.length === 0}
+            />
+            <UploadStatisticsInput onUploadData={handleUploadData} />
+            {hasUnsavedChanges ? (
+              isFileImported ? (
+                <ConfirmSaveDialog onConfirmAction={handleSave}>
+                  <ButtonWithLoading
+                    label="Save"
+                    loadingLabel={"Saving..."}
+                    disabled={isPending}
+                  />
+                </ConfirmSaveDialog>
+              ) : (
                 <ButtonWithLoading
                   label="Save"
                   loadingLabel={"Saving..."}
                   disabled={isPending}
+                  onClick={handleSave}
                 />
-              </ConfirmSaveDialog>
-            ) : (
-              <ButtonWithLoading
-                label="Save"
-                loadingLabel={"Saving..."}
-                disabled={isPending}
-                onClick={handleSave}
-              />
-            )
-          ) : null}
-        </div>
+              )
+            ) : null}
+          </div>
+        </PermissionClient>
       </div>
       <div className="rounded-md border">
         <Table>

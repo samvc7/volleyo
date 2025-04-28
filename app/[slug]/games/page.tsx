@@ -4,6 +4,7 @@ import { GameCardLink } from "./GameCard"
 import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 import { Volleyball } from "lucide-react"
+import { Permission } from "@/components/ui/custom/Permission"
 
 export default async function GamesView({
   params,
@@ -48,14 +49,18 @@ export default async function GamesView({
           You haven't added any games yet. Start planning your games and document statistics by adding new
           games.
         </p>
-        <NewGameDialog />
+        <Permission teamSlug={slug}>
+          <NewGameDialog />
+        </Permission>
       </div>
     )
   }
 
   return (
     <>
-      <NewGameDialog triggerClassName="ml-auto" />
+      <Permission teamSlug={slug}>
+        <NewGameDialog triggerClassName="ml-auto" />
+      </Permission>
       {upcomingGames.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
           {upcomingGames.map(game => (

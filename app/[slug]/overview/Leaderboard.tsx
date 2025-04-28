@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table"
 import {
   ColumnDef,
@@ -14,19 +13,20 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
 import { useState } from "react"
 import { ColumnHeader } from "../../statistics/[slug]/columnHeader"
 import { Statistics } from "@/app/statistics/[slug]/columns"
 import { getCommonPinningClasses } from "@/app/statistics/[slug]/columns/utils"
 import { ViewOptions } from "../../statistics/[slug]/viewOptions"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+// import { Button } from "@/components/ui/button"
+// import { MoreHorizontal } from "lucide-react"
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export type LeaderboardPlayer = Pick<Statistics, "name" | "kills" | "serveAces" | "digs" | "setAssists"> & {
@@ -105,29 +105,29 @@ export const columns: ColumnDef<LeaderboardPlayer>[] = [
     accessorFn: row => row.setAssists,
     invertSorting: true,
   },
-  {
-    id: "actions",
-    cell: () => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View Player</DropdownMenuItem>
-            <DropdownMenuItem>View Statistics</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  // {
+  //   id: "actions",
+  //   cell: () => {
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button
+  //             variant="ghost"
+  //             className="h-8 w-8 p-0"
+  //           >
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //           <DropdownMenuItem>View Player</DropdownMenuItem>
+  //           <DropdownMenuItem>View Statistics</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
 ]
 
 interface DataTableProps<TData, TValue> {
@@ -163,13 +163,13 @@ export function Leaderboard<TData, TValue>({ columns, data }: DataTableProps<TDa
         <CardTitle>
           <div className="flex items-center">
             <div className="text-2xl font-semibold leading-none tracking-tight">Leaderboard</div>
-            <ViewOptions table={table} />
           </div>
         </CardTitle>
         <CardDescription>Who is the best of the best?</CardDescription>
       </CardHeader>
 
       <CardContent>
+        <ViewOptions table={table} />
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (

@@ -124,15 +124,18 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   return (
     <>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter names ..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Filter names ..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+          <ViewOptions table={table} />
+        </div>
+
         <div className="flex gap-2 ml-auto">
           <AddTeamMemberDialog />
-          <ViewOptions table={table} />
         </div>
       </div>
       <div className="rounded-md border">

@@ -6,6 +6,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import NextAuth, { AuthOptions, getServerSession } from "next-auth"
 import { compare } from "bcrypt"
 import { prisma } from "@/prisma/singlePrismaClient"
+import { TeamRole } from "@prisma/client"
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -44,12 +45,29 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async session({ session, token }) {
       if (token?.sub && session.user) {
-        const dbUser = await prisma.user.findUnique({ where: { id: token.sub } })
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.sub },
+          include: { members: { include: { teams: { include: { team: true } } } } },
+        })
         if (dbUser) {
           session.user.id = dbUser.id
           session.user.role = dbUser.role
+          session.user.members = dbUser.members
+
+          const teamRoles: Record<string, TeamRole> = {}
+
+          dbUser?.members.forEach(member => {
+            member.teams.forEach(teamMember => {
+              teamRoles[teamMember.team.slug] = teamMember.roles.includes("ADMIN")
+                ? TeamRole.ADMIN
+                : TeamRole.MEMBER
+            })
+          })
+
+          session.user.teamRoles = teamRoles
         }
       }
+
       return session
     },
   },
