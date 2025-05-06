@@ -1,6 +1,6 @@
 "use server"
 
-import bycript from "bcrypt"
+import bycript from "bcryptjs"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { redirect } from "next/navigation"
 

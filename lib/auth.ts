@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 // import GoogleProvider from "next-auth/providers/google"
 // import FacebookProvider from "next-auth/providers/facebook"
 import NextAuth, { AuthOptions, getServerSession } from "next-auth"
-import { compare } from "bcrypt"
+import { compare } from "bcryptjs"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { TeamRole } from "@prisma/client"
 

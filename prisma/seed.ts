@@ -1,4 +1,4 @@
-import bycript from "bcrypt"
+import bycript from "bcryptjs"
 import { Member, PrismaClient } from "@prisma/client"
 import { adminMember, games, gameStatistics, members } from "./seedData"
 
