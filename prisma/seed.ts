@@ -37,7 +37,10 @@ async function main() {
           description: "Elite volleyball team",
           slug: "alpha-squad",
           members: {
-            create: memberRecords.map(member => ({ memberId: member.id })),
+            create: memberRecords.map(member => ({
+              memberId: member.id,
+              roles: member.email === "admin@example.com" ? ["ADMIN"] : ["MEMBER"],
+            })),
           },
         },
       })
