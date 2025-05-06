@@ -70,7 +70,7 @@ export function DataTable<TData extends Statistics, TValue>({
 
   useEffect(() => {
     setData(initialData)
-    setHasUnsavedChanges(true)
+    if (data.length !== initialData.length) setHasUnsavedChanges(true)
   }, [initialData])
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
@@ -156,15 +156,17 @@ export function DataTable<TData extends Statistics, TValue>({
   return (
     <>
       <div className="flex items-center gap-4 py-4">
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Filter names ..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
-            className="w-full sm:w-64"
-          />
-          <ViewOptions table={table} />
-        </div>
+        {data.length ? (
+          <div className="flex items-center gap-2">
+            <Input
+              placeholder="Filter names ..."
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
+              className="w-full sm:w-64"
+            />
+            <ViewOptions table={table} />
+          </div>
+        ) : null}
 
         <PermissionClient teamSlug={teamSlug}>
           <div className="flex gap-2 ml-auto">
@@ -195,58 +197,60 @@ export function DataTable<TData extends Statistics, TValue>({
           </div>
         </PermissionClient>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={getCommonPinningClasses(header.column)}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map(cell => {
+      {data.length ? (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map(headerGroup => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map(header => {
                     return (
-                      <TableCell
-                        key={cell.id}
-                        className={getCommonPinningClasses(cell.column)}
+                      <TableHead
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        className={getCommonPinningClasses(header.column)}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </TableHead>
                     )
                   })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getAllLeafColumns().length}
-                  className="h-24"
-                />
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableHeader>
+
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map(row => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map(cell => {
+                      return (
+                        <TableCell
+                          key={cell.id}
+                          className={getCommonPinningClasses(cell.column)}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      )
+                    })}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllLeafColumns().length}
+                    className="h-24"
+                  />
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      ) : null}
     </>
   )
 }
