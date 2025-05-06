@@ -40,7 +40,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
-  const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+  const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     try {
       const createdTeam = await createTeam(formData)
       setShowNewTeamDialog(false)

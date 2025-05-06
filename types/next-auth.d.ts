@@ -12,6 +12,8 @@ declare module "next-auth" {
     user: {
       id: string
       email: string
+      firstName: string
+      lastName: string
       role: string
       members: MemberWithTeams[]
       teamRoles: Record<string, TeamRole>
