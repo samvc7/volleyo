@@ -129,7 +129,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             placeholder="Filter names ..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={event => table.getColumn("name")?.setFilterValue(event.target.value)}
-            className="max-w-sm"
+            className="w-full sm:w-64"
           />
           <ViewOptions table={table} />
         </div>
