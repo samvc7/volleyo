@@ -1,7 +1,7 @@
 "use client"
 
 import { useToast } from "@/hooks/use-toast"
-import { useActionState, useState } from "react"
+import { useActionState, useRef, useState } from "react"
 import { addPlayer } from "./actions"
 import {
   Dialog,
@@ -29,15 +29,22 @@ type AddPlayerDialogProps = {
 export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
   const addPlayerWithGameId = addPlayer.bind(null, gameId)
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+    const action = formData.get("action")
+
     try {
       await addPlayerWithGameId(formData)
-      setShowDialog(false)
+      if (action === "add") setShowDialog(false)
+      if (action === "add-more") {
+        formRef.current?.reset()
+      }
       toast({ title: "Player added successfully" })
     } catch (error) {
       console.error(error)
-      return "Could not add player. Please try again"
+      toast({ title: "Could not add player. Please try again" })
     }
 
     return null
@@ -73,7 +80,10 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
           <DialogTitle>Add Player</DialogTitle>
           <DialogDescription>Add a player for the game.</DialogDescription>
         </DialogHeader>
-        <form action={formAction}>
+        <form
+          ref={formRef}
+          action={formAction}
+        >
           <div className="space-y-4 py-2 pb-4">
             <div className="space-y-2">
               <Label htmlFor="member">Team Members</Label>
@@ -107,11 +117,22 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
             >
               Cancel
             </Button>
+
+            <ButtonWithLoading
+              label="Add More"
+              loadingLabel="Adding..."
+              disabled={isPending}
+              value="add-more"
+              name="action"
+            />
+
             <ButtonWithLoading
               label="Add"
               loadingLabel="Adding..."
               disabled={isPending}
               type="submit"
+              value="add"
+              name="action"
             />
           </DialogFooter>
         </form>

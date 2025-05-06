@@ -14,7 +14,7 @@ import {
   ColumnDef,
   RowData,
 } from "@tanstack/react-table"
-import { useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
@@ -67,6 +67,11 @@ export function DataTable<TData extends Statistics, TValue>({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isFileImported, setIsFileImported] = useState(false)
+
+  useEffect(() => {
+    setData(initialData)
+    setHasUnsavedChanges(true)
+  }, [initialData])
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
     let correctValueType
