@@ -46,8 +46,8 @@ export default async function GamesView({
         </div>
         <h2 className="text-2xl font-bold tracking-tight">No games yet.</h2>
         <p className="text-muted-foreground max-w-md mt-2 mb-6">
-          You haven't added any games yet. Start planning your games and document statistics by adding new
-          games.
+          {`You haven't added any games yet. Start planning your games and document statistics by adding new
+          games.`}
         </p>
         <Permission teamSlug={slug}>
           <NewGameDialog />

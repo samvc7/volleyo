@@ -28,7 +28,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
 
       router.push(`${pathname}?${params.toString()}`)
     }
-  }, [date])
+  }, [date, pathname, router])
 
   const handleSelectPreset = (value: string) => {
     const date = new Date()

@@ -285,7 +285,7 @@ export const serveGroupColumn = columnHelper.group({
                 <br />
                 <p>
                   Serve Rating Breakdown: <br />
-                  0: Ace (opponent couldn't pass, pass rating 0). <br />
+                  0: Ace (opponent couldn&apos;t pass, pass rating 0). <br />
                   1: Opponent passed a 1 (bad pass). <br />
                   2: Opponent passed a 2 (ok pass). <br />
                   3: Server error or Opponent passed a 3 (perfect pass).

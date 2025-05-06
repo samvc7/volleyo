@@ -37,7 +37,7 @@ export function LineChartScore({ chartData }: LineChartScoreProps) {
       scores: chartData.reduce((acc, curr) => acc + curr.scores, 0),
       errors: chartData.reduce((acc, curr) => acc + curr.errors, 0),
     }),
-    [],
+    [chartData],
   )
 
   return (

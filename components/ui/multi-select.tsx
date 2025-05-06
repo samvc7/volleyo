@@ -138,7 +138,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
       if (!isPopoverOpen && !isInitialOpen) {
         onSelectionDone?.(selectedValues)
       }
-    }, [isPopoverOpen])
+    }, [isPopoverOpen, isInitialOpen, onSelectionDone, selectedValues])
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
