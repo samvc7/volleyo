@@ -42,6 +42,14 @@ export const saveStatistics = async (
   revalidatePath("/statistics/[slug]", "page")
 }
 
+export const deleteStatistics = async (statisticIds: string[]) => {
+  await prisma.statistics.deleteMany({
+    where: { id: { in: statisticIds } },
+  })
+
+  revalidatePath("/statistics/[slug]", "page")
+}
+
 export const addPlayer = async (gameId: string, formData: FormData) => {
   const memberId = formData.get("member") as string
   const positions = (formData

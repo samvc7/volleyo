@@ -12,12 +12,12 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
-type ConfirmSaveDialogProps = {
+type ConfirmDataLossDialogProps = {
   onConfirmAction: () => void
   children: ReactNode
 }
 
-export const ConfirmSaveDialog = ({ onConfirmAction, children }: ConfirmSaveDialogProps) => {
+export const ConfirmDataLossDialog = ({ onConfirmAction, children }: ConfirmDataLossDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
 
   const handleConfirm = () => {

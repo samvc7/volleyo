@@ -18,13 +18,13 @@ import { useEffect, useState, useTransition } from "react"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
-import { saveStatistics } from "./actions"
+import { deleteStatistics, saveStatistics } from "./actions"
 import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { AddPlayerDialog } from "./AddPlayerDialog"
 import { Member, Team } from "@prisma/client"
-import { ConfirmSaveDialog } from "./ConfirmSaveDialog"
+import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 
 type EditingCell = {
@@ -63,14 +63,17 @@ export function DataTable<TData extends Statistics, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [data, setData] = useState<TData[]>(initialData)
+
   const [editingCell, setEditingCell] = useState<EditingCell>()
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [isDeletePending, startDeleteTransition] = useTransition()
   const [isFileImported, setIsFileImported] = useState(false)
+
+  const hasSelectedRows = Object.entries(rowSelection).length > 0
 
   useEffect(() => {
     setData(initialData)
-    if (data.length !== initialData.length) setHasUnsavedChanges(true)
   }, [initialData])
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
@@ -153,6 +156,20 @@ export function DataTable<TData extends Statistics, TValue>({
     })
   }
 
+  const handleDelete = () => {
+    startDeleteTransition(async () => {
+      try {
+        const statisticIds = Object.keys(rowSelection).map(k => data[Number(k)].id)
+        deleteStatistics(statisticIds)
+        setRowSelection({})
+        toast({ title: "Successfully deleted statistics" })
+      } catch (error) {
+        console.error(error)
+        toast({ title: "Could not delete statistics. Please try again" })
+      }
+    })
+  }
+
   return (
     <>
       <div className="flex items-center gap-4 py-4">
@@ -170,6 +187,15 @@ export function DataTable<TData extends Statistics, TValue>({
 
         <PermissionClient teamSlug={teamSlug}>
           <div className="flex gap-2 ml-auto">
+            {hasSelectedRows ? (
+              <ConfirmDataLossDialog onConfirmAction={handleDelete}>
+                <ButtonWithLoading
+                  label="Delete"
+                  loadingLabel={"Deleting..."}
+                  disabled={isDeletePending}
+                />
+              </ConfirmDataLossDialog>
+            ) : null}
             <AddPlayerDialog
               gameId={gameId}
               membersNotParticipating={membersNotParticipating}
@@ -178,13 +204,13 @@ export function DataTable<TData extends Statistics, TValue>({
             <UploadStatisticsInput onUploadData={handleUploadData} />
             {hasUnsavedChanges ? (
               isFileImported ? (
-                <ConfirmSaveDialog onConfirmAction={handleSave}>
+                <ConfirmDataLossDialog onConfirmAction={handleSave}>
                   <ButtonWithLoading
                     label="Save"
                     loadingLabel={"Saving..."}
                     disabled={isPending}
                   />
-                </ConfirmSaveDialog>
+                </ConfirmDataLossDialog>
               ) : (
                 <ButtonWithLoading
                   label="Save"
