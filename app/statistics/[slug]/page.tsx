@@ -29,6 +29,11 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     return <h1>Game not found</h1>
   }
 
+  const isMember = session.user.members.some(member => member.teams.some(team => team.teamId === game.teamId))
+  if (!isMember) {
+    redirect("/forbidden")
+  }
+
   const statistics = game?.statistics.map(statistic => {
     const { member, ...statisticData } = statistic
     return {

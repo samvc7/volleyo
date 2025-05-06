@@ -26,6 +26,13 @@ export default async function Layout({
   // TODO: not found team with slug
   const selectedTeam = (await prisma.team.findUnique({ where: { slug } })) ?? undefined
 
+  const isMember = session.user.members.some(member =>
+    member.teams.some(team => team.teamId === selectedTeam?.id),
+  )
+  if (!isMember) {
+    redirect("/forbidden")
+  }
+
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <div className="flex gap-4">
