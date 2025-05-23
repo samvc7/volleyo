@@ -14,7 +14,7 @@ import {
   ColumnDef,
   RowData,
 } from "@tanstack/react-table"
-import { useEffect, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
@@ -26,6 +26,7 @@ import { AddPlayerDialog } from "./AddPlayerDialog"
 import { Member, Team } from "@prisma/client"
 import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
+import { useStatistics } from "./StatisticsProvider"
 
 type EditingCell = {
   rowId: string
@@ -47,7 +48,6 @@ interface DataTableProps<TData, TValue> {
   membersNotParticipating: Member[]
   columns: ColumnDef<TData, TValue>[]
   isAdmin?: boolean
-  initialData?: TData[]
 }
 
 export function DataTable<TData extends Statistics, TValue>({
@@ -56,13 +56,12 @@ export function DataTable<TData extends Statistics, TValue>({
   membersNotParticipating,
   columns,
   isAdmin,
-  initialData = [],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState<TData[]>(initialData)
+  const { statistics: data, setStatistics: setData } = useStatistics<TData>()
 
   const [editingCell, setEditingCell] = useState<EditingCell>()
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
@@ -71,10 +70,6 @@ export function DataTable<TData extends Statistics, TValue>({
   const [isFileImported, setIsFileImported] = useState(false)
 
   const hasSelectedRows = Object.entries(rowSelection).length > 0
-
-  useEffect(() => {
-    setData(initialData)
-  }, [initialData])
 
   const updateCell = (rowId: string, columnId: string, value: string) => {
     let correctValueType

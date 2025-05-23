@@ -5,6 +5,10 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { GameDetailsCard } from "./GameDetailsCard"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TabsContent } from "@radix-ui/react-tabs"
+import CourtTracker from "./_court-tracker/CourtTracker"
+import { StatisticsProvider } from "./StatisticsProvider"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
@@ -54,14 +58,28 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <GameDetailsCard game={game} />
-      <DataTable
-        gameId={game.id}
-        teamSlug={game.team?.slug ?? ""}
-        membersNotParticipating={membersNotParticipating}
-        columns={columns}
-        isAdmin={isAdmin}
-        initialData={statistics}
-      />
+      <Tabs defaultValue="stats">
+        <TabsList>
+          <TabsTrigger value={"court"}>Court</TabsTrigger>
+          <TabsTrigger value={"stats"}>Statistics</TabsTrigger>
+        </TabsList>
+
+        <StatisticsProvider initialData={statistics}>
+          <TabsContent value="court">
+            <CourtTracker />
+          </TabsContent>
+
+          <TabsContent value="stats">
+            <DataTable
+              gameId={game.id}
+              teamSlug={game.team?.slug ?? ""}
+              membersNotParticipating={membersNotParticipating}
+              columns={columns}
+              isAdmin={isAdmin}
+            />
+          </TabsContent>
+        </StatisticsProvider>
+      </Tabs>
     </main>
   )
 }
