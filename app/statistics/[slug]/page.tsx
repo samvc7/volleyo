@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TabsContent } from "@radix-ui/react-tabs"
 import CourtTracker from "./_court-tracker/CourtTracker"
 import { StatisticsProvider } from "./StatisticsProvider"
+import { SaveButton } from "./Savebutton"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
@@ -59,12 +60,17 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <GameDetailsCard game={game} />
       <Tabs defaultValue="stats">
-        <TabsList>
-          <TabsTrigger value={"court"}>Court</TabsTrigger>
-          <TabsTrigger value={"stats"}>Statistics</TabsTrigger>
-        </TabsList>
-
         <StatisticsProvider initialData={statistics}>
+          <div className="flex">
+            <TabsList>
+              <TabsTrigger value={"court"}>Court</TabsTrigger>
+              <TabsTrigger value={"stats"}>Statistics</TabsTrigger>
+            </TabsList>
+            <div className="ml-auto">
+              <SaveButton gameId={game.id} />
+            </div>
+          </div>
+
           <TabsContent value="court">
             <CourtTracker />
           </TabsContent>

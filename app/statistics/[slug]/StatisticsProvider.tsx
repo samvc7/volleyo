@@ -7,6 +7,8 @@ type StatisticsContextType<TData> = {
   setStatistics: Dispatch<SetStateAction<TData[]>>
   hasUnsavedChanges: boolean
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void
+  isFileImported: boolean
+  setIsFileImported: (isFileImported: boolean) => void
 }
 
 const StatisticsContext = createContext<StatisticsContextType<any> | null>(null)
@@ -19,6 +21,7 @@ type StatisticsProviderProps<TData> = {
 export const StatisticsProvider = <TData,>({ initialData, children }: StatisticsProviderProps<TData>) => {
   const [statistics, setStatistics] = useState<TData[]>(initialData)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isFileImported, setIsFileImported] = useState(false)
 
   useEffect(() => {
     setStatistics(initialData)
@@ -26,7 +29,14 @@ export const StatisticsProvider = <TData,>({ initialData, children }: Statistics
 
   return (
     <StatisticsContext.Provider
-      value={{ statistics, setStatistics, hasUnsavedChanges, setHasUnsavedChanges }}
+      value={{
+        statistics,
+        setStatistics,
+        hasUnsavedChanges,
+        setHasUnsavedChanges,
+        isFileImported,
+        setIsFileImported,
+      }}
     >
       {children}
     </StatisticsContext.Provider>

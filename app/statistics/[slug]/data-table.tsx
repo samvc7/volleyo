@@ -18,7 +18,7 @@ import { useState, useTransition } from "react"
 import { ViewOptions } from "./viewOptions"
 import { getCommonPinningClasses } from "./columns/utils"
 import { UploadStatisticsInput } from "./UploadStatisticsInput"
-import { deleteStatistics, saveStatistics } from "./actions"
+import { deleteStatistics } from "./actions"
 import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
@@ -64,13 +64,11 @@ export function DataTable<TData extends Statistics, TValue>({
   const {
     statistics: data,
     setStatistics: setData,
-    hasUnsavedChanges,
     setHasUnsavedChanges,
+    setIsFileImported,
   } = useStatistics<TData>()
   const [editingCell, setEditingCell] = useState<EditingCell>()
-  const [isPending, startTransition] = useTransition()
   const [isDeletePending, startDeleteTransition] = useTransition()
-  const [isFileImported, setIsFileImported] = useState(false)
 
   const hasSelectedRows = Object.entries(rowSelection).length > 0
 
@@ -140,20 +138,6 @@ export function DataTable<TData extends Statistics, TValue>({
     setIsFileImported(true)
   }
 
-  const handleSave = () => {
-    startTransition(async () => {
-      try {
-        await saveStatistics(data, gameId, isFileImported)
-        setHasUnsavedChanges(false)
-        setIsFileImported(false)
-        toast({ title: "Successfully saved statistics" })
-      } catch (error) {
-        console.error(error)
-        toast({ title: "Could not save statistics. Please try again" })
-      }
-    })
-  }
-
   const handleDelete = () => {
     startDeleteTransition(async () => {
       try {
@@ -200,24 +184,6 @@ export function DataTable<TData extends Statistics, TValue>({
               disabled={membersNotParticipating.length === 0}
             />
             <UploadStatisticsInput onUploadData={handleUploadData} />
-            {hasUnsavedChanges ? (
-              isFileImported ? (
-                <ConfirmDataLossDialog onConfirmAction={handleSave}>
-                  <ButtonWithLoading
-                    label="Save"
-                    loadingLabel={"Saving..."}
-                    disabled={isPending}
-                  />
-                </ConfirmDataLossDialog>
-              ) : (
-                <ButtonWithLoading
-                  label="Save"
-                  loadingLabel={"Saving..."}
-                  disabled={isPending}
-                  onClick={handleSave}
-                />
-              )
-            ) : null}
           </div>
         </PermissionClient>
       </div>
