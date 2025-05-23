@@ -5,6 +5,8 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 type StatisticsContextType<TData> = {
   statistics: TData[]
   setStatistics: Dispatch<SetStateAction<TData[]>>
+  hasUnsavedChanges: boolean
+  setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void
 }
 
 const StatisticsContext = createContext<StatisticsContextType<any> | null>(null)
@@ -16,13 +18,18 @@ type StatisticsProviderProps<TData> = {
 
 export const StatisticsProvider = <TData,>({ initialData, children }: StatisticsProviderProps<TData>) => {
   const [statistics, setStatistics] = useState<TData[]>(initialData)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   useEffect(() => {
     setStatistics(initialData)
   }, [initialData])
 
   return (
-    <StatisticsContext.Provider value={{ statistics, setStatistics }}>{children}</StatisticsContext.Provider>
+    <StatisticsContext.Provider
+      value={{ statistics, setStatistics, hasUnsavedChanges, setHasUnsavedChanges }}
+    >
+      {children}
+    </StatisticsContext.Provider>
   )
 }
 

@@ -61,10 +61,13 @@ export function DataTable<TData extends Statistics, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-  const { statistics: data, setStatistics: setData } = useStatistics<TData>()
-
+  const {
+    statistics: data,
+    setStatistics: setData,
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+  } = useStatistics<TData>()
   const [editingCell, setEditingCell] = useState<EditingCell>()
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isDeletePending, startDeleteTransition] = useTransition()
   const [isFileImported, setIsFileImported] = useState(false)

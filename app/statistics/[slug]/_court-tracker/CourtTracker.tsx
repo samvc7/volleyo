@@ -9,21 +9,23 @@ import { useState } from "react"
 import { useStatistics } from "../StatisticsProvider"
 import { Statistics } from "../columns"
 
+type StatKey = keyof Statistics
+
 type Stat = {
-  id: string
+  key: StatKey
   name: string
 }
 
 const DEFAULT_STATS: Stat[] = [
-  { id: "kill", name: "Attack" },
-  { id: "blockMultiple", name: "Block" },
-  { id: "digs", name: "Dig" },
-  { id: "setAssists", name: "Set" },
-  { id: "serveAces", name: "Ace" },
+  { key: "kills", name: "Attack" },
+  { key: "blockMultiple", name: "Block" },
+  { key: "digs", name: "Dig" },
+  { key: "setAssists", name: "Set" },
+  { key: "serveAces", name: "Ace" },
 ]
 
 export default function CourtTracker() {
-  const { statistics, setStatistics } = useStatistics<Statistics>()
+  const { statistics, setStatistics, setHasUnsavedChanges } = useStatistics<Statistics>()
   const [selectedPosition, setSelectedPosition] = useState<string>("")
   const [selectedBench, setSelectedBench] = useState<string>("")
   const [courtPositions, setCourtPositions] = useState<(Statistics | undefined)[]>(
@@ -31,7 +33,25 @@ export default function CourtTracker() {
   )
   const [benched, setBenched] = useState<Statistics[]>(statistics)
 
-  const handleRecordStat = (stat: Stat) => {}
+  const handleRecordStat = (statKey: StatKey) => {
+    const selectedPositionIx = Number(selectedPosition.split("-")[1])
+    const selectedCourtPlayer = courtPositions[selectedPositionIx]
+
+    setStatistics(prev => {
+      const newStatistics = [...prev]
+      const index = newStatistics.findIndex(stat => stat.id === selectedCourtPlayer?.id)
+      if (index !== -1) {
+        const previousStat = prev[index][statKey] as number
+        newStatistics[index] = {
+          ...newStatistics[index],
+          [statKey]: previousStat + 1,
+        }
+      }
+
+      return newStatistics
+    })
+    setHasUnsavedChanges(true)
+  }
 
   const handleSubstitute = () => {
     const selectedBenchPlayer = statistics.find(stat => stat.id === selectedBench)
@@ -105,9 +125,10 @@ export default function CourtTracker() {
           {DEFAULT_STATS.map(stat => {
             return (
               <Button
-                key={stat.id}
+                key={stat.key}
                 variant="outline"
                 className="rounded-full"
+                onClick={() => handleRecordStat(stat.key)}
               >
                 {stat.name}
               </Button>
