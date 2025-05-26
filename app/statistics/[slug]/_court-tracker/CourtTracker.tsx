@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { useState } from "react"
 import { useStatistics } from "../StatisticsProvider"
 import { Statistics } from "../columns"
+import { SplitCounterButton } from "./SplitCounterButton"
 
 type StatKey = keyof Statistics
 
@@ -33,10 +34,11 @@ export default function CourtTracker() {
   )
   const [benched, setBenched] = useState<Statistics[]>(statistics)
 
-  const handleRecordStat = (statKey: StatKey) => {
-    const selectedPositionIx = Number(selectedPosition.split("-")[1])
-    const selectedCourtPlayer = courtPositions[selectedPositionIx]
+  const selectedPositionIx = Number(selectedPosition.split("-")[1])
+  const selectedCourtPlayer = courtPositions[selectedPositionIx]
+  const statsOfSelectedPlayer = statistics.find(stat => stat.id === selectedCourtPlayer?.id)
 
+  const handleIncrementStat = (statKey: StatKey) => {
     setStatistics(prev => {
       const newStatistics = [...prev]
       const index = newStatistics.findIndex(stat => stat.id === selectedCourtPlayer?.id)
@@ -53,10 +55,26 @@ export default function CourtTracker() {
     setHasUnsavedChanges(true)
   }
 
+  const handleDecrementStat = (statKey: StatKey) => {
+    setStatistics(prev => {
+      const newStatistics = [...prev]
+      const index = newStatistics.findIndex(stat => stat.id === selectedCourtPlayer?.id)
+      if (index !== -1) {
+        const previousStat = prev[index][statKey] as number
+        newStatistics[index] = {
+          ...newStatistics[index],
+          [statKey]: Math.max(previousStat - 1, 0),
+        }
+      }
+
+      return newStatistics
+    })
+
+    setHasUnsavedChanges(true)
+  }
+
   const handleSubstitute = () => {
     const selectedBenchPlayer = statistics.find(stat => stat.id === selectedBench)
-    const selectedPositionIx = Number(selectedPosition.split("-")[1])
-    const selectedCourtPlayer = courtPositions[selectedPositionIx]
     if (!selectedBenchPlayer) return
 
     setCourtPositions(prev => {
@@ -123,15 +141,18 @@ export default function CourtTracker() {
 
         <Card className="flex flex-col gap-6 p-4">
           {DEFAULT_STATS.map(stat => {
+            const currentStatValue = (statsOfSelectedPlayer?.[stat.key] ?? 0) as number
+
             return (
-              <Button
+              <SplitCounterButton
                 key={stat.key}
-                variant="outline"
-                className="rounded-full"
-                onClick={() => handleRecordStat(stat.key)}
-              >
-                {stat.name}
-              </Button>
+                value={currentStatValue}
+                onIncrement={() => handleIncrementStat(stat.key)}
+                disabledIncrement={!selectedCourtPlayer}
+                onDecrement={() => handleDecrementStat(stat.key)}
+                disabledDecrement={!selectedCourtPlayer || currentStatValue <= 0}
+                label={stat.name}
+              />
             )
           })}
         </Card>
