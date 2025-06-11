@@ -5,10 +5,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Label } from "@/components/ui/label"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useStatistics } from "../StatisticsProvider"
 import { Statistics } from "../columns"
 import { SplitCounterButton } from "./SplitCounterButton"
+import { useSessionStorage } from "@uidotdev/usehooks"
 
 type StatKey = keyof Statistics
 
@@ -26,17 +27,39 @@ const DEFAULT_STATS: Stat[] = [
 ]
 
 export default function CourtTracker() {
-  const { statistics, setStatistics, setHasUnsavedChanges } = useStatistics<Statistics>()
+  const { statistics, setStatistics, setHasUnsavedChanges, gameSlug } = useStatistics<Statistics>()
   const [selectedPosition, setSelectedPosition] = useState<string>("")
   const [selectedBench, setSelectedBench] = useState<string>("")
-  const [courtPositions, setCourtPositions] = useState<(Statistics | undefined)[]>(
-    new Array(6).fill(undefined),
+  const [savedPositions, savePositions] = useSessionStorage<(string | undefined)[]>(
+    `${gameSlug}-court-positions`,
+    [],
   )
-  const [benched, setBenched] = useState<Statistics[]>(statistics)
+  const statisticsFromPositions = savedPositions.map(position => {
+    return statistics.find(stat => stat.id === position)
+  })
+  const [courtPositions, setCourtPositions] = useState<(Statistics | undefined)[]>(
+    statisticsFromPositions.length > 0 ? statisticsFromPositions : Array(6).fill(undefined),
+  )
+  const playersNotOnCourt = statistics.filter(stat => !courtPositions.some(pos => pos?.id === stat.id))
+  const [benched, setBenched] = useState<Statistics[]>(playersNotOnCourt)
 
   const selectedPositionIx = Number(selectedPosition.split("-")[1])
   const selectedCourtPlayer = courtPositions[selectedPositionIx]
   const statsOfSelectedPlayer = statistics.find(stat => stat.id === selectedCourtPlayer?.id)
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+    }
+
+    if (savedPositions.length > 0) {
+      window.addEventListener("beforeunload", handleBeforeUnload)
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [])
 
   const handleIncrementStat = (statKey: StatKey) => {
     setStatistics(prev => {
@@ -93,8 +116,13 @@ export default function CourtTracker() {
       if (selectedCourtPlayer) {
         newBenched.push(selectedCourtPlayer)
       }
+
       return newBenched
     })
+
+    const positionsToSave = [...courtPositions]
+    positionsToSave[selectedPositionIx] = selectedBenchPlayer
+    savePositions(positionsToSave.map(stat => stat?.id ?? ""))
   }
 
   return (

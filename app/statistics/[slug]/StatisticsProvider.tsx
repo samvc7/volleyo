@@ -5,6 +5,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 type StatisticsContextType<TData> = {
   statistics: TData[]
   setStatistics: Dispatch<SetStateAction<TData[]>>
+  gameSlug: string
   hasUnsavedChanges: boolean
   setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void
   isFileImported: boolean
@@ -15,10 +16,15 @@ const StatisticsContext = createContext<StatisticsContextType<any> | null>(null)
 
 type StatisticsProviderProps<TData> = {
   initialData: TData[]
+  gameSlug: string
   children: ReactNode
 }
 
-export const StatisticsProvider = <TData,>({ initialData, children }: StatisticsProviderProps<TData>) => {
+export const StatisticsProvider = <TData,>({
+  initialData,
+  gameSlug,
+  children,
+}: StatisticsProviderProps<TData>) => {
   const [statistics, setStatistics] = useState<TData[]>(initialData)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isFileImported, setIsFileImported] = useState(false)
@@ -30,6 +36,7 @@ export const StatisticsProvider = <TData,>({ initialData, children }: Statistics
   return (
     <StatisticsContext.Provider
       value={{
+        gameSlug,
         statistics,
         setStatistics,
         hasUnsavedChanges,

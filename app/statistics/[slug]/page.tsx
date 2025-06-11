@@ -60,7 +60,10 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <GameDetailsCard game={game} />
       <Tabs defaultValue="stats">
-        <StatisticsProvider initialData={statistics}>
+        <StatisticsProvider
+          initialData={statistics}
+          gameSlug={game.slug}
+        >
           <div className="flex">
             <TabsList>
               <TabsTrigger value={"court"}>Court</TabsTrigger>
