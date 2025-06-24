@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { cn } from "@/lib/utils"
@@ -27,6 +27,9 @@ const DEFAULT_STATS: Stat[] = [
 ]
 
 export default function CourtTracker() {
+  const DEFAULT_TIMEOUTS = 2
+  const DEFAULT_SUBSTITUTIONS = 6
+
   const { statistics, setStatistics, setHasUnsavedChanges, gameSlug } = useStatistics<Statistics>()
   const [selectedPosition, setSelectedPosition] = useState<string>("")
   const [selectedBench, setSelectedBench] = useState<string>("")
@@ -42,6 +45,8 @@ export default function CourtTracker() {
   )
   const playersNotOnCourt = statistics.filter(stat => !courtPositions.some(pos => pos?.id === stat.id))
   const [benched, setBenched] = useState<Statistics[]>(playersNotOnCourt)
+  const [timoutCount, setTimeoutCount] = useSessionStorage(`${gameSlug}-timeouts`, DEFAULT_TIMEOUTS)
+  const [subCount, setSubCount] = useSessionStorage(`${gameSlug}-subs`, DEFAULT_SUBSTITUTIONS)
 
   const selectedPositionIx = Number(selectedPosition.split("-")[1])
   const selectedCourtPlayer = courtPositions[selectedPositionIx]
@@ -113,16 +118,20 @@ export default function CourtTracker() {
       if (index !== -1) {
         newBenched.splice(index, 1)
       }
+
       if (selectedCourtPlayer) {
         newBenched.push(selectedCourtPlayer)
       }
-
       return newBenched
     })
 
     const positionsToSave = [...courtPositions]
     positionsToSave[selectedPositionIx] = selectedBenchPlayer
     savePositions(positionsToSave.map(stat => stat?.id ?? ""))
+
+    if (selectedCourtPlayer) {
+      setSubCount(prev => Math.max(prev - 1, 0))
+    }
   }
 
   return (
@@ -189,6 +198,79 @@ export default function CourtTracker() {
       <Card className="mb-10">
         <CardHeader>
           <CardTitle className="font-medium">Bench Players</CardTitle>
+          <CardDescription className="flex flex-col gap-2">
+            <div className="flex gap-2 items-center">
+              <span className="w-20">Timeouts</span>
+              <div className="space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setTimeoutCount(prev => {
+                      if (prev > 0) {
+                        return prev - 1
+                      }
+                      return prev
+                    })
+                  }}
+                  disabled={timoutCount <= 0}
+                >
+                  –
+                </Button>
+                <span>{timoutCount}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setTimeoutCount(prev => prev + 1)}
+                >
+                  +
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTimeoutCount(DEFAULT_TIMEOUTS)}
+              >
+                Reset
+              </Button>
+            </div>
+
+            <div className="flex gap-2 items-center">
+              <span className="w-20">Subs</span>
+              <div className="space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSubCount(prev => {
+                      if (prev > 0) {
+                        return prev - 1
+                      }
+                      return prev
+                    })
+                  }}
+                  disabled={subCount <= 0}
+                >
+                  –
+                </Button>
+                <span>{subCount}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSubCount(prev => prev + 1)}
+                >
+                  +
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSubCount(DEFAULT_SUBSTITUTIONS)}
+              >
+                Reset
+              </Button>
+            </div>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ToggleGroup
