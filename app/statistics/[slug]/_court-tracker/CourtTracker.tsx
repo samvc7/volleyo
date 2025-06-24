@@ -127,10 +127,10 @@ export default function CourtTracker() {
 
   return (
     <>
-      <div className="flex flex-row gap-4 my-4">
-        <Card className=" w-full p-12 border rounded-md">
+      <div className="flex flex-col md:flex-row gap-4 my-4">
+        <Card className="w-full p-4 md:p-12 border rounded-md">
           <ToggleGroup
-            className="grid grid-cols-3 gap-12"
+            className="grid grid-cols-3 gap-4 md:gap-12"
             type="single"
             value={selectedPosition}
             onValueChange={val => setSelectedPosition(val ?? "")}
@@ -158,7 +158,7 @@ export default function CourtTracker() {
                       {index + 1}
                     </div>
                     <CardContent className="p-4">
-                      <span className="font-medium">{stat?.name}</span>
+                      <span className="font-medium">{shortenName(stat?.name)}</span>
                     </CardContent>
                   </Card>
                 </Label>
@@ -167,7 +167,7 @@ export default function CourtTracker() {
           </ToggleGroup>
         </Card>
 
-        <Card className="flex flex-col gap-6 p-4">
+        <Card className="flex flex-wrap flex-row md:flex-col gap-2 sm:gap-1 lg:gap-6 p-4">
           {DEFAULT_STATS.map(stat => {
             const currentStatValue = (statsOfSelectedPlayer?.[stat.key] ?? 0) as number
 
@@ -201,7 +201,7 @@ export default function CourtTracker() {
               return (
                 <Label
                   key={stat.id}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-[120px]"
                 >
                   <ToggleGroupItem
                     value={stat.id}
@@ -217,7 +217,7 @@ export default function CourtTracker() {
                     )}
                   >
                     <CardContent className="p-4">
-                      <span className="font-semibold">{stat.name}</span>
+                      <span className="font-semibold">{shortenName(stat.name)}</span>
                     </CardContent>
                   </Card>
                 </Label>
@@ -231,4 +231,10 @@ export default function CourtTracker() {
       </Card>
     </>
   )
+}
+
+const shortenName = (name?: string) => {
+  if (!name) return name
+  const [firstName, lastName] = name.split(" ")
+  return `${firstName.charAt(0)}. ${lastName.trim()}`
 }
