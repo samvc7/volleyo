@@ -68,7 +68,7 @@ export function DataTable<TData extends Statistics, TValue>({
     setIsFileImported,
   } = useStatistics<TData>()
   const [editingCell, setEditingCell] = useState<EditingCell>()
-  const [isDeletePending, startDeleteTransition] = useTransition()
+  const [isRemovingPlayer, startRemovingPlayerTransition] = useTransition()
 
   const hasSelectedRows = Object.entries(rowSelection).length > 0
 
@@ -138,8 +138,8 @@ export function DataTable<TData extends Statistics, TValue>({
     setIsFileImported(true)
   }
 
-  const handleDelete = () => {
-    startDeleteTransition(async () => {
+  const handleRemove = () => {
+    startRemovingPlayerTransition(async () => {
       try {
         const statisticIds = Object.keys(rowSelection).map(k => data[Number(k)].id)
         deleteStatistics(statisticIds)
@@ -170,11 +170,11 @@ export function DataTable<TData extends Statistics, TValue>({
         <PermissionClient teamSlug={teamSlug}>
           <div className="flex gap-2 ml-auto">
             {hasSelectedRows ? (
-              <ConfirmDataLossDialog onConfirmAction={handleDelete}>
+              <ConfirmDataLossDialog onConfirmAction={handleRemove}>
                 <ButtonWithLoading
-                  label="Delete"
-                  loadingLabel={"Deleting..."}
-                  disabled={isDeletePending}
+                  label="Remove"
+                  loadingLabel={"Removing Player..."}
+                  disabled={isRemovingPlayer}
                 />
               </ConfirmDataLossDialog>
             ) : null}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useToast } from "@/hooks/use-toast"
-import { useActionState, useRef, useState } from "react"
+import { useActionState, useRef, useState, MouseEvent } from "react"
 import { addPlayer } from "./actions"
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
+import { PlusCircle, Clipboard } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { Member } from "@prisma/client"
@@ -49,6 +49,11 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
 
     return null
   }, null)
+
+  const createAndCopyInviteLink = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    console.log("TODO: Generate invite link")
+  }
 
   return (
     <Dialog
@@ -116,6 +121,14 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
               onClick={() => setShowDialog(false)}
             >
               Cancel
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={createAndCopyInviteLink}
+            >
+              <Clipboard className="h-4 w-4"></Clipboard>
+              Copy Invite Link
             </Button>
 
             <ButtonWithLoading
