@@ -10,6 +10,7 @@ import { TabsContent } from "@radix-ui/react-tabs"
 import CourtTracker from "./_court-tracker/CourtTracker"
 import { StatisticsProvider } from "./StatisticsProvider"
 import { SaveButton } from "./Savebutton"
+import { AddPlayerDialog } from "./AddPlayerDialog"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
@@ -71,6 +72,11 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
             </TabsList>
             <div className="ml-auto">
               <SaveButton gameId={game.id} />
+              <AddPlayerDialog
+                gameId={game.id}
+                membersNotParticipating={membersNotParticipating}
+                disabled={membersNotParticipating.length === 0}
+              />
             </div>
           </div>
 
@@ -80,9 +86,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
           <TabsContent value="stats">
             <DataTable
-              gameId={game.id}
               teamSlug={game.team?.slug ?? ""}
-              membersNotParticipating={membersNotParticipating}
               columns={columns}
               isAdmin={isAdmin}
             />

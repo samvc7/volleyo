@@ -22,8 +22,7 @@ import { deleteStatistics } from "./actions"
 import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
-import { AddPlayerDialog } from "./AddPlayerDialog"
-import { Member, Team } from "@prisma/client"
+import { Team } from "@prisma/client"
 import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 import { useStatistics } from "./StatisticsProvider"
@@ -43,17 +42,13 @@ declare module "@tanstack/react-table" {
 }
 
 interface DataTableProps<TData, TValue> {
-  gameId: string
   teamSlug: Team["slug"]
-  membersNotParticipating: Member[]
   columns: ColumnDef<TData, TValue>[]
   isAdmin?: boolean
 }
 
 export function DataTable<TData extends Statistics, TValue>({
-  gameId,
   teamSlug,
-  membersNotParticipating,
   columns,
   isAdmin,
 }: DataTableProps<TData, TValue>) {
@@ -178,11 +173,6 @@ export function DataTable<TData extends Statistics, TValue>({
                 />
               </ConfirmDataLossDialog>
             ) : null}
-            <AddPlayerDialog
-              gameId={gameId}
-              membersNotParticipating={membersNotParticipating}
-              disabled={membersNotParticipating.length === 0}
-            />
             <UploadStatisticsInput onUploadData={handleUploadData} />
           </div>
         </PermissionClient>

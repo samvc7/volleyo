@@ -53,6 +53,8 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
   const createAndCopyInviteLink = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     console.log("TODO: Generate invite link")
+    const inviteLink = `https://localhost:3000/invite?game=${gameId}&token=abcd1234`
+    window.navigator.clipboard.writeText(inviteLink)
   }
 
   return (
