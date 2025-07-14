@@ -2,7 +2,7 @@
 
 import { useToast } from "@/hooks/use-toast"
 import { useActionState, useRef, useState, MouseEvent } from "react"
-import { addPlayer } from "./actions"
+import { addPlayer, getAuthToken } from "./actions"
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, Clipboard } from "lucide-react"
+import { PlusCircle, Clipboard, Check } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { Member } from "@prisma/client"
@@ -29,6 +29,7 @@ type AddPlayerDialogProps = {
 export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
+  const [copiedInviteLink, setCopiedInviteLink] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
   const addPlayerWithGameId = addPlayer.bind(null, gameId)
@@ -52,9 +53,19 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
 
   const createAndCopyInviteLink = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    console.log("TODO: Generate invite link")
-    const inviteLink = `https://localhost:3000/invite?game=${gameId}&token=abcd1234`
-    window.navigator.clipboard.writeText(inviteLink)
+    if (copiedInviteLink) return
+    try {
+      const authToken = await getAuthToken(gameId)
+      const inviteLink = `https://${window.location.host}/statistics/invite?game=${gameId}&token=${authToken.token}`
+      window.navigator.clipboard.writeText(inviteLink)
+
+      setCopiedInviteLink(true)
+      setTimeout(() => {
+        setCopiedInviteLink(false)
+      }, 2000)
+    } catch (error) {
+      toast({ title: `${error} Create a guest member for this team first` })
+    }
   }
 
   return (
@@ -126,11 +137,18 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
             </Button>
 
             <Button
+              className={`${copiedInviteLink ? "border-green-600" : ""}`}
               variant="outline"
               onClick={createAndCopyInviteLink}
             >
-              <Clipboard className="h-4 w-4"></Clipboard>
-              Copy Invite Link
+              <>
+                {copiedInviteLink ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Clipboard className="h-4 w-4" />
+                )}
+                Copy Invite Link
+              </>
             </Button>
 
             <ButtonWithLoading

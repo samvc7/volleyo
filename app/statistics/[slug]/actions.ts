@@ -4,6 +4,8 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { revalidatePath } from "next/cache"
 import { Statistics } from "./columns"
 import { Position, Prisma } from "@prisma/client"
+import { v4 as uuidv4 } from "uuid"
+import { add } from "date-fns"
 
 export const saveStatistics = async (
   data: Statistics[],
@@ -91,4 +93,34 @@ const getMemberId = async (statistic: Statistics) => {
   }
 
   return members[0].id
+}
+
+export const getAuthToken = async (gameId: string) => {
+  const guestMember = await prisma.member.findFirst({
+    where: {
+      firstName: "Guest",
+      teams: { some: { team: { games: { some: { id: gameId } } } } },
+    },
+    include: { user: { include: { authToken: true } } },
+  })
+
+  if (!guestMember?.userId || !guestMember.user) {
+    throw new Error("Guest member not found.")
+  }
+
+  const existingToken = guestMember.user.authToken
+
+  if (existingToken && existingToken.expiresAt > new Date()) {
+    return existingToken
+  }
+
+  const newToken = await prisma.authToken.create({
+    data: {
+      userId: guestMember.userId,
+      token: uuidv4(),
+      expiresAt: add(new Date(), { months: 1 }),
+    },
+  })
+
+  return newToken
 }

@@ -19,6 +19,12 @@ export const adminMember = {
   email: "admin@example.com",
 }
 
+export const guestMember = {
+  firstName: "Guest",
+  lastName: "Member",
+  email: "guest@example.com",
+}
+
 export const games = [
   {
     title: "Game 1",
