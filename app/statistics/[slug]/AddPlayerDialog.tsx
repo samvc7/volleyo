@@ -56,7 +56,8 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
     if (copiedInviteLink) return
     try {
       const authToken = await getAuthToken(gameId)
-      const inviteLink = `https://${window.location.host}/statistics/invite?game=${gameId}&token=${authToken.token}`
+      // TODO: use game slug instead of gameId
+      const inviteLink = `${window.location.host}/statistics/invite?game=${gameId}&token=${authToken.token}`
       window.navigator.clipboard.writeText(inviteLink)
 
       setCopiedInviteLink(true)

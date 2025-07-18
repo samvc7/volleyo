@@ -7,7 +7,7 @@ import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
-import { ChevronUp, ChevronDown, Users, XIcon, Loader2 } from "lucide-react"
+import { ChevronUp, ChevronDown, Users, XIcon, Loader2, CheckIcon } from "lucide-react"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 import { Prisma } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
@@ -15,6 +15,9 @@ import { positionBadgeColors, positionShortLabels } from "./columns/utils"
 import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
 import { deleteStatistics } from "./actions"
 import { toast } from "@/hooks/use-toast"
+import { ConfirmDialog } from "./_components/ConfirmDialog"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 type GameDetailsCardProps = {
   game: Prisma.GameGetPayload<{
@@ -23,9 +26,15 @@ type GameDetailsCardProps = {
       team?: true
     }
   }>
+  enableCollapse?: boolean
+  enableInvitationResponse?: boolean
 }
 
-export const GameDetailsCard = ({ game }: GameDetailsCardProps) => {
+export const GameDetailsCard = ({
+  game,
+  enableCollapse = true,
+  enableInvitationResponse,
+}: GameDetailsCardProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
@@ -48,15 +57,17 @@ export const GameDetailsCard = ({ game }: GameDetailsCardProps) => {
             <EditGameDialog game={game} />
           </PermissionClient>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(prev => !prev)}
-            className="h-8 w-8"
-          >
-            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-            <span className="sr-only">{isCollapsed ? "Expand" : "Collapse"}</span>
-          </Button>
+          {enableCollapse && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(prev => !prev)}
+              className="h-8 w-8"
+            >
+              {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+              <span className="sr-only">{isCollapsed ? "Expand" : "Collapse"}</span>
+            </Button>
+          )}
         </div>
       </CardHeader>
       {!isCollapsed && (
@@ -82,7 +93,11 @@ export const GameDetailsCard = ({ game }: GameDetailsCardProps) => {
                   key={statistic.id}
                   className="flex flex-row justify-between items-center p-2 border rounded-lg"
                 >
-                  <AttendeeCard statistic={statistic} />
+                  <AttendeeCard
+                    statistic={statistic}
+                    gameSlug={game.slug}
+                    enableInvitationResponse={enableInvitationResponse}
+                  />
                 </li>
               ))}
             </ul>
@@ -97,12 +112,34 @@ type AttendeeCardProps = {
   statistic: Prisma.StatisticsGetPayload<{
     include: { member: { select: { firstName: true; lastName: true } } }
   }>
+  gameSlug: string
+  enableInvitationResponse?: boolean
 }
 
-const AttendeeCard = ({ statistic }: AttendeeCardProps) => {
+const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
+  const router = useRouter()
   const [isRemoving, startRemovingTransition] = useTransition()
+  const fullName = `${statistic.member.firstName} ${statistic.member.lastName}`
 
-  const handleRemove = () => {
+  const handleAcceptInvitation = () => {
+    startRemovingTransition(async () => {
+      try {
+        // const res = await signIn("credentials", {
+        //   token,
+        //   redirect: false,
+        //   callbackUrl: `/statistics/${statistic.game.slug}`,
+        // })
+
+        router.push(`/statistics/${gameSlug}`)
+        toast({ title: "Successfully accepted invitation" })
+      } catch (error) {
+        console.error(error)
+        toast({ title: "Could not accept invitation. Please try again" })
+      }
+    })
+  }
+
+  const handleDeclineInvitation = () => {
     startRemovingTransition(() => {
       try {
         deleteStatistics([statistic.id])
@@ -117,7 +154,7 @@ const AttendeeCard = ({ statistic }: AttendeeCardProps) => {
   return (
     <>
       <div>
-        <div className="text-sm font-semibold">{`${statistic.member.firstName} ${statistic.member.lastName}`}</div>
+        <div className="text-sm font-semibold">{fullName}</div>
         <Badge
           key={`attendee-position-${statistic.id}`}
           variant="outline"
@@ -147,16 +184,38 @@ const AttendeeCard = ({ statistic }: AttendeeCardProps) => {
             "Pending"
           )}
         </Badge>
+        {enableInvitationResponse && (
+          <>
+            <ConfirmDialog
+              onConfirmAction={handleAcceptInvitation}
+              title="You are accepting the invitation!"
+              description={
+                <>
+                  Are you sure you are <span className="font-bold">{fullName}</span>?
+                </>
+              }
+              confirmText="Accept"
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6"
+              >
+                <CheckIcon />
+              </Button>
+            </ConfirmDialog>
 
-        <ConfirmDataLossDialog onConfirmAction={handleRemove}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-6"
-          >
-            <XIcon />
-          </Button>
-        </ConfirmDataLossDialog>
+            <ConfirmDataLossDialog onConfirmAction={handleDeclineInvitation}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6"
+              >
+                <XIcon />
+              </Button>
+            </ConfirmDataLossDialog>
+          </>
+        )}
       </div>
     </>
   )
