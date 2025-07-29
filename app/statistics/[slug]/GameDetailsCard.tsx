@@ -16,7 +16,7 @@ import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
 import { deleteStatistics } from "./actions"
 import { toast } from "@/hooks/use-toast"
 import { ConfirmDialog } from "./_components/ConfirmDialog"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 
 type GameDetailsCardProps = {
@@ -118,20 +118,26 @@ type AttendeeCardProps = {
 
 const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const token = searchParams.get("token")
   const [isRemoving, startRemovingTransition] = useTransition()
   const fullName = `${statistic.member.firstName} ${statistic.member.lastName}`
 
   const handleAcceptInvitation = () => {
     startRemovingTransition(async () => {
       try {
-        // const res = await signIn("credentials", {
-        //   token,
-        //   redirect: false,
-        //   callbackUrl: `/statistics/${statistic.game.slug}`,
-        // })
+        const res = await signIn("credentials", {
+          token,
+          redirect: false,
+        })
 
-        router.push(`/statistics/${gameSlug}`)
-        toast({ title: "Successfully accepted invitation" })
+        if (res?.error) {
+          console.log("Login error:", res.error)
+          toast({ title: "Invalid token. Could not sign in. Please try again" })
+        } else {
+          router.push(`/statistics/${gameSlug}`)
+          toast({ title: "Successfully accepted invitation" })
+        }
       } catch (error) {
         console.error(error)
         toast({ title: "Could not accept invitation. Please try again" })

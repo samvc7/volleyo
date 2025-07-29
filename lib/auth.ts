@@ -24,20 +24,14 @@ export const authOptions: AuthOptions = {
       credentials: {
         identifier: { label: "Email or Username", type: "text" },
         password: { label: "Password", type: "password" },
+        token: { label: "Token", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.identifier || !credentials?.password) return null
+        if (credentials?.token) {
+          return authenticateWithToken(credentials.token)
+        }
 
-        const user = await prisma.user.findFirst({
-          where: {
-            OR: [{ email: credentials.identifier }, { username: credentials.identifier }],
-          },
-        })
-
-        if (!user || !user.password) return null
-
-        const isValid = await compare(credentials.password, user.password)
-        return isValid ? user : null
+        return authenticateWithCredentials(credentials?.identifier, credentials?.password)
       },
     }),
   ],
@@ -80,4 +74,27 @@ export default NextAuth(authOptions)
 
 export const getAuthSession = () => {
   return getServerSession(authOptions)
+}
+
+const authenticateWithToken = async (token: string) => {
+  const user = await prisma.user.findFirst({
+    where: { authToken: { token } },
+  })
+
+  return user
+}
+
+const authenticateWithCredentials = async (identifier?: string, password?: string) => {
+  if (!identifier || !password) return null
+
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ email: identifier }, { username: identifier }],
+    },
+  })
+
+  if (!user || !user.password) return null
+
+  const isValid = await compare(password, user.password)
+  return isValid ? user : null
 }
