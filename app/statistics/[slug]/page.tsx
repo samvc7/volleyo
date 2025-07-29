@@ -23,9 +23,10 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   const game = await prisma.game.findUnique({
     where: { slug: slug },
     include: {
-      statistics: {
+      attendees: {
         include: {
           member: { select: { firstName: true, lastName: true } },
+          statistics: true,
         },
       },
       team: true,
@@ -41,18 +42,19 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     redirect("/forbidden")
   }
 
-  const statistics = game?.statistics.map(statistic => {
-    const { member, ...statisticData } = statistic
+  const statistics = game?.attendees.map(attendee => {
+    const { member, ...statisticData } = attendee
     return {
       ...statisticData,
       name: `${member.firstName} ${member.lastName}`,
+      attendeeId: attendee.id,
     }
   }) as Statistics[]
 
   const membersNotParticipating = await prisma.member.findMany({
     where: {
       teams: { some: { team: { slug: game.team?.slug }, removedAt: null } },
-      statistics: { none: { gameId: game.id } },
+      attendees: { none: { gameId: game.id } },
     },
   })
 

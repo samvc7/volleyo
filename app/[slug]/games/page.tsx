@@ -19,7 +19,7 @@ export default async function GamesView({
   const toDate = new Date(to as string)
 
   const games = await prisma.game.findMany({
-    include: { statistics: true, team: true },
+    include: { attendees: { include: { statistics: true } }, team: true },
     where: { team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
     orderBy: { date: "desc" },
   })
@@ -90,4 +90,6 @@ export default async function GamesView({
   )
 }
 
-export type GameWithRelations = Prisma.GameGetPayload<{ include: { statistics: true; team?: true } }>
+export type GameWithRelations = Prisma.GameGetPayload<{
+  include: { attendees: { include: { statistics: true } }; team?: true }
+}>

@@ -58,17 +58,18 @@ model AuthToken {
 }
 
 model Member {
-  id         String       @id @default(cuid())
-  email      String?
-  firstName  String       @map("first_name")
-  lastName   String       @map("last_name")
-  nickName   String?      @map("nick_name")
-  createdAt  DateTime     @default(now()) @map("created_at")
-  birthday   DateTime?
-  userId     String?
-  user       User?        @relation(fields: [userId], references: [id])
-  statistics Statistics[]
-  teams      TeamMember[]
+  id        String    @id @default(cuid())
+  email     String?
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  nickName  String?   @map("nick_name")
+  createdAt DateTime  @default(now()) @map("created_at")
+  birthday  DateTime?
+
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id])
+  teams     TeamMember[]
+  attendees Attendee[]
 }
 
 model Team {
@@ -94,8 +95,8 @@ model TeamMember {
 }
 
 model Game {
-  id            String       @id @default(cuid())
-  slug          String       @unique
+  id            String     @id @default(cuid())
+  slug          String     @unique
   title         String
   description   String?
   location      String?
@@ -104,46 +105,55 @@ model Game {
   opponentName  String?
   teamScore     Int?
   opponentScore Int?
-  team          Team?        @relation(fields: [teamId], references: [id])
-  statistics    Statistics[]
+  team          Team?      @relation(fields: [teamId], references: [id])
+  attendees     Attendee[]
+}
+
+model Attendee {
+  id           String      @id @default(cuid())
+  playerNumber Int?
+  positions    Position[]
+  status       String      @default("PENDING")
+  statistics   Statistics?
+
+  gameId   String
+  memberId String
+  game     Game   @relation(fields: [gameId], references: [id])
+  member   Member @relation(fields: [memberId], references: [id])
 }
 
 model Statistics {
-  id                String     @id @default(cuid())
+  id                String @id @default(cuid())
   kills             Int?
-  attackErrors      Int?       @map("attack_errors")
-  attackAttempts    Int?       @map("attack_attempts")
-  attackEfficiency  Float?     @map("attack_efficiency")
-  killsPerSet       Float?     @map("kills_per_set")
-  serveAces         Int?       @map("serve_aces")
-  serveErrors       Int?       @map("serve_errors")
-  serveAttempts     Int?       @map("serve_attempts")
-  servePercentage   Float?     @map("serve_percentage")
-  serveEfficiency   Float?     @map("serve_efficiency")
-  serveRating       Float?     @map("serve_rating")
-  receivePerfect    Int?       @map("receive_perfect")
-  receivePositive   Int?       @map("receive_positive")
-  receiveNegative   Int?       @map("receive_negative")
-  receiveError      Int?       @map("receive_error")
-  receiveAttempts   Int?       @map("receive_attempts")
-  receivePercentage Float?     @map("receive_percentage")
-  setAssists        Int?       @map("set_assists")
-  setsTotal         Int?       @map("sets_total")
-  setErrors         Int?       @map("set_errors")
-  digs              Int?       @map("digs")
-  digErrors         Int?       @map("dig_errors")
-  blockSingle       Int?       @map("block_single")
-  blockMultiple     Int?       @map("block_multiple")
-  blockErrors       Int?       @map("block_errors")
-  blocksPerSet      Float?     @map("blocks_per_set")
-  setsPlayed        Int?       @map("sets_played")
-  positions         Position[]
-  memberId          String
-  gameId            String
-  game              Game       @relation(fields: [gameId], references: [id])
-  member            Member     @relation(fields: [memberId], references: [id])
+  attackErrors      Int?   @map("attack_errors")
+  attackAttempts    Int?   @map("attack_attempts")
+  attackEfficiency  Float? @map("attack_efficiency")
+  killsPerSet       Float? @map("kills_per_set")
+  serveAces         Int?   @map("serve_aces")
+  serveErrors       Int?   @map("serve_errors")
+  serveAttempts     Int?   @map("serve_attempts")
+  servePercentage   Float? @map("serve_percentage")
+  serveEfficiency   Float? @map("serve_efficiency")
+  serveRating       Float? @map("serve_rating")
+  receivePerfect    Int?   @map("receive_perfect")
+  receivePositive   Int?   @map("receive_positive")
+  receiveNegative   Int?   @map("receive_negative")
+  receiveError      Int?   @map("receive_error")
+  receiveAttempts   Int?   @map("receive_attempts")
+  receivePercentage Float? @map("receive_percentage")
+  setAssists        Int?   @map("set_assists")
+  setsTotal         Int?   @map("sets_total")
+  setErrors         Int?   @map("set_errors")
+  digs              Int?   @map("digs")
+  digErrors         Int?   @map("dig_errors")
+  blockSingle       Int?   @map("block_single")
+  blockMultiple     Int?   @map("block_multiple")
+  blockErrors       Int?   @map("block_errors")
+  blocksPerSet      Float? @map("blocks_per_set")
+  setsPlayed        Int?   @map("sets_played")
 
-  @@unique([memberId, gameId])
+  attendeeId String   @unique
+  attendee   Attendee @relation(fields: [attendeeId], references: [id])
 }
 
 enum Position {
@@ -162,4 +172,10 @@ enum UserRole {
 enum TeamRole {
   ADMIN
   MEMBER
+}
+
+enum AttendeeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

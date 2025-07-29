@@ -28,7 +28,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const statistics = (
     await prisma.statistics.aggregate({
-      where: { game: gameWhereQuery },
+      where: { attendee: { game: gameWhereQuery } },
       _sum: {
         kills: true,
         attackErrors: true,
@@ -54,14 +54,14 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const games = await prisma.game.findMany({
     where: gameWhereQuery,
-    include: { statistics: true },
+    include: { attendees: { include: { statistics: true } } },
     orderBy: { date: "asc" },
     ...(!hasDateFilter ? { take: 30 } : {}),
   })
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
-    by: ["memberId"],
-    where: { game: gameWhereQuery },
+    by: ["attendeeId"],
+    where: { attendee: { game: gameWhereQuery } },
     _sum: {
       kills: true,
       attackAttempts: true,
@@ -73,20 +73,23 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     },
   })
 
-  const leaderBoardPlayers = await prisma.member.findMany({
-    where: {
-      id: { in: leaderBoardStatistics.map(data => data.memberId) },
-    },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      nickName: true,
+  // TODO: refactor to only get the members
+  const leaderBoardPlayers = await prisma.attendee.findMany({
+    where: { id: { in: leaderBoardStatistics.map(data => data.attendeeId) } },
+    include: {
+      member: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          nickName: true,
+        },
+      },
     },
   })
 
   const leaderBoardData = leaderBoardStatistics.map(statistic => {
-    const player = leaderBoardPlayers.find(player => player.id === statistic.memberId)
+    const player = leaderBoardPlayers.find(player => player.id === statistic.attendeeId)
 
     // TODO: handle not found player
 
@@ -99,8 +102,8 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     const score = kills * 1.5 + serveAces * 1.2 + blocks + digs * 0.75 + setAssists * 0.75
 
     return {
-      playerId: player?.id ?? "",
-      name: player?.nickName ?? `${player?.firstName} ${player?.lastName}`,
+      playerId: player?.memberId ?? "",
+      name: player?.member.nickName ?? `${player?.member.firstName} ${player?.member.lastName}`,
       kills,
       blocks,
       serveAces,
@@ -152,21 +155,21 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const scoresChartData = games.map(game => ({
     date: format(game.date, DATE_ISO_FORMAT),
-    scores: game.statistics.reduce((acc, curr) => {
-      const kills = curr.kills ?? 0
-      const blocks = (curr.blockSingle ?? 0) + (curr.blockMultiple ?? 0)
-      const aces = curr.serveAces ?? 0
+    scores: game.attendees.reduce((acc, curr) => {
+      const kills = curr.statistics?.kills ?? 0
+      const blocks = (curr.statistics?.blockSingle ?? 0) + (curr.statistics?.blockMultiple ?? 0)
+      const aces = curr.statistics?.serveAces ?? 0
       const scores = kills + blocks + aces
 
       return acc + scores
     }, 0),
-    errors: game.statistics.reduce((acc, curr) => {
-      const attackErrors = curr.attackErrors ?? 0
-      const serveErrors = curr.serveErrors ?? 0
-      const receiveErrors = curr.receiveError ?? 0
-      const setErrors = curr.setErrors ?? 0
-      const digErrors = curr.digErrors ?? 0
-      const blockErrors = curr.blockErrors ?? 0
+    errors: game.attendees.reduce((acc, curr) => {
+      const attackErrors = curr.statistics?.attackErrors ?? 0
+      const serveErrors = curr.statistics?.serveErrors ?? 0
+      const receiveErrors = curr.statistics?.receiveError ?? 0
+      const setErrors = curr.statistics?.setErrors ?? 0
+      const digErrors = curr.statistics?.digErrors ?? 0
+      const blockErrors = curr.statistics?.blockErrors ?? 0
 
       const errors = attackErrors + serveErrors + receiveErrors + setErrors + digErrors + blockErrors
 
@@ -177,15 +180,15 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   const errorsChartData = games.map(game => {
     return {
       date: format(game.date, DATE_ISO_FORMAT),
-      attack: game.statistics.reduce((acc, stat) => acc + (stat.attackErrors ?? 0), 0),
-      receive: game.statistics.reduce((acc, stat) => acc + (stat.receiveError ?? 0), 0),
+      attack: game.attendees.reduce((acc, stat) => acc + (stat.statistics?.attackErrors ?? 0), 0),
+      receive: game.attendees.reduce((acc, stat) => acc + (stat.statistics?.receiveError ?? 0), 0),
     }
   })
 
   const attackChartData = games.map(game => ({
     date: format(game.date, DATE_ISO_FORMAT),
-    attempts: game.statistics.reduce((acc, curr) => acc + (curr.attackAttempts ?? 0), 0),
-    errors: game.statistics.reduce((acc, curr) => acc + (curr.attackErrors ?? 0), 0),
+    attempts: game.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackAttempts ?? 0), 0),
+    errors: game.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackErrors ?? 0), 0),
   }))
 
   return (

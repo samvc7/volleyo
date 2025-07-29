@@ -1,6 +1,6 @@
 import bycript from "bcryptjs"
 import { Member, PrismaClient } from "@prisma/client"
-import { adminMember, games, gameStatistics, guestMember, members } from "./seedData"
+import { adminMember, games, attendees, guestMember, members } from "./seedData"
 
 const prisma = new PrismaClient()
 async function main() {
@@ -62,32 +62,37 @@ async function main() {
         },
       })
 
-      for (let ix = 0; ix < games.length; ix++) {
-        const game = games[ix]
-        const stats = gameStatistics[ix]
+      for (const game of games) {
         await tx.game.create({
           data: {
             ...game,
-            teamId: team.id,
-            statistics: stats
-              ? {
-                  create: gameStatistics[ix].map(statistic => {
-                    const { name, ...stats } = statistic
-
-                    return {
-                      ...stats,
-                      member: {
-                        connect: {
-                          id: memberRecords.find(member => member.firstName === statistic.name.split(" ")[0])
-                            ?.id,
-                        },
-                      },
-                    }
-                  }),
-                }
-              : undefined,
+            team: { connect: { id: team.id } },
           },
         })
+      }
+
+      for (let i = 0; i < attendees.length; i++) {
+        const game = games[i]
+        const attendeeData = attendees[i]
+
+        for (const data of attendeeData) {
+          const member = memberRecords.find(m => m.firstName === data.attendee.name.split(" ")[0])
+
+          if (!member) {
+            console.warn(`Member not found for name: ${data.attendee.name}`)
+            continue
+          }
+
+          await tx.attendee.create({
+            data: {
+              game: { connect: { slug: game.slug } },
+              member: { connect: { id: member.id } },
+              statistics: {
+                create: data.statistics,
+              },
+            },
+          })
+        }
       }
 
       console.log("Seed data inserted successfully")

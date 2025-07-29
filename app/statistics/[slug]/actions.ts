@@ -17,26 +17,32 @@ export const saveStatistics = async (
       .filter(statistic => !statistic.name.includes("total"))
       .map(async statistic => {
         return prisma.$transaction(async tx => {
-          const { id, name, memberId, gameId, ...statisticPrismaPayload } = statistic
+          const { id, name, attendeeId, ...statisticPrismaPayload } = statistic
 
-          const correctmemberId = memberId ?? (await getMemberId(statistic))
-          const correctGameId = gameId ?? gameIdFallback
+          if (deleteCurrentStatistics) {
+            await tx.statistics.deleteMany({ where: { attendee: { gameId: gameIdFallback } } })
+          }
 
-          if (deleteCurrentStatistics) await tx.statistics.deleteMany({ where: { gameId: correctGameId } })
-
-          await tx.statistics.upsert({
-            where: { memberId_gameId: { memberId: correctmemberId, gameId: correctGameId } },
-            update: {
-              ...statisticPrismaPayload,
-              memberId: correctmemberId,
-              gameId: correctGameId,
-            },
-            create: {
-              ...statisticPrismaPayload,
-              memberId: correctmemberId,
-              gameId: correctGameId,
-            },
+          const existingStat = await tx.statistics.findFirst({
+            where: { attendeeId },
           })
+
+          if (!existingStat) {
+            await tx.statistics.create({
+              data: {
+                ...statisticPrismaPayload,
+                attendeeId,
+              },
+            })
+          } else {
+            await tx.statistics.update({
+              where: { id: existingStat.id },
+              data: {
+                ...statisticPrismaPayload,
+                attendeeId,
+              },
+            })
+          }
         })
       }),
   )
@@ -60,39 +66,15 @@ export const addPlayer = async (gameId: string, formData: FormData) => {
     .split(",")
     .filter(p => p.trim().length) || []) as Position[]
 
-  await prisma.statistics.create({
+  await prisma.attendee.create({
     data: {
-      memberId,
       gameId,
+      memberId,
       positions,
     },
   })
 
   revalidatePath("/statistics/[slug]", "page")
-}
-
-const getMemberId = async (statistic: Statistics) => {
-  if (statistic.memberId) return statistic.memberId
-
-  const names = statistic.name.split(" ")
-
-  const firstNamesQuery = names.slice(0, names.length - 1).map(name => {
-    return { firstName: { contains: name } } as Prisma.MemberWhereInput
-  })
-
-  const members = await prisma.member.findMany({
-    where: { lastName: names[names.length - 1], AND: [...firstNamesQuery] },
-  })
-
-  if (!members || members.length === 0) {
-    throw new Error(`Member not found: ${name}`)
-  }
-
-  if (members.length > 1) {
-    throw new Error(`Multiple members found: ${name}`)
-  }
-
-  return members[0].id
 }
 
 export const getAuthToken = async (gameId: string) => {

@@ -22,7 +22,7 @@ import { signIn } from "next-auth/react"
 type GameDetailsCardProps = {
   game: Prisma.GameGetPayload<{
     include: {
-      statistics: { include: { member: { select: { firstName: true; lastName: true } } } }
+      attendees: { include: { member: { select: { firstName: true; lastName: true } }; statistics: true } }
       team?: true
     }
   }>
@@ -48,7 +48,7 @@ export const GameDetailsCard = ({
               {game.location || "TBA"} |
               <span className="flex items-center gap-1">
                 <Users size={14} />
-                {game.statistics.length ?? 0}
+                {game.attendees.length ?? 0}
               </span>
             </CardDescription>
           </div>
@@ -88,13 +88,13 @@ export const GameDetailsCard = ({
           <div className="mt-4">
             <h3 className="font-semibold">Attendees</h3>
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {game.statistics.map(statistic => (
+              {game.attendees.map(attendee => (
                 <li
-                  key={statistic.id}
+                  key={attendee.id}
                   className="flex flex-row justify-between items-center p-2 border rounded-lg"
                 >
                   <AttendeeCard
-                    statistic={statistic}
+                    attendee={attendee}
                     gameSlug={game.slug}
                     enableInvitationResponse={enableInvitationResponse}
                   />
@@ -109,19 +109,19 @@ export const GameDetailsCard = ({
 }
 
 type AttendeeCardProps = {
-  statistic: Prisma.StatisticsGetPayload<{
+  attendee: Prisma.AttendeeGetPayload<{
     include: { member: { select: { firstName: true; lastName: true } } }
   }>
   gameSlug: string
   enableInvitationResponse?: boolean
 }
 
-const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
+const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
   const [isRemoving, startRemovingTransition] = useTransition()
-  const fullName = `${statistic.member.firstName} ${statistic.member.lastName}`
+  const fullName = `${attendee.member.firstName} ${attendee.member.lastName}`
 
   const handleAcceptInvitation = () => {
     startRemovingTransition(async () => {
@@ -132,7 +132,7 @@ const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }:
         })
 
         if (res?.error) {
-          console.log("Login error:", res.error)
+          console.error("Login error:", res.error)
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
           router.push(`/statistics/${gameSlug}`)
@@ -148,7 +148,7 @@ const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }:
   const handleDeclineInvitation = () => {
     startRemovingTransition(() => {
       try {
-        deleteStatistics([statistic.id])
+        deleteStatistics([attendee.id])
         toast({ title: "Successfully deleted statistics" })
       } catch (error) {
         console.error(error)
@@ -162,7 +162,7 @@ const AttendeeCard = ({ statistic, gameSlug, enableInvitationResponse = false }:
       <div>
         <div className="text-sm font-semibold">{fullName}</div>
         <Badge
-          key={`attendee-position-${statistic.id}`}
+          key={`attendee-position-${attendee.id}`}
           variant="outline"
           className={positionBadgeColors["OUTSIDE_HITTER"]}
         >

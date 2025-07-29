@@ -33,7 +33,7 @@ export const GameCardLink = ({ game }: GameCardLinkProps) => {
                 <div>📍 {game.location || "TBA"}</div>
                 <div className="flex items-center gap-1">
                   <Users size={14} />
-                  {game.statistics.length ?? 0}
+                  {game.attendees.length ?? 0}
                 </div>
               </div>
             </div>

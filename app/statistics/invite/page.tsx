@@ -6,12 +6,12 @@ type InvitePageProps = {
 }
 
 export default async function InvitePage({ searchParams }: InvitePageProps) {
-  const { game, token } = await searchParams
+  const { game } = await searchParams
 
   const gameToInvite = await prisma.game.findUnique({
     where: { id: game as string },
     include: {
-      statistics: { include: { member: true } },
+      attendees: { include: { member: true, statistics: true } },
       team: { include: { members: { include: { member: true } } } },
     },
   })
