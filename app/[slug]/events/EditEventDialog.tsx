@@ -29,7 +29,7 @@ type EditEventDialogProps = {
 
 export const EditEventDialog = ({ event }: EditEventDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(event.date)
+  const [selectedDate, setSelectedDate] = useState<Date | undefined | null>(event.date)
 
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     if (!selectedDate) {
@@ -106,7 +106,7 @@ export const EditEventDialog = ({ event }: EditEventDialogProps) => {
                 <DatePicker
                   id="date"
                   name="date"
-                  date={selectedDate ? selectedDate : new Date(event.date)}
+                  date={selectedDate ? selectedDate : new Date()}
                   onDateChange={setSelectedDate}
                 />
               </div>

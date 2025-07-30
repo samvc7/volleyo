@@ -45,8 +45,14 @@ export const EventDetailsCard = ({
           <div className="flex flex-col gap-2">
             <CardTitle>{event.title}</CardTitle>
             <CardDescription className="inline-flex items-center gap-2">
-              📅 {format(event.date, DATE_FORMAT)} 🕒 {format(event.date, TIME_FORMAT)} | 📍{" "}
-              {event.location || "TBA"} |
+              {event.date ? (
+                <>
+                  📅 {format(event.date, DATE_FORMAT)} 🕒 {format(event.date, TIME_FORMAT)}
+                </>
+              ) : (
+                <>📅 TBA</>
+              )}
+              | 📍 {event.location || "TBA"} |
               <span className="flex items-center gap-1">
                 <Users size={14} />
                 {event.attendees.length ?? 0}

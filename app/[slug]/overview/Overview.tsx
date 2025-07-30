@@ -11,6 +11,7 @@ import { DATE_ISO_FORMAT } from "@/app/utils"
 import { Event, EventType } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { EventWithRelations } from "../events/page"
 
 type OverviewProps = {
   teamSlug: string
@@ -26,7 +27,10 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
       { teamScore: { not: null }, opponentScore: { not: null } },
       { type: { notIn: [EventType.SOCIAL, EventType.OTHER] } },
     ],
-    ...(hasDateFilter ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } } : {}),
+    date: {
+      not: null,
+      ...(hasDateFilter ? { gte: fromDateFilter, lte: toDateFilter } : {}),
+    },
   }
 
   const statistics = (
@@ -55,12 +59,12 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     })
   )._sum
 
-  const events = await prisma.event.findMany({
+  const events = (await prisma.event.findMany({
     where: eventWhereQuery,
     include: { attendees: { include: { statistics: true } } },
     orderBy: { date: "asc" },
     ...(!hasDateFilter ? { take: 30 } : {}),
-  })
+  })) as EventWithDate[]
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
     by: ["attendeeId"],
@@ -262,6 +266,8 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     </>
   )
 }
+
+type EventWithDate = EventWithRelations & { date: Date }
 
 const calculateGamesOverview = (events: Event[]) => {
   let wins = 0

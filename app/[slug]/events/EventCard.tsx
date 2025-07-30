@@ -28,7 +28,13 @@ export const EventCardLink = ({ event }: EventCardLinkProps) => {
             <div>
               <div className="text-sm text-muted-foreground">
                 <div>
-                  📅 {format(event.date, DATE_FORMAT)} ⏰ {format(event.date, TIME_FORMAT)}
+                  {event.date ? (
+                    <>
+                      📅 {format(event.date, DATE_FORMAT)} ⏰ {format(event.date, TIME_FORMAT)}
+                    </>
+                  ) : (
+                    <>📅 TBA</>
+                  )}
                 </div>
                 <div>📍 {event.location || "TBA"}</div>
                 <div className="flex items-center gap-1">

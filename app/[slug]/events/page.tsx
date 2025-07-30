@@ -20,13 +20,21 @@ export default async function EventsView({
 
   const events = await prisma.event.findMany({
     include: { attendees: { include: { statistics: true } }, team: true },
-    where: { team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
+    where: {
+      team: { slug },
+      date: {
+        not: null,
+        ...(from && to ? { gte: fromDate, lte: toDate } : {}),
+      },
+    },
     orderBy: { date: "desc" },
   })
 
   const today = new Date()
   const [upcomingEvents, pastEvents] = events.reduce<[EventWithRelations[], EventWithRelations[]]>(
     ([upcoming, past], event) => {
+      if (!event.date) return [upcoming, past]
+
       if (event.date >= today) {
         upcoming.push(event)
       } else {

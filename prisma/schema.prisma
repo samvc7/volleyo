@@ -95,19 +95,20 @@ model TeamMember {
 }
 
 model Event {
-  id            String     @id @default(cuid())
-  slug          String     @unique
-  title         String
-  description   String?
-  location      String?
-  date          DateTime
-  type          EventType  @default(OTHER)
-  teamId        String?
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  description String?
+  location    String?
+  date        DateTime?
+  attendees   Attendee[]
+
+  type          EventType @default(OTHER)
   opponentName  String?
   teamScore     Int?
   opponentScore Int?
-  team          Team?      @relation(fields: [teamId], references: [id])
-  attendees     Attendee[]
+  teamId        String?
+  team          Team?     @relation(fields: [teamId], references: [id])
 }
 
 model Attendee {
