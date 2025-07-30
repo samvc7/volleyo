@@ -4,7 +4,7 @@ import { DatePickerWithRange } from "../DateRangePicker"
 import { TeamSwitcher } from "../team-switcher/TeamSwitcher"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
 import { OverviewLink } from "./navigations/OverviewLink"
-import { GamesLink } from "./navigations/GamesLink"
+import { EventLink } from "./navigations/EventLink"
 import { MembersLink } from "./navigations/MembersLink"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -47,7 +47,7 @@ export default async function Layout({
             </NavigationMenuItem>
 
             <NavigationMenuItem className="space-x-1">
-              <GamesLink href={`/${slug}/games`} />
+              <EventLink href={`/${slug}/events`} />
             </NavigationMenuItem>
 
             <Permission teamSlug={slug}>

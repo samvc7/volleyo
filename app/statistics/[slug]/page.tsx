@@ -2,7 +2,7 @@ import { DataTable } from "@/app/statistics/[slug]/data-table"
 import { Statistics } from "./columns"
 import { columns } from "./columns"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { GameDetailsCard } from "./GameDetailsCard"
+import { EventDetailsCard } from "./EventDetailsCard"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,7 +20,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   }
 
   const slug = (await params).slug
-  const game = await prisma.game.findUnique({
+  const event = await prisma.event.findUnique({
     where: { slug: slug },
     include: {
       attendees: {
@@ -33,16 +33,18 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     },
   })
 
-  if (!game) {
-    return <h1>Game not found</h1>
+  if (!event) {
+    return <h1>Event not found</h1>
   }
 
-  const isMember = session.user.members.some(member => member.teams.some(team => team.teamId === game.teamId))
+  const isMember = session.user.members.some(member =>
+    member.teams.some(team => team.teamId === event.teamId),
+  )
   if (!isMember) {
     redirect("/forbidden")
   }
 
-  const statistics = game?.attendees.map(attendee => {
+  const statistics = event?.attendees.map(attendee => {
     const { member, ...statisticData } = attendee
     return {
       ...statisticData,
@@ -53,31 +55,31 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
   const membersNotParticipating = await prisma.member.findMany({
     where: {
-      teams: { some: { team: { slug: game.team?.slug }, removedAt: null } },
-      attendees: { none: { gameId: game.id } },
+      teams: { some: { team: { slug: event.team?.slug }, removedAt: null } },
+      attendees: { none: { eventId: event.id } },
     },
   })
 
-  const isAdmin = session.user.teamRoles[game.team?.slug ?? ""] === "ADMIN"
+  const isAdmin = session.user.teamRoles[event.team?.slug ?? ""] === "ADMIN"
 
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <GameDetailsCard game={game} />
+      <EventDetailsCard event={event} />
       <Tabs defaultValue="stats">
         <StatisticsProvider
           initialData={statistics}
-          gameSlug={game.slug}
+          eventSlug={event.slug}
         >
           <div className="flex">
             <TabsList>
               <TabsTrigger value={"court"}>Court</TabsTrigger>
               <TabsTrigger value={"stats"}>Statistics</TabsTrigger>
             </TabsList>
-            <Permission teamSlug={game.team?.slug ?? ""}>
+            <Permission teamSlug={event.team?.slug ?? ""}>
               <div className="ml-auto">
-                <SaveButton gameId={game.id} />
+                <SaveButton eventId={event.id} />
                 <AddPlayerDialog
-                  gameId={game.id}
+                  eventId={event.id}
                   membersNotParticipating={membersNotParticipating}
                   disabled={membersNotParticipating.length === 0}
                 />
@@ -91,7 +93,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
           <TabsContent value="stats">
             <DataTable
-              teamSlug={game.team?.slug ?? ""}
+              teamSlug={event.team?.slug ?? ""}
               columns={columns}
               isAdmin={isAdmin}
             />

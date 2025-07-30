@@ -8,7 +8,7 @@ import { saveStatistics } from "./actions"
 import { Statistics } from "./columns"
 import { toast } from "@/hooks/use-toast"
 
-export const SaveButton = ({ gameId }: { gameId: string }) => {
+export const SaveButton = ({ eventId }: { eventId: string }) => {
   const { statistics, hasUnsavedChanges, setHasUnsavedChanges, isFileImported, setIsFileImported } =
     useStatistics<Statistics>()
   const [isPending, startTransition] = useTransition()
@@ -16,7 +16,7 @@ export const SaveButton = ({ gameId }: { gameId: string }) => {
   const handleSave = () => {
     startTransition(async () => {
       try {
-        await saveStatistics(statistics, gameId, isFileImported)
+        await saveStatistics(statistics, eventId, isFileImported)
         setHasUnsavedChanges(false)
         setIsFileImported(false)
         toast({ title: "Successfully saved statistics" })

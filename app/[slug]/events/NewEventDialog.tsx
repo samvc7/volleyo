@@ -17,16 +17,16 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "./DatePicker"
 import { toast } from "@/hooks/use-toast"
-import { createGame } from "./actions"
+import { createEvent } from "./actions"
 import { useParams } from "next/navigation"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
-type NewGameDialogProps = {
+type NewEventDialogProps = {
   triggerClassName?: string
   forceRedirect?: boolean
 }
 
-export const NewGameDialog = ({ triggerClassName }: NewGameDialogProps) => {
+export const NewEventDialog = ({ triggerClassName }: NewEventDialogProps) => {
   const { slug } = useParams() as { slug: string }
 
   const [showDialog, setShowDialog] = useState(false)
@@ -38,16 +38,16 @@ export const NewGameDialog = ({ triggerClassName }: NewGameDialogProps) => {
       return null
     }
 
-    const createGameWithDateAndTeamSlug = createGame.bind(null, slug, selectedDate)
+    const createWithDateAndTeamSlug = createEvent.bind(null, slug, selectedDate)
 
     try {
-      createGameWithDateAndTeamSlug(formData)
+      createWithDateAndTeamSlug(formData)
       setShowDialog(false)
       setSelectedDate(undefined)
-      toast({ title: "New game added" })
+      toast({ title: "New event added" })
     } catch (error) {
       console.error(error)
-      return "Could not add new game. Please try again"
+      return "Could not add new event. Please try again"
     }
 
     return null
@@ -65,20 +65,20 @@ export const NewGameDialog = ({ triggerClassName }: NewGameDialogProps) => {
         <Button
           variant={"outline"}
           aria-expanded={showDialog}
-          aria-label="Add Game"
+          aria-label="Add Event"
           onClick={() => {
             setShowDialog(true)
           }}
           className={triggerClassName}
         >
           <PlusCircle className="h-5 w-5" />
-          Add Game
+          Add Event
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Game</DialogTitle>
+          <DialogTitle>Add Event</DialogTitle>
           <DialogDescription>
             Add a new tournament, single game, training, tuneup etc. to manage statistics.
           </DialogDescription>
@@ -99,7 +99,7 @@ export const NewGameDialog = ({ triggerClassName }: NewGameDialogProps) => {
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Describe this game with useful information like address, game format, etc."
+                placeholder="Describe this event with useful information like address, game format, etc."
               />
             </div>
             <div className="grid grid-cols-2 gap-4">

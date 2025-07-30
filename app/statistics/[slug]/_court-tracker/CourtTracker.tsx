@@ -30,11 +30,11 @@ export default function CourtTracker() {
   const DEFAULT_TIMEOUTS = 2
   const DEFAULT_SUBSTITUTIONS = 6
 
-  const { statistics, setStatistics, setHasUnsavedChanges, gameSlug } = useStatistics<Statistics>()
+  const { statistics, setStatistics, setHasUnsavedChanges, eventSlug } = useStatistics<Statistics>()
   const [selectedPosition, setSelectedPosition] = useState<string>("")
   const [selectedBench, setSelectedBench] = useState<string>("")
   const [savedPositions, savePositions] = useSessionStorage<(string | undefined)[]>(
-    `${gameSlug}-court-positions`,
+    `${eventSlug}-court-positions`,
     [],
   )
   const statisticsFromPositions = savedPositions.map(position => {
@@ -45,8 +45,8 @@ export default function CourtTracker() {
   )
   const playersNotOnCourt = statistics.filter(stat => !courtPositions.some(pos => pos?.id === stat.id))
   const [benched, setBenched] = useState<Statistics[]>(playersNotOnCourt)
-  const [timoutCount, setTimeoutCount] = useSessionStorage(`${gameSlug}-timeouts`, DEFAULT_TIMEOUTS)
-  const [subCount, setSubCount] = useSessionStorage(`${gameSlug}-subs`, DEFAULT_SUBSTITUTIONS)
+  const [timoutCount, setTimeoutCount] = useSessionStorage(`${eventSlug}-timeouts`, DEFAULT_TIMEOUTS)
+  const [subCount, setSubCount] = useSessionStorage(`${eventSlug}-subs`, DEFAULT_SUBSTITUTIONS)
 
   const selectedPositionIx = Number(selectedPosition.split("-")[1])
   const selectedCourtPlayer = courtPositions[selectedPositionIx]

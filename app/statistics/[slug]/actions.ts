@@ -3,13 +3,13 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { revalidatePath } from "next/cache"
 import { Statistics } from "./columns"
-import { Position, Prisma } from "@prisma/client"
+import { Position } from "@prisma/client"
 import { v4 as uuidv4 } from "uuid"
 import { add } from "date-fns"
 
 export const saveStatistics = async (
   data: Statistics[],
-  gameIdFallback: string,
+  eventIdFallback: string,
   deleteCurrentStatistics?: boolean,
 ) => {
   await Promise.all(
@@ -20,7 +20,7 @@ export const saveStatistics = async (
           const { id, name, attendeeId, ...statisticPrismaPayload } = statistic
 
           if (deleteCurrentStatistics) {
-            await tx.statistics.deleteMany({ where: { attendee: { gameId: gameIdFallback } } })
+            await tx.statistics.deleteMany({ where: { attendee: { eventId: eventIdFallback } } })
           }
 
           const existingStat = await tx.statistics.findFirst({
@@ -58,7 +58,7 @@ export const deleteStatistics = async (statisticIds: string[]) => {
   revalidatePath("/statistics/[slug]", "page")
 }
 
-export const addPlayer = async (gameId: string, formData: FormData) => {
+export const addPlayer = async (eventId: string, formData: FormData) => {
   const memberId = formData.get("member") as string
   const positions = (formData
     .get("positions")
@@ -68,7 +68,7 @@ export const addPlayer = async (gameId: string, formData: FormData) => {
 
   await prisma.attendee.create({
     data: {
-      gameId,
+      eventId,
       memberId,
       positions,
     },
@@ -77,11 +77,11 @@ export const addPlayer = async (gameId: string, formData: FormData) => {
   revalidatePath("/statistics/[slug]", "page")
 }
 
-export const getAuthToken = async (gameId: string) => {
+export const getAuthToken = async (eventId: string) => {
   const guestMember = await prisma.member.findFirst({
     where: {
       firstName: "Guest",
-      teams: { some: { team: { games: { some: { id: gameId } } } } },
+      teams: { some: { team: { events: { some: { id: eventId } } } } },
     },
     include: { user: { include: { authToken: true } } },
   })
@@ -109,7 +109,7 @@ export const getAuthToken = async (gameId: string) => {
 
 export const acceptInvitation = async (attendeeId: string) => {
   await prisma.attendee.update({
-    where: { id: attendeeId }, 
+    where: { id: attendeeId },
     data: {
       status: "ACCEPTED",
     },

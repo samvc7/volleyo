@@ -21,23 +21,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PositionsMultiSelect } from "./PositionsMultiSelect"
 
 type AddPlayerDialogProps = {
-  gameId: string
+  eventId: string
   membersNotParticipating: Member[]
   disabled?: boolean
 }
 
-export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
+export const AddPlayerDialog = ({ eventId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
   const [copiedInviteLink, setCopiedInviteLink] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
-  const addPlayerWithGameId = addPlayer.bind(null, gameId)
+  const addPlayerWithEventId = addPlayer.bind(null, eventId)
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     const action = formData.get("action")
 
     try {
-      await addPlayerWithGameId(formData)
+      await addPlayerWithEventId(formData)
       if (action === "add") setShowDialog(false)
       if (action === "add-more") {
         formRef.current?.reset()
@@ -55,9 +55,9 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
     e.preventDefault()
     if (copiedInviteLink) return
     try {
-      const authToken = await getAuthToken(gameId)
-      // TODO: use game slug instead of gameId
-      const inviteLink = `${window.location.host}/statistics/invite?game=${gameId}&token=${authToken.token}`
+      const authToken = await getAuthToken(eventId)
+      // TODO: use event slug instead of eventId
+      const inviteLink = `${window.location.host}/statistics/invite?event=${eventId}&token=${authToken.token}`
       window.navigator.clipboard.writeText(inviteLink)
 
       setCopiedInviteLink(true)
@@ -97,7 +97,7 @@ export const AddPlayerDialog = ({ gameId, membersNotParticipating, disabled }: A
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Player</DialogTitle>
-          <DialogDescription>Add a player for the game.</DialogDescription>
+          <DialogDescription>Add a player for the event.</DialogDescription>
         </DialogHeader>
         <form
           ref={formRef}

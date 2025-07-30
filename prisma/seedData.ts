@@ -1,3 +1,4 @@
+import { EventType } from "@prisma/client"
 import { subDays } from "date-fns"
 
 export const members = [
@@ -25,12 +26,13 @@ export const guestMember = {
   email: "guest@example.com",
 }
 
-export const games = [
+export const events = [
   {
     title: "Game 1",
     slug: "game-1",
     description: "Season Opener",
     date: subDays(new Date(), 7),
+    type: EventType.MATCH,
     teamScore: 25,
     opponentScore: 20,
   },
@@ -39,6 +41,7 @@ export const games = [
     slug: "game-2",
     description: "Tough Opponent",
     date: subDays(new Date(), 5),
+    type: EventType.MATCH,
     teamScore: 25,
     opponentScore: 22,
   },
@@ -47,6 +50,7 @@ export const games = [
     slug: "game-3",
     description: "Mid-season Battle",
     date: subDays(new Date(), 3),
+    type: EventType.MATCH,
     teamScore: 18,
     opponentScore: 25,
   },
@@ -55,6 +59,7 @@ export const games = [
     slug: "game-4",
     description: "Final Showdown",
     date: subDays(new Date(), 1),
+    type: EventType.MATCH,
     teamScore: 25,
     opponentScore: 20,
   },
@@ -63,6 +68,7 @@ export const games = [
     slug: "game-5",
     description: "Playoffs",
     date: new Date(),
+    type: EventType.MATCH,
   },
 ]
 

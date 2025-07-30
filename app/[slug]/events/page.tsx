@@ -1,12 +1,12 @@
 import { prisma } from "@/prisma/singlePrismaClient"
-import { NewGameDialog } from "./NewGameDialog"
-import { GameCardLink } from "./GameCard"
+import { NewEventDialog } from "./NewEventDialog"
+import { EventCardLink } from "./EventCard"
 import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 import { Volleyball } from "lucide-react"
 import { Permission } from "@/components/ui/custom/Permission"
 
-export default async function GamesView({
+export default async function EventsView({
   params,
   searchParams,
 }: {
@@ -18,19 +18,19 @@ export default async function GamesView({
   const fromDate = new Date(from as string)
   const toDate = new Date(to as string)
 
-  const games = await prisma.game.findMany({
+  const events = await prisma.event.findMany({
     include: { attendees: { include: { statistics: true } }, team: true },
     where: { team: { slug }, ...(from && to ? { AND: { date: { gte: fromDate, lte: toDate } } } : {}) },
     orderBy: { date: "desc" },
   })
 
   const today = new Date()
-  const [upcomingGames, pastGames] = games.reduce<[GameWithRelations[], GameWithRelations[]]>(
-    ([upcoming, past], game) => {
-      if (game.date >= today) {
-        upcoming.push(game)
+  const [upcomingEvents, pastEvents] = events.reduce<[EventWithRelations[], EventWithRelations[]]>(
+    ([upcoming, past], event) => {
+      if (event.date >= today) {
+        upcoming.push(event)
       } else {
-        past.push(game)
+        past.push(event)
       }
 
       return [upcoming, past]
@@ -38,19 +38,19 @@ export default async function GamesView({
     [[], []],
   )
 
-  if (!games.length) {
+  if (!events.length) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
         <div className="mb-4 rounded-full bg-muted p-6">
           {<Volleyball className="h-12 w-12 text-muted-foreground" />}
         </div>
-        <h2 className="text-2xl font-bold tracking-tight">No games yet.</h2>
+        <h2 className="text-2xl font-bold tracking-tight">No events yet.</h2>
         <p className="text-muted-foreground max-w-md mt-2 mb-6">
-          {`You haven't added any games yet. Start planning your games and document statistics by adding new
-          games.`}
+          {`You haven't added any events yet. Start planning your events and document statistics by adding new
+          events.`}
         </p>
         <Permission teamSlug={slug}>
-          <NewGameDialog />
+          <NewEventDialog />
         </Permission>
       </div>
     )
@@ -59,13 +59,13 @@ export default async function GamesView({
   return (
     <>
       <Permission teamSlug={slug}>
-        <NewGameDialog triggerClassName="ml-auto" />
+        <NewEventDialog triggerClassName="ml-auto" />
       </Permission>
-      {upcomingGames.length ? (
+      {upcomingEvents.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4 mb-4">
-          {upcomingGames.map(game => (
-            <li key={game.id}>
-              <GameCardLink game={game} />
+          {upcomingEvents.map(event => (
+            <li key={event.id}>
+              <EventCardLink event={event} />
             </li>
           ))}
         </ul>
@@ -73,15 +73,15 @@ export default async function GamesView({
 
       <div className="flex items-center w-full gap-4">
         <Separator allowShrink />
-        <span className="px-4 whitespace-nowrap text-muted-foreground text-sm">Past Games</span>
+        <span className="px-4 whitespace-nowrap text-muted-foreground text-sm">Past Events</span>
         <Separator allowShrink />
       </div>
 
-      {pastGames.length ? (
+      {pastEvents.length ? (
         <ul className="w-full flex flex-col gap-4 mt-4">
-          {pastGames.map(game => (
-            <li key={game.id}>
-              <GameCardLink game={game} />
+          {pastEvents.map(event => (
+            <li key={event.id}>
+              <EventCardLink event={event} />
             </li>
           ))}
         </ul>
@@ -90,6 +90,6 @@ export default async function GamesView({
   )
 }
 
-export type GameWithRelations = Prisma.GameGetPayload<{
+export type EventWithRelations = Prisma.EventGetPayload<{
   include: { attendees: { include: { statistics: true } }; team?: true }
 }>

@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { EditGameDialog } from "@/app/[slug]/games/EditGameDialog"
-import { Score } from "@/app/[slug]/games/GameCard"
+import { EditEventDialog } from "@/app/[slug]/events/EditEventDialog"
+import { Score } from "@/app/[slug]/events/EventCard"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -20,8 +20,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { cn } from "@/lib/utils"
 
-type GameDetailsCardProps = {
-  game: Prisma.GameGetPayload<{
+type EventDetailsCardProps = {
+  event: Prisma.EventGetPayload<{
     include: {
       attendees: { include: { member: { select: { firstName: true; lastName: true } }; statistics: true } }
       team?: true
@@ -31,11 +31,11 @@ type GameDetailsCardProps = {
   enableInvitationResponse?: boolean
 }
 
-export const GameDetailsCard = ({
-  game,
+export const EventDetailsCard = ({
+  event,
   enableCollapse = true,
   enableInvitationResponse,
-}: GameDetailsCardProps) => {
+}: EventDetailsCardProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
 
   return (
@@ -43,19 +43,19 @@ export const GameDetailsCard = ({
       <CardHeader>
         <div className="flex justify-between">
           <div className="flex flex-col gap-2">
-            <CardTitle>{game.title}</CardTitle>
+            <CardTitle>{event.title}</CardTitle>
             <CardDescription className="inline-flex items-center gap-2">
-              📅 {format(game.date, DATE_FORMAT)} 🕒 {format(game.date, TIME_FORMAT)} | 📍{" "}
-              {game.location || "TBA"} |
+              📅 {format(event.date, DATE_FORMAT)} 🕒 {format(event.date, TIME_FORMAT)} | 📍{" "}
+              {event.location || "TBA"} |
               <span className="flex items-center gap-1">
                 <Users size={14} />
-                {game.attendees.length ?? 0}
+                {event.attendees.length ?? 0}
               </span>
             </CardDescription>
           </div>
 
-          <PermissionClient teamSlug={game.team?.slug || ""}>
-            <EditGameDialog game={game} />
+          <PermissionClient teamSlug={event.team?.slug || ""}>
+            <EditEventDialog event={event} />
           </PermissionClient>
 
           {enableCollapse && (
@@ -74,29 +74,29 @@ export const GameDetailsCard = ({
       {!isCollapsed && (
         <CardContent>
           <Score
-            teamName={game.team?.name}
-            opponentName={game.opponentName}
-            teamScore={game.teamScore}
-            opponentScore={game.opponentScore}
+            teamName={event.team?.name}
+            opponentName={event.opponentName}
+            teamScore={event.teamScore}
+            opponentScore={event.opponentScore}
           />
-          {game.description && (
+          {event.description && (
             <div className="mt-4">
               <h3 className="font-semibold">Description</h3>
-              <p className="text-sm">{game.description}</p>
+              <p className="text-sm">{event.description}</p>
             </div>
           )}
 
           <div className="mt-4">
             <h3 className="font-semibold">Attendees</h3>
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {game.attendees.map(attendee => (
+              {event.attendees.map(attendee => (
                 <li
                   key={attendee.id}
                   className="flex flex-row justify-between items-center p-2 border rounded-lg"
                 >
                   <AttendeeCard
                     attendee={attendee}
-                    gameSlug={game.slug}
+                    eventSlug={event.slug}
                     enableInvitationResponse={enableInvitationResponse}
                   />
                 </li>
@@ -113,11 +113,11 @@ type AttendeeCardProps = {
   attendee: Prisma.AttendeeGetPayload<{
     include: { member: { select: { firstName: true; lastName: true } } }
   }>
-  gameSlug: string
+  eventSlug: string
   enableInvitationResponse?: boolean
 }
 
-const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
+const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }: AttendeeCardProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
@@ -137,7 +137,7 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
           await acceptInvitation(attendee.id)
-          router.push(`/statistics/${gameSlug}`)
+          router.push(`/statistics/${eventSlug}`)
           toast({ title: "Successfully accepted invitation" })
         }
       } catch (error) {
@@ -160,7 +160,7 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
           await declineInvitation(attendee.id)
-          router.push(`/statistics/${gameSlug}`)
+          router.push(`/statistics/${eventSlug}`)
           toast({ title: "Declined invitation" })
         }
       } catch (error) {

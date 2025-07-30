@@ -8,7 +8,7 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { round2DecimalPlaces } from "@/app/statistics/[slug]/columns/utils"
 import { format } from "date-fns"
 import { DATE_ISO_FORMAT } from "@/app/utils"
-import { Game } from "@prisma/client"
+import { Event, EventType } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
@@ -20,15 +20,18 @@ type OverviewProps = {
 
 export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
   const hasDateFilter = !!fromDateFilter && !!toDateFilter
-  const gameWhereQuery = {
+  const eventWhereQuery = {
     team: { slug: teamSlug },
-    AND: { teamScore: { not: null }, opponentScore: { not: null } },
+    AND: [
+      { teamScore: { not: null }, opponentScore: { not: null } },
+      { type: { notIn: [EventType.SOCIAL, EventType.OTHER] } },
+    ],
     ...(hasDateFilter ? { AND: { date: { gte: fromDateFilter, lte: toDateFilter } } } : {}),
   }
 
   const statistics = (
     await prisma.statistics.aggregate({
-      where: { attendee: { game: gameWhereQuery } },
+      where: { attendee: { event: eventWhereQuery } },
       _sum: {
         kills: true,
         attackErrors: true,
@@ -52,8 +55,8 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     })
   )._sum
 
-  const games = await prisma.game.findMany({
-    where: gameWhereQuery,
+  const events = await prisma.event.findMany({
+    where: eventWhereQuery,
     include: { attendees: { include: { statistics: true } } },
     orderBy: { date: "asc" },
     ...(!hasDateFilter ? { take: 30 } : {}),
@@ -61,7 +64,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const leaderBoardStatistics = await prisma.statistics.groupBy({
     by: ["attendeeId"],
-    where: { attendee: { game: gameWhereQuery } },
+    where: { attendee: { event: eventWhereQuery } },
     _sum: {
       kills: true,
       attackAttempts: true,
@@ -115,7 +118,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
   const top5Players = leaderBoardData.sort((a, b) => b.score - a.score).slice(0, 5)
 
-  if (games.length === 0) {
+  if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
         <div className="mb-4 rounded-full bg-muted p-6">
@@ -127,17 +130,17 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
           games and document statistics.
         </p>
         <Link
-          href={`/${teamSlug}/games`}
+          href={`/${teamSlug}/events`}
           legacyBehavior
           passHref
         >
-          <Button variant="outline">Go to Games</Button>
+          <Button variant="outline">Go to Events</Button>
         </Link>
       </div>
     )
   }
 
-  const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(games)
+  const { wins, loses, winPercentage, totalGames } = calculateGamesOverview(events)
 
   const {
     totalKills,
@@ -153,9 +156,9 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     totalServeEfficiency,
   } = calculateTotalStatistics(statistics)
 
-  const scoresChartData = games.map(game => ({
-    date: format(game.date, DATE_ISO_FORMAT),
-    scores: game.attendees.reduce((acc, curr) => {
+  const scoresChartData = events.map(event => ({
+    date: format(event.date, DATE_ISO_FORMAT),
+    scores: event.attendees.reduce((acc, curr) => {
       const kills = curr.statistics?.kills ?? 0
       const blocks = (curr.statistics?.blockSingle ?? 0) + (curr.statistics?.blockMultiple ?? 0)
       const aces = curr.statistics?.serveAces ?? 0
@@ -163,7 +166,7 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
 
       return acc + scores
     }, 0),
-    errors: game.attendees.reduce((acc, curr) => {
+    errors: event.attendees.reduce((acc, curr) => {
       const attackErrors = curr.statistics?.attackErrors ?? 0
       const serveErrors = curr.statistics?.serveErrors ?? 0
       const receiveErrors = curr.statistics?.receiveError ?? 0
@@ -177,18 +180,18 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
     }, 0),
   }))
 
-  const errorsChartData = games.map(game => {
+  const errorsChartData = events.map(event => {
     return {
-      date: format(game.date, DATE_ISO_FORMAT),
-      attack: game.attendees.reduce((acc, stat) => acc + (stat.statistics?.attackErrors ?? 0), 0),
-      receive: game.attendees.reduce((acc, stat) => acc + (stat.statistics?.receiveError ?? 0), 0),
+      date: format(event.date, DATE_ISO_FORMAT),
+      attack: event.attendees.reduce((acc, stat) => acc + (stat.statistics?.attackErrors ?? 0), 0),
+      receive: event.attendees.reduce((acc, stat) => acc + (stat.statistics?.receiveError ?? 0), 0),
     }
   })
 
-  const attackChartData = games.map(game => ({
-    date: format(game.date, DATE_ISO_FORMAT),
-    attempts: game.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackAttempts ?? 0), 0),
-    errors: game.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackErrors ?? 0), 0),
+  const attackChartData = events.map(event => ({
+    date: format(event.date, DATE_ISO_FORMAT),
+    attempts: event.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackAttempts ?? 0), 0),
+    errors: event.attendees.reduce((acc, curr) => acc + (curr.statistics?.attackErrors ?? 0), 0),
   }))
 
   return (
@@ -260,22 +263,22 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
   )
 }
 
-const calculateGamesOverview = (games: Game[]) => {
+const calculateGamesOverview = (events: Event[]) => {
   let wins = 0
   let loses = 0
 
-  games.forEach(game => {
-    if (!game.teamScore || !game.opponentScore) return
+  events.forEach(event => {
+    if (!event.teamScore || !event.opponentScore) return
 
-    if (game.teamScore > game.opponentScore) {
+    if (event.teamScore > event.opponentScore) {
       wins++
     } else {
       loses++
     }
   })
 
-  const winPercentage = games.length > 0 ? Math.ceil((wins / games.length) * 10000) / 100 : 0
-  const totalGames = games.length
+  const winPercentage = events.length > 0 ? Math.ceil((wins / events.length) * 10000) / 100 : 0
+  const totalGames = events.length
 
   return {
     wins,

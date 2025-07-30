@@ -1,6 +1,6 @@
 import bycript from "bcryptjs"
 import { Member, PrismaClient } from "@prisma/client"
-import { adminMember, games, attendees, guestMember, members } from "./seedData"
+import { adminMember, events, attendees, guestMember, members } from "./seedData"
 
 const prisma = new PrismaClient()
 async function main() {
@@ -62,17 +62,17 @@ async function main() {
         },
       })
 
-      for (const game of games) {
-        await tx.game.create({
+      for (const event of events) {
+        await tx.event.create({
           data: {
-            ...game,
+            ...event,
             team: { connect: { id: team.id } },
           },
         })
       }
 
       for (let i = 0; i < attendees.length; i++) {
-        const game = games[i]
+        const event = events[i]
         const attendeeData = attendees[i]
 
         for (const data of attendeeData) {
@@ -85,7 +85,7 @@ async function main() {
 
           await tx.attendee.create({
             data: {
-              game: { connect: { slug: game.slug } },
+              event: { connect: { slug: event.slug } },
               member: { connect: { id: member.id } },
               statistics: {
                 create: data.statistics,

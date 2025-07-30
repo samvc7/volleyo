@@ -19,17 +19,17 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
-import { DatePicker } from "@/app/[slug]/games/DatePicker"
-import { updateGame } from "./actions"
-import { GameWithRelations } from "./page"
+import { DatePicker } from "@/app/[slug]/events/DatePicker"
+import { updateEvent } from "./actions"
+import { EventWithRelations } from "./page"
 
-type EditGameDialogProps = {
-  game: GameWithRelations
+type EditEventDialogProps = {
+  event: EventWithRelations
 }
 
-export const EditGameDialog = ({ game }: EditGameDialogProps) => {
+export const EditEventDialog = ({ event }: EditEventDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(game.date)
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(event.date)
 
   const [state, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     if (!selectedDate) {
@@ -37,15 +37,15 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
       return null
     }
 
-    const updateGameWithIdAndDate = updateGame.bind(null, game.id, selectedDate)
+    const updateWithIdAndDate = updateEvent.bind(null, event.id, selectedDate)
 
     try {
-      updateGameWithIdAndDate(formData)
+      updateWithIdAndDate(formData)
       setShowDialog(false)
-      toast({ title: "Saved game" })
+      toast({ title: "Saved Event" })
     } catch (error) {
       console.error(error)
-      return "Could not save game. Please try again"
+      return "Could not save event. Please try again"
     }
 
     return null
@@ -63,21 +63,21 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
         <Button
           variant="ghost"
           aria-expanded={showDialog}
-          aria-label="Edit Game"
+          aria-label="Edit Event"
           className="h-8 w-8 p-0 ml-auto"
           onClick={() => {
             setShowDialog(true)
           }}
         >
-          <span className="sr-only">Edit game</span>
+          <span className="sr-only">Edit event</span>
           <SquarePen className="h-4 w-4" />
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Game</DialogTitle>
-          <DialogDescription>Make changes to the game information.</DialogDescription>
+          <DialogTitle>Edit Event</DialogTitle>
+          <DialogDescription>Make changes to the event information.</DialogDescription>
         </DialogHeader>
 
         <form action={formAction}>
@@ -87,7 +87,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
               <Input
                 id="title"
                 name="title"
-                defaultValue={game.title}
+                defaultValue={event.title}
                 required
               />
             </div>
@@ -96,8 +96,8 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
               <Textarea
                 id="description"
                 name="description"
-                defaultValue={game.description ?? undefined}
-                placeholder="Describe this game with useful information like address, game format, etc."
+                defaultValue={event.description ?? undefined}
+                placeholder="Describe this event with useful information like address, game format, etc."
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -106,7 +106,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                 <DatePicker
                   id="date"
                   name="date"
-                  date={selectedDate ? selectedDate : new Date(game.date)}
+                  date={selectedDate ? selectedDate : new Date(event.date)}
                   onDateChange={setSelectedDate}
                 />
               </div>
@@ -133,7 +133,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
               <Input
                 id="location"
                 name="location"
-                defaultValue={game.location ?? undefined}
+                defaultValue={event.location ?? undefined}
               />
             </div>
 
@@ -143,7 +143,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                 <Input
                   id="team"
                   name="team"
-                  defaultValue={game.team?.name ?? "Team"}
+                  defaultValue={event.team?.name ?? "Team"}
                   disabled
                 />
               </div>
@@ -152,7 +152,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                 <Input
                   id="opponent"
                   name="opponent"
-                  defaultValue={game.opponentName ?? undefined}
+                  defaultValue={event.opponentName ?? undefined}
                 />
               </div>
             </div>
@@ -166,7 +166,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                   type="number"
                   min={0}
                   max={100}
-                  defaultValue={game.teamScore ?? undefined}
+                  defaultValue={event.teamScore ?? undefined}
                 />
               </div>
               <div className="space-y-2">
@@ -177,7 +177,7 @@ export const EditGameDialog = ({ game }: EditGameDialogProps) => {
                   type="number"
                   min={0}
                   max={100}
-                  defaultValue={game.opponentScore ?? undefined}
+                  defaultValue={event.opponentScore ?? undefined}
                 />
               </div>
             </div>

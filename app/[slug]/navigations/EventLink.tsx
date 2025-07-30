@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { addDateRangeToUrl } from "./utils"
 
-export const GamesLink = ({ href }: { href: string }) => {
+export const EventLink = ({ href }: { href: string }) => {
   const searchParams = useSearchParams()
   const from = searchParams.get("from") ?? undefined
   const to = searchParams.get("to") ?? undefined
@@ -16,7 +16,7 @@ export const GamesLink = ({ href }: { href: string }) => {
       legacyBehavior
       passHref
     >
-      <NavigationMenuLink className={navigationMenuTriggerStyle()}>Games</NavigationMenuLink>
+      <NavigationMenuLink className={navigationMenuTriggerStyle()}>Events</NavigationMenuLink>
     </Link>
   )
 }

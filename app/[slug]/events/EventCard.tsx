@@ -1,26 +1,26 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users } from "lucide-react"
-import { GameWithRelations } from "./page"
+import { EventWithRelations } from "./page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
-type GameCardLinkProps = {
-  game: GameWithRelations
+type EventCardLinkProps = {
+  event: EventWithRelations
 }
 
-export const GameCardLink = ({ game }: GameCardLinkProps) => {
+export const EventCardLink = ({ event }: EventCardLinkProps) => {
   return (
     <Link
-      href={`/statistics/${game.slug}`}
+      href={`/statistics/${event.slug}`}
       legacyBehavior
       passHref
     >
       <Card className="hover:bg-slate-100 dark:hover:bg-slate-50 cursor-pointer">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{game.title}</CardTitle>
+            <CardTitle>{event.title}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
@@ -28,21 +28,21 @@ export const GameCardLink = ({ game }: GameCardLinkProps) => {
             <div>
               <div className="text-sm text-muted-foreground">
                 <div>
-                  📅 {format(game.date, DATE_FORMAT)} ⏰ {format(game.date, TIME_FORMAT)}
+                  📅 {format(event.date, DATE_FORMAT)} ⏰ {format(event.date, TIME_FORMAT)}
                 </div>
-                <div>📍 {game.location || "TBA"}</div>
+                <div>📍 {event.location || "TBA"}</div>
                 <div className="flex items-center gap-1">
                   <Users size={14} />
-                  {game.attendees.length ?? 0}
+                  {event.attendees.length ?? 0}
                 </div>
               </div>
             </div>
 
             <Score
-              teamName={game.team?.name}
-              opponentName={game.opponentName}
-              teamScore={game.teamScore}
-              opponentScore={game.opponentScore}
+              teamName={event.team?.name}
+              opponentName={event.opponentName}
+              teamScore={event.teamScore}
+              opponentScore={event.opponentScore}
             />
           </div>
         </CardContent>
