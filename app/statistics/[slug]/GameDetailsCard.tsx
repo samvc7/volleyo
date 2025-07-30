@@ -13,11 +13,12 @@ import { Prisma } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
 import { positionBadgeColors, positionShortLabels } from "./columns/utils"
 import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
-import { deleteStatistics } from "./actions"
+import { acceptInvitation, declineInvitation } from "./actions"
 import { toast } from "@/hooks/use-toast"
 import { ConfirmDialog } from "./_components/ConfirmDialog"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
+import { cn } from "@/lib/utils"
 
 type GameDetailsCardProps = {
   game: Prisma.GameGetPayload<{
@@ -120,11 +121,11 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
-  const [isRemoving, startRemovingTransition] = useTransition()
+  const [isStatusUpdating, startStatusTransition] = useTransition()
   const fullName = `${attendee.member.firstName} ${attendee.member.lastName}`
 
   const handleAcceptInvitation = () => {
-    startRemovingTransition(async () => {
+    startStatusTransition(async () => {
       try {
         const res = await signIn("credentials", {
           token,
@@ -135,6 +136,7 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
           console.error("Login error:", res.error)
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
+          await acceptInvitation(attendee.id)
           router.push(`/statistics/${gameSlug}`)
           toast({ title: "Successfully accepted invitation" })
         }
@@ -146,13 +148,24 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
   }
 
   const handleDeclineInvitation = () => {
-    startRemovingTransition(() => {
+    startStatusTransition(async () => {
       try {
-        deleteStatistics([attendee.id])
-        toast({ title: "Successfully deleted statistics" })
+        const res = await signIn("credentials", {
+          token,
+          redirect: false,
+        })
+
+        if (res?.error) {
+          console.error("Login error:", res.error)
+          toast({ title: "Invalid token. Could not sign in. Please try again" })
+        } else {
+          await declineInvitation(attendee.id)
+          router.push(`/statistics/${gameSlug}`)
+          toast({ title: "Declined invitation" })
+        }
       } catch (error) {
         console.error(error)
-        toast({ title: "Could not delete statistics. Please try again" })
+        toast({ title: "Could not decline invitation. Please try again" })
       }
     })
   }
@@ -178,18 +191,10 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
       </div>
 
       <div className="flex items-center gap-1">
-        <Badge
-          variant="outline"
-          className="flex border-gray-100 bg-gray-100 text-black"
-        >
-          {isRemoving ? (
-            <>
-              <Loader2 className="animate-spin h-4 w-4 mr-1" /> <span>Removing</span>
-            </>
-          ) : (
-            "Pending"
-          )}
-        </Badge>
+        <StatusBadge
+          status={attendee.status}
+          isUpdating={isStatusUpdating}
+        />
         {enableInvitationResponse && (
           <>
             <ConfirmDialog
@@ -224,5 +229,36 @@ const AttendeeCard = ({ attendee, gameSlug, enableInvitationResponse = false }: 
         )}
       </div>
     </>
+  )
+}
+
+type StatusBadgeProps = {
+  status: string
+  isUpdating?: boolean
+}
+
+const StatusBadge = ({ status, isUpdating = false }: StatusBadgeProps) => {
+  const statusStyles: Record<typeof status, string> = {
+    ACCEPTED: "bg-green-600 border-green-600 text-white",
+    PENDING: "bg-gray-100 border-gray-100 text-black",
+    DECLINED: "bg-red-600 border-red-600 text-white",
+  }
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "flex",
+        isUpdating ? statusStyles["PENDING"] : statusStyles[status] ?? statusStyles["PENDING"],
+      )}
+    >
+      {isUpdating ? (
+        <>
+          <Loader2 className="animate-spin h-4 w-4 mr-1" /> <span>Updating</span>
+        </>
+      ) : (
+        `${status.charAt(0).toUpperCase()}${status.slice(1).toLowerCase()}`
+      )}
+    </Badge>
   )
 }

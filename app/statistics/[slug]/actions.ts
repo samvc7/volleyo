@@ -106,3 +106,21 @@ export const getAuthToken = async (gameId: string) => {
 
   return newToken
 }
+
+export const acceptInvitation = async (attendeeId: string) => {
+  await prisma.attendee.update({
+    where: { id: attendeeId }, 
+    data: {
+      status: "ACCEPTED",
+    },
+  })
+}
+
+export const declineInvitation = async (attendeeId: string) => {
+  await prisma.attendee.update({
+    where: { id: attendeeId },
+    data: {
+      status: "DECLINED",
+    },
+  })
+}
