@@ -1,30 +1,47 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { use, useActionState, useRef, useState, useTransition } from "react"
 import { EditEventDialog } from "@/app/[slug]/events/EditEventDialog"
 import { Score } from "@/app/[slug]/events/EventCard"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { format } from "date-fns"
-import { ChevronUp, ChevronDown, Users, XIcon, Loader2, CheckIcon } from "lucide-react"
+import { ChevronUp, ChevronDown, Users, XIcon, Loader2, CheckIcon, PlusIcon, UserCog } from "lucide-react"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 import { Prisma } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
 import { positionBadgeColors, positionShortLabels } from "./columns/utils"
 import { ConfirmDataLossDialog } from "./ConfirmDataLossDialog"
-import { acceptInvitation, declineInvitation } from "./actions"
-import { toast } from "@/hooks/use-toast"
+import { acceptInvitation, declineInvitation, updateAttendeePositions } from "./actions"
+import { toast, useToast } from "@/hooks/use-toast"
 import { ConfirmDialog } from "./_components/ConfirmDialog"
 import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
 import { isEventCompetitive } from "../util"
+import { PositionsMultiSelect } from "./PositionsMultiSelect"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 
 type EventDetailsCardProps = {
   event: Prisma.EventGetPayload<{
     include: {
-      attendees: { include: { member: { select: { firstName: true; lastName: true } }; statistics: true } }
+      attendees: {
+        include: {
+          member: { select: { firstName: true; lastName: true } }
+          statistics: true
+          event: { include: { team: true } }
+        }
+      }
       team?: true
     }
   }>
@@ -37,7 +54,9 @@ export const EventDetailsCard = ({
   enableCollapse = true,
   enableInvitationResponse,
 }: EventDetailsCardProps) => {
+  const session = useSession()
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const isAdmin = session.data?.user.teamRoles[event.team?.slug || ""] === "ADMIN"
 
   return (
     <Card>
@@ -104,12 +123,12 @@ export const EventDetailsCard = ({
                 {event.attendees.map(attendee => (
                   <li
                     key={attendee.id}
-                    className="flex flex-row justify-between items-center p-2 border rounded-lg"
+                    className="flex flex-row justify-between items-center p-2 border rounded-lg min-h-16"
                   >
                     <AttendeeCard
                       attendee={attendee}
                       eventSlug={event.slug}
-                      enableInvitationResponse={enableInvitationResponse}
+                      enableInvitationResponse={enableInvitationResponse || isAdmin}
                     />
                   </li>
                 ))}
@@ -124,7 +143,7 @@ export const EventDetailsCard = ({
 
 type AttendeeCardProps = {
   attendee: Prisma.AttendeeGetPayload<{
-    include: { member: { select: { firstName: true; lastName: true } } }
+    include: { member: { select: { firstName: true; lastName: true } }; event: { include: { team: true } } }
   }>
   eventSlug: string
   enableInvitationResponse?: boolean
@@ -136,10 +155,18 @@ const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }:
   const token = searchParams.get("token")
   const [isStatusUpdating, startStatusTransition] = useTransition()
   const fullName = `${attendee.member.firstName} ${attendee.member.lastName}`
+  const isAdmin = useSession().data?.user.teamRoles[attendee.event.team?.slug || ""] === "ADMIN"
 
   const handleAcceptInvitation = () => {
     startStatusTransition(async () => {
       try {
+        if (isAdmin) {
+          // If the user is an admin, we can directly accept the invitation without needing a token
+          await acceptInvitation(attendee.id)
+          toast({ title: "Successfully accepted invitation" })
+          return
+        }
+
         const res = await signIn("credentials", {
           token,
           redirect: false,
@@ -163,6 +190,13 @@ const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }:
   const handleDeclineInvitation = () => {
     startStatusTransition(async () => {
       try {
+        if (isAdmin) {
+          // If the user is an admin, we can directly decline the invitation without needing a token
+          await declineInvitation(attendee.id)
+          toast({ title: "Declined invitation" })
+          return
+        }
+
         const res = await signIn("credentials", {
           token,
           redirect: false,
@@ -187,20 +221,22 @@ const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }:
     <>
       <div>
         <div className="text-sm font-semibold">{fullName}</div>
-        <Badge
-          key={`attendee-position-${attendee.id}`}
-          variant="outline"
-          className={positionBadgeColors["OUTSIDE_HITTER"]}
-        >
-          {positionShortLabels["OUTSIDE_HITTER"]}
-        </Badge>
-
-        <Badge
-          variant="outline"
-          className={"border-emerald-500 text-emerald-600"}
-        >
-          Test Position
-        </Badge>
+        <div className="flex gap-1">
+          {attendee.positions.length > 0
+            ? attendee.positions.map(position => {
+                return (
+                  <Badge
+                    key={`${attendee.id}-${position}`}
+                    variant="outline"
+                    className={positionBadgeColors[position]}
+                  >
+                    {positionShortLabels[position]}
+                  </Badge>
+                )
+              })
+            : null}
+          {isAdmin ? <EditPositonsDialog attendee={attendee} /> : null}
+        </div>
       </div>
 
       <div className="flex items-center gap-1">
@@ -229,7 +265,11 @@ const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }:
               </Button>
             </ConfirmDialog>
 
-            <ConfirmDataLossDialog onConfirmAction={handleDeclineInvitation}>
+            <ConfirmDialog
+              onConfirmAction={handleDeclineInvitation}
+              title="You are declining the event!"
+              description={`Are you sure you want to decline the event for ${fullName}?`}
+            >
               <Button
                 variant="ghost"
                 size="icon"
@@ -237,7 +277,7 @@ const AttendeeCard = ({ attendee, eventSlug, enableInvitationResponse = false }:
               >
                 <XIcon />
               </Button>
-            </ConfirmDataLossDialog>
+            </ConfirmDialog>
           </>
         )}
       </div>
@@ -273,5 +313,81 @@ const StatusBadge = ({ status, isUpdating = false }: StatusBadgeProps) => {
         `${status.charAt(0).toUpperCase()}${status.slice(1).toLowerCase()}`
       )}
     </Badge>
+  )
+}
+
+type EditPositonsDialogProps = {
+  attendee: AttendeeCardProps["attendee"]
+}
+
+const EditPositonsDialog = ({ attendee }: EditPositonsDialogProps) => {
+  const { toast } = useToast()
+  const [showDialog, setShowDialog] = useState(false)
+
+  const addWithAttendeeId = updateAttendeePositions.bind(null, attendee.id)
+  const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
+    try {
+      await addWithAttendeeId(formData)
+      setShowDialog(false)
+      toast({ title: "Edited positions successfully" })
+    } catch (error) {
+      console.error(error)
+      toast({ title: "Could not edit positions. Please try again" })
+    }
+
+    return null
+  }, null)
+
+  return (
+    <Dialog
+      open={showDialog}
+      onOpenChange={setShowDialog}
+    >
+      <DialogTrigger
+        className="flex"
+        asChild
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-6"
+        >
+          {attendee.positions.length > 0 ? <PlusIcon /> : <UserCog />}
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            Edit Position of {attendee.member.firstName} {attendee.member.lastName}
+          </DialogTitle>
+        </DialogHeader>
+        <form action={formAction}>
+          <div className="space-y-4 py-2 pb-4">
+            <div className="space-y-2">
+              <Label htmlFor="positions">Positions</Label>
+              <PositionsMultiSelect />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDialog(false)}
+            >
+              Cancel
+            </Button>
+
+            <ButtonWithLoading
+              label="Save"
+              loadingLabel="Saving..."
+              disabled={isPending}
+              type="submit"
+              name="action"
+            />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

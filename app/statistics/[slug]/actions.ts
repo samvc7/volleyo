@@ -114,6 +114,8 @@ export const acceptInvitation = async (attendeeId: string) => {
       status: "ACCEPTED",
     },
   })
+
+  revalidatePath("/statistics/[slug]", "page")
 }
 
 export const declineInvitation = async (attendeeId: string) => {
@@ -123,4 +125,22 @@ export const declineInvitation = async (attendeeId: string) => {
       status: "DECLINED",
     },
   })
+
+  revalidatePath("/statistics/[slug]", "page")
+}
+
+export const updateAttendeePositions = async (attendeeId: string, formData: FormData) => {
+  const positions = formData
+    .get("positions")
+    ?.toString()
+    .split(",")
+    .filter(p => p.trim().length) as Position[]
+
+  await prisma.attendee.update({
+    where: { id: attendeeId },
+    data: {
+      positions,
+    },
+  })
+  revalidatePath("/statistics/[slug]", "page")
 }

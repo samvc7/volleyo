@@ -28,6 +28,7 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
         include: {
           member: { select: { firstName: true, lastName: true } },
           statistics: true,
+          event: { include: { team: true } },
         },
       },
       team: true,
