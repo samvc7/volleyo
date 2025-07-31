@@ -5,6 +5,7 @@ import { EventWithRelations } from "./page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { isEventCompetitive } from "@/app/statistics/util"
 
 type EventCardLinkProps = {
   event: EventWithRelations
@@ -44,12 +45,14 @@ export const EventCardLink = ({ event }: EventCardLinkProps) => {
               </div>
             </div>
 
-            <Score
-              teamName={event.team?.name}
-              opponentName={event.opponentName}
-              teamScore={event.teamScore}
-              opponentScore={event.opponentScore}
-            />
+            {isEventCompetitive(event.type) && (
+              <Score
+                teamName={event.team?.name}
+                opponentName={event.opponentName}
+                teamScore={event.teamScore}
+                opponentScore={event.opponentScore}
+              />
+            )}
           </div>
         </CardContent>
       </Card>

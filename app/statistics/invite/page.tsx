@@ -25,11 +25,7 @@ export default async function InvitePage({ searchParams }: InvitePageProps) {
       <h1 className="flex flex-col items-center justify-center text-2xl font-bold">
         You were invited to {eventToInvite.title}
       </h1>
-      <EventDetailsCard
-        event={eventToInvite}
-        enableCollapse
-        enableInvitationResponse
-      />
+      <EventDetailsCard event={eventToInvite} />
     </main>
   )
 }
