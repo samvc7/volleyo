@@ -19,6 +19,7 @@ import { ConfirmDialog } from "./_components/ConfirmDialog"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
 import { cn } from "@/lib/utils"
+import { isEventCompetitive } from "../util"
 
 type EventDetailsCardProps = {
   event: Prisma.EventGetPayload<{
@@ -79,12 +80,14 @@ export const EventDetailsCard = ({
       </CardHeader>
       {!isCollapsed && (
         <CardContent>
-          <Score
-            teamName={event.team?.name}
-            opponentName={event.opponentName}
-            teamScore={event.teamScore}
-            opponentScore={event.opponentScore}
-          />
+          {isEventCompetitive(event.type) && (
+            <Score
+              teamName={event.team?.name}
+              opponentName={event.opponentName}
+              teamScore={event.teamScore}
+              opponentScore={event.opponentScore}
+            />
+          )}
           {event.description && (
             <div className="mt-4">
               <h3 className="font-semibold">Description</h3>
@@ -94,20 +97,24 @@ export const EventDetailsCard = ({
 
           <div className="mt-4">
             <h3 className="font-semibold">Attendees</h3>
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-              {event.attendees.map(attendee => (
-                <li
-                  key={attendee.id}
-                  className="flex flex-row justify-between items-center p-2 border rounded-lg"
-                >
-                  <AttendeeCard
-                    attendee={attendee}
-                    eventSlug={event.slug}
-                    enableInvitationResponse={enableInvitationResponse}
-                  />
-                </li>
-              ))}
-            </ul>
+            {event.attendees.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No attendees yet. Invite members to join.</p>
+            ) : (
+              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                {event.attendees.map(attendee => (
+                  <li
+                    key={attendee.id}
+                    className="flex flex-row justify-between items-center p-2 border rounded-lg"
+                  >
+                    <AttendeeCard
+                      attendee={attendee}
+                      eventSlug={event.slug}
+                      enableInvitationResponse={enableInvitationResponse}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </CardContent>
       )}

@@ -2,7 +2,7 @@
 
 import { useToast } from "@/hooks/use-toast"
 import { useActionState, useRef, useState, MouseEvent } from "react"
-import { addPlayer, getAuthToken } from "./actions"
+import { addMember, getAuthToken } from "./actions"
 import {
   Dialog,
   DialogContent,
@@ -20,32 +20,32 @@ import { Member } from "@prisma/client"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PositionsMultiSelect } from "./PositionsMultiSelect"
 
-type AddPlayerDialogProps = {
+type AddMemberDialogProps = {
   eventId: string
   membersNotParticipating: Member[]
   disabled?: boolean
 }
 
-export const AddPlayerDialog = ({ eventId, membersNotParticipating, disabled }: AddPlayerDialogProps) => {
+export const AddMemberDialog = ({ eventId, membersNotParticipating, disabled }: AddMemberDialogProps) => {
   const { toast } = useToast()
   const [showDialog, setShowDialog] = useState(false)
   const [copiedInviteLink, setCopiedInviteLink] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
 
-  const addPlayerWithEventId = addPlayer.bind(null, eventId)
+  const addWithEventId = addMember.bind(null, eventId)
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     const action = formData.get("action")
 
     try {
-      await addPlayerWithEventId(formData)
+      await addWithEventId(formData)
       if (action === "add") setShowDialog(false)
       if (action === "add-more") {
         formRef.current?.reset()
       }
-      toast({ title: "Player added successfully" })
+      toast({ title: "Member added successfully" })
     } catch (error) {
       console.error(error)
-      toast({ title: "Could not add player. Please try again" })
+      toast({ title: "Could not add member. Please try again" })
     }
 
     return null
@@ -83,21 +83,21 @@ export const AddPlayerDialog = ({ eventId, membersNotParticipating, disabled }: 
           variant={"outline"}
           size="sm"
           aria-expanded={showDialog}
-          aria-label="Add Player"
+          aria-label="Add Member"
           onClick={() => {
             setShowDialog(true)
           }}
           disabled={disabled}
         >
           <PlusCircle className="h-5 w-5" />
-          Add Player
+          Add Member
         </Button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Player</DialogTitle>
-          <DialogDescription>Add a player for the event.</DialogDescription>
+          <DialogTitle>Add Member</DialogTitle>
+          <DialogDescription>Add a member for the event.</DialogDescription>
         </DialogHeader>
         <form
           ref={formRef}
@@ -108,7 +108,7 @@ export const AddPlayerDialog = ({ eventId, membersNotParticipating, disabled }: 
               <Label htmlFor="member">Team Members</Label>
               <Select name="member">
                 <SelectTrigger>
-                  <SelectValue placeholder="Select player" />
+                  <SelectValue placeholder="Select Member" />
                 </SelectTrigger>
                 <SelectContent>
                   {membersNotParticipating.map(member => (

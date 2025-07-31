@@ -25,7 +25,7 @@ export default function LoginForm() {
     })
 
     if (res?.error) {
-      console.log("Login error:", res.error)
+      console.error("Login error:", res.error)
       setError("Invalid credentials")
     } else {
       router.push("/")

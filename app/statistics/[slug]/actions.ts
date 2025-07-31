@@ -58,7 +58,7 @@ export const deleteStatistics = async (statisticIds: string[]) => {
   revalidatePath("/statistics/[slug]", "page")
 }
 
-export const addPlayer = async (eventId: string, formData: FormData) => {
+export const addMember = async (eventId: string, formData: FormData) => {
   const memberId = formData.get("member") as string
   const positions = (formData
     .get("positions")

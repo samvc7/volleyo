@@ -10,8 +10,9 @@ import { TabsContent } from "@radix-ui/react-tabs"
 import CourtTracker from "./_court-tracker/CourtTracker"
 import { StatisticsProvider } from "./StatisticsProvider"
 import { SaveButton } from "./Savebutton"
-import { AddPlayerDialog } from "./AddPlayerDialog"
+import { AddMemberDialog } from "./AddMemberDialog"
 import { Permission } from "@/components/ui/custom/Permission"
+import { isEventCompetitive } from "../util"
 
 export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
@@ -65,41 +66,57 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   return (
     <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
       <EventDetailsCard event={event} />
-      <Tabs defaultValue="stats">
-        <StatisticsProvider
-          initialData={statistics}
-          eventSlug={event.slug}
-        >
-          <div className="flex">
-            <TabsList>
-              <TabsTrigger value={"court"}>Court</TabsTrigger>
-              <TabsTrigger value={"stats"}>Statistics</TabsTrigger>
-            </TabsList>
-            <Permission teamSlug={event.team?.slug ?? ""}>
-              <div className="ml-auto">
-                <SaveButton eventId={event.id} />
-                <AddPlayerDialog
-                  eventId={event.id}
-                  membersNotParticipating={membersNotParticipating}
-                  disabled={membersNotParticipating.length === 0}
-                />
-              </div>
-            </Permission>
-          </div>
+      {isEventCompetitive(event.type) && (
+        <Tabs defaultValue="stats">
+          <StatisticsProvider
+            initialData={statistics}
+            eventSlug={event.slug}
+          >
+            <div className="flex gap-4">
+              <TabsList className="w-full gap-4">
+                {isEventCompetitive(event.type) && (
+                  <>
+                    <TabsTrigger
+                      className="w-full"
+                      value={"court"}
+                    >
+                      Court
+                    </TabsTrigger>
+                    <TabsTrigger
+                      className="w-full"
+                      value={"stats"}
+                    >
+                      Statistics
+                    </TabsTrigger>
+                  </>
+                )}
+              </TabsList>
+              <Permission teamSlug={event.team?.slug ?? ""}>
+                <div className="ml-auto">
+                  <SaveButton eventId={event.id} />
+                  <AddMemberDialog
+                    eventId={event.id}
+                    membersNotParticipating={membersNotParticipating}
+                    disabled={membersNotParticipating.length === 0}
+                  />
+                </div>
+              </Permission>
+            </div>
 
-          <TabsContent value="court">
-            <CourtTracker />
-          </TabsContent>
+            <TabsContent value="court">
+              <CourtTracker />
+            </TabsContent>
 
-          <TabsContent value="stats">
-            <DataTable
-              teamSlug={event.team?.slug ?? ""}
-              columns={columns}
-              isAdmin={isAdmin}
-            />
-          </TabsContent>
-        </StatisticsProvider>
-      </Tabs>
+            <TabsContent value="stats">
+              <DataTable
+                teamSlug={event.team?.slug ?? ""}
+                columns={columns}
+                isAdmin={isAdmin}
+              />
+            </TabsContent>
+          </StatisticsProvider>
+        </Tabs>
+      )}
     </main>
   )
 }

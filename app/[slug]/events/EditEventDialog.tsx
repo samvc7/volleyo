@@ -22,6 +22,9 @@ import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { DatePicker } from "@/app/[slug]/events/DatePicker"
 import { updateEvent } from "./actions"
 import { EventWithRelations } from "./page"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { EventType } from "@prisma/client"
+import { isEventCompetitive } from "@/app/statistics/util"
 
 type EditEventDialogProps = {
   event: EventWithRelations
@@ -83,6 +86,28 @@ export const EditEventDialog = ({ event }: EditEventDialogProps) => {
         <form action={formAction}>
           <div className="space-y-4 py-2 pb-4">
             <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select
+                name="type"
+                defaultValue={event.type}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={event.type} />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(EventType).map(type => (
+                    <SelectItem
+                      key={type}
+                      value={type}
+                    >
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
@@ -137,50 +162,54 @@ export const EditEventDialog = ({ event }: EditEventDialogProps) => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="team">Team</Label>
-                <Input
-                  id="team"
-                  name="team"
-                  defaultValue={event.team?.name ?? "Team"}
-                  disabled
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="opponent">Opponent</Label>
-                <Input
-                  id="opponent"
-                  name="opponent"
-                  defaultValue={event.opponentName ?? undefined}
-                />
-              </div>
-            </div>
+            {isEventCompetitive(event.type) && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="team">Team</Label>
+                    <Input
+                      id="team"
+                      name="team"
+                      defaultValue={event.team?.name ?? "Team"}
+                      disabled
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="opponent">Opponent</Label>
+                    <Input
+                      id="opponent"
+                      name="opponent"
+                      defaultValue={event.opponentName ?? undefined}
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="team-score">Team Score</Label>
-                <Input
-                  id="team-score"
-                  name="team-score"
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={event.teamScore ?? undefined}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="opponent-score">Opponent Score</Label>
-                <Input
-                  id="opponent-score"
-                  name="opponent-score"
-                  type="number"
-                  min={0}
-                  max={100}
-                  defaultValue={event.opponentScore ?? undefined}
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="team-score">Team Score</Label>
+                    <Input
+                      id="team-score"
+                      name="team-score"
+                      type="number"
+                      min={0}
+                      max={100}
+                      defaultValue={event.teamScore ?? undefined}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="opponent-score">Opponent Score</Label>
+                    <Input
+                      id="opponent-score"
+                      name="opponent-score"
+                      type="number"
+                      min={0}
+                      max={100}
+                      defaultValue={event.opponentScore ?? undefined}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <DialogFooter>

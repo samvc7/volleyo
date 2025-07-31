@@ -43,9 +43,13 @@ export const updateEvent = async (eventId: string, date: Date, formData: FormDat
       date,
       location,
       type,
-      teamScore: teamScore ? parseInt(teamScore) : null,
-      opponentName,
-      opponentScore: opponentScore ? parseInt(opponentScore) : null,
+      ...(teamScore === null ? {} : teamScore === "" ? null : { teamScore: parseInt(teamScore) }),
+      ...(opponentName === null ? {} : opponentName === "" ? null : { opponentName }),
+      ...(opponentScore === null
+        ? {}
+        : opponentScore === ""
+        ? null
+        : { opponentScore: parseInt(opponentScore) }),
     },
   })
 

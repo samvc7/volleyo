@@ -20,6 +20,8 @@ import { toast } from "@/hooks/use-toast"
 import { createEvent } from "./actions"
 import { useParams } from "next/navigation"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { EventType } from "@prisma/client"
 
 type NewEventDialogProps = {
   triggerClassName?: string
@@ -86,6 +88,25 @@ export const NewEventDialog = ({ triggerClassName }: NewEventDialogProps) => {
 
         <form action={formAction}>
           <div className="space-y-4 py-2 pb-4">
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select name="type">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select event type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(EventType).map(type => (
+                    <SelectItem
+                      key={type}
+                      value={type}
+                    >
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
