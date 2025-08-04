@@ -30,12 +30,14 @@ type AttendeeCardProps = {
   }>
   eventSlug: string
   enableInvitationResponse?: boolean
+  isFromOtherTeam?: boolean
 }
 
 export const AttendeeCard = ({
   attendee,
   eventSlug,
   enableInvitationResponse = false,
+  isFromOtherTeam,
 }: AttendeeCardProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -128,6 +130,14 @@ export const AttendeeCard = ({
       </div>
 
       <div className="flex items-center gap-1">
+        {isFromOtherTeam && (
+          <Badge
+            variant="outline"
+            className="bg-orange-600 border-orange-600 text-white"
+          >
+            Guest
+          </Badge>
+        )}
         <StatusBadge
           status={attendee.status}
           isUpdating={isStatusUpdating}

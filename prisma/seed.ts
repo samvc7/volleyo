@@ -1,6 +1,6 @@
 import bycript from "bcryptjs"
 import { Member, PrismaClient } from "@prisma/client"
-import { adminMember, events, attendees, guestMember, members } from "./seedData"
+import { adminMember, events, attendees, guestMember, members, membersBeta } from "./seedData"
 
 const prisma = new PrismaClient()
 async function main() {
@@ -55,6 +55,31 @@ async function main() {
           slug: "alpha-squad",
           members: {
             create: memberRecords.map(member => ({
+              memberId: member.id,
+              roles: member.email === "admin@example.com" ? ["ADMIN"] : ["MEMBER"],
+            })),
+          },
+        },
+      })
+
+      const memberRecordsBeta: Member[] = []
+      for (const member of membersBeta) {
+        const record = await tx.member.create({
+          data: member,
+        })
+        memberRecordsBeta.push(record)
+      }
+
+      memberRecordsBeta.push(admin)
+      memberRecordsBeta.push(guest)
+
+      await tx.team.create({
+        data: {
+          name: "Beta Team",
+          description: "Competitive volleyball team",
+          slug: "beta-team",
+          members: {
+            create: memberRecordsBeta.map(member => ({
               memberId: member.id,
               roles: member.email === "admin@example.com" ? ["ADMIN"] : ["MEMBER"],
             })),

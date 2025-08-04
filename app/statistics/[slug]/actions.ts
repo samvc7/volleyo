@@ -58,23 +58,73 @@ export const deleteStatistics = async (statisticIds: string[]) => {
   revalidatePath("/statistics/[slug]", "page")
 }
 
-export const addMember = async (eventId: string, formData: FormData) => {
-  const memberId = formData.get("member") as string
-  const positions = (formData
-    .get("positions")
-    ?.toString()
-    .split(",")
-    .filter(p => p.trim().length) || []) as Position[]
+export const addNotAttendeeMembers = async (eventId: string, formData: FormData) => {
+  const memberIds =
+    formData
+      .get("members")
+      ?.toString()
+      .split(",")
+      .filter(m => m.trim().length) || []
 
-  await prisma.attendee.create({
-    data: {
+  const otherMemberIds =
+    formData
+      .get("other-team-members")
+      ?.toString()
+      .split(",")
+      .filter(om => om.trim().length) || []
+
+  await prisma.attendee.createMany({
+    data: memberIds.map(memberId => ({
       eventId,
       memberId,
-      positions,
-    },
+    })),
+  })
+
+  await prisma.attendee.createMany({
+    data: otherMemberIds.map(memberId => ({
+      eventId,
+      memberId,
+    })),
   })
 
   revalidatePath("/statistics/[slug]", "page")
+}
+
+export const addTeamsNotParticipating = async (eventId: string, formData: FormData) => {
+  const teamsId = (formData
+    .get("teams")
+    ?.toString()
+    .split(",")
+    .filter(t => t.trim().length) || []) as string[]
+
+  await Promise.all(
+    teamsId.map(async teamId => {
+      prisma.team.update({
+        where: { id: teamId },
+        data: { events: { connect: { id: eventId } } },
+      })
+    }),
+  )
+
+  revalidatePath("/statistics/[slug]", "page")
+}
+
+export const isFromOtherTeam = async (attendeeId: string, teamId: string) => {
+  const memberInTeam = await prisma.teamMember.findFirst({
+    where: {
+      memberId: {
+        equals: (
+          await prisma.attendee.findUnique({
+            where: { id: attendeeId },
+            select: { memberId: true },
+          })
+        )?.memberId,
+      },
+      teamId: teamId,
+    },
+  })
+
+  return !memberInTeam
 }
 
 export const getAuthToken = async (eventId: string) => {

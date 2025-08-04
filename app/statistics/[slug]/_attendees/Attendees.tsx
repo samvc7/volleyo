@@ -1,10 +1,11 @@
 import { Prisma } from "@prisma/client"
 import { Permission } from "@/components/ui/custom/Permission"
-import { AddMemberDialog } from "../AddMemberDialog"
+import { AddMembersDialog } from "../AddMembersDialog"
 import { AttendeeCard } from "./AttendeeCard"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { isFromOtherTeam } from "../actions"
 
 type AttendeesCardProps = {
   event: Prisma.EventGetPayload<{
@@ -12,7 +13,6 @@ type AttendeesCardProps = {
       attendees: {
         include: {
           member: { select: { firstName: true; lastName: true } }
-          statistics: true
           event: { include: { team: true } }
         }
       }
@@ -28,10 +28,20 @@ export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCa
     redirect("/login")
   }
   const isAdmin = session.user.teamRoles[event.team?.slug || ""] === "ADMIN"
+  const teamsOfAdmin = isAdmin
+    ? Object.keys(session.user.teamRoles).filter(teamSlug => teamSlug !== event.team?.slug)
+    : []
 
   const membersNotParticipating = await prisma.member.findMany({
     where: {
       teams: { some: { team: { slug: event.team?.slug }, removedAt: null } },
+      attendees: { none: { eventId: event.id } },
+    },
+  })
+
+  const otherTeamMembersAndNotParticipating = await prisma.member.findMany({
+    where: {
+      teams: { some: { team: { slug: { in: teamsOfAdmin } }, removedAt: null } },
       attendees: { none: { eventId: event.id } },
     },
   })
@@ -41,11 +51,14 @@ export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCa
       <div className="flex mb-4 items-center">
         <h3 className="font-semibold">Attendees</h3>
         <Permission teamSlug={event.team?.slug ?? ""}>
-          <div className="ml-auto">
-            <AddMemberDialog
+          <div className="flex gap-1 ml-auto">
+            <AddMembersDialog
               eventId={event.id}
               membersNotParticipating={membersNotParticipating}
-              disabled={membersNotParticipating.length === 0}
+              otherTeamMembers={otherTeamMembersAndNotParticipating}
+              disabled={
+                membersNotParticipating.length === 0 && otherTeamMembersAndNotParticipating.length === 0
+              }
             />
           </div>
         </Permission>
@@ -55,7 +68,7 @@ export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCa
         <p className="text-sm text-muted-foreground">No attendees yet. Invite members to join.</p>
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {event.attendees.map(attendee => (
+          {event.attendees.map(async attendee => (
             <li
               key={attendee.id}
               className="flex flex-row justify-between items-center p-2 border rounded-lg min-h-16"
@@ -64,6 +77,7 @@ export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCa
                 attendee={attendee}
                 eventSlug={event.slug}
                 enableInvitationResponse={enableInvitationResponse || isAdmin}
+                isFromOtherTeam={await isFromOtherTeam(attendee.id, event.team?.id || "")}
               />
             </li>
           ))}

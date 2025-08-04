@@ -14,6 +14,19 @@ export const members = [
   { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" },
 ]
 
+export const membersBeta = [
+  { firstName: "Olivia", lastName: "Hartman", email: "olivia.hartman@example.com" },
+  { firstName: "Ethan", lastName: "Morris", email: "ethan.morris@example.com" },
+  { firstName: "Avery", lastName: "Nguyen", email: "avery.nguyen@example.com" },
+  { firstName: "Lucas", lastName: "Santos", email: "lucas.santos@example.com" },
+  { firstName: "Isabella", lastName: "Foster", email: "isabella.foster@example.com" },
+  { firstName: "Noah", lastName: "Zimmerman", email: "noah.zimmerman@example.com" },
+  { firstName: "Chloe", lastName: "Kim", email: "chloe.kim@example.com" },
+  { firstName: "Elijah", lastName: "Turner", email: "elijah.turner@example.com" },
+  { firstName: "Aria", lastName: "Bennett", email: "aria.bennett@example.com" },
+  { firstName: "Jackson", lastName: "Cruz", email: "jackson.cruz@example.com" },
+]
+
 export const adminMember = {
   firstName: "Ad",
   lastName: "Min",
