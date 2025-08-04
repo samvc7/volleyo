@@ -53,7 +53,7 @@ export const AttendeeCard = ({
   const handleAcceptInvitation = () => {
     startStatusTransition(async () => {
       try {
-        if (isAdmin) {
+        if (isAdmin && searchParams.has("invite")) {
           // If the user is an admin, we can directly accept the invitation without needing a token
           await acceptInvitation(attendee.id)
           toast({ title: "Successfully accepted invitation" })

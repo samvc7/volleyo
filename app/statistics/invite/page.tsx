@@ -12,7 +12,7 @@ export default async function InvitePage({ searchParams }: InvitePageProps) {
   const { event, token } = await searchParams
 
   const eventToInvite = await prisma.event.findUnique({
-    where: { id: event as string },
+    where: { slug: event as string },
     include: {
       attendees: { include: { member: true, statistics: true, event: { include: { team: true } } } },
       team: { include: { members: { include: { member: true } } } },

@@ -20,14 +20,19 @@ import { Member } from "@prisma/client"
 import { MultiSelect } from "@/components/ui/multi-select"
 
 type AddMemberDialogProps = {
-  eventId: string
+  event: Event
   membersNotParticipating: Member[]
   otherTeamMembers?: Member[]
   disabled?: boolean
 }
 
+type Event = {
+  id: string
+  slug: string
+}
+
 export const AddMembersDialog = ({
-  eventId,
+  event,
   membersNotParticipating,
   otherTeamMembers,
   disabled,
@@ -36,7 +41,7 @@ export const AddMembersDialog = ({
   const [showDialog, setShowDialog] = useState(false)
   const [copiedInviteLink, setCopiedInviteLink] = useState(false)
 
-  const addWithEventId = addNotAttendeeMembers.bind(null, eventId)
+  const addWithEventId = addNotAttendeeMembers.bind(null, event.id)
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     try {
       await addWithEventId(formData)
@@ -54,9 +59,8 @@ export const AddMembersDialog = ({
     e.preventDefault()
     if (copiedInviteLink) return
     try {
-      const authToken = await getAuthToken(eventId)
-      // TODO: use event slug instead of eventId
-      const inviteLink = `${window.location.host}/statistics/invite?event=${eventId}&token=${authToken.token}`
+      const authToken = await getAuthToken(event.slug)
+      const inviteLink = `${window.location.host}/statistics/invite?event=${event.slug}&token=${authToken.token}`
       window.navigator.clipboard.writeText(inviteLink)
 
       setCopiedInviteLink(true)

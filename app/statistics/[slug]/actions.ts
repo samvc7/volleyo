@@ -127,11 +127,11 @@ export const isFromOtherTeam = async (attendeeId: string, teamId: string) => {
   return !memberInTeam
 }
 
-export const getAuthToken = async (eventId: string) => {
+export const getAuthToken = async (eventSlug: string) => {
   const guestMember = await prisma.member.findFirst({
     where: {
       firstName: "Guest",
-      teams: { some: { team: { events: { some: { id: eventId } } } } },
+      teams: { some: { team: { events: { some: { slug: eventSlug } } } } },
     },
     include: { user: { include: { authToken: true } } },
   })

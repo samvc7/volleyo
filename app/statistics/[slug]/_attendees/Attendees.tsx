@@ -53,7 +53,7 @@ export const Attendees = async ({ event, enableInvitationResponses }: AttendeesC
         <Permission teamSlug={event.team?.slug ?? ""}>
           <div className="flex gap-1 ml-auto">
             <AddMembersDialog
-              eventId={event.id}
+              event={event}
               membersNotParticipating={membersNotParticipating}
               otherTeamMembers={otherTeamMembersAndNotParticipating}
               disabled={
