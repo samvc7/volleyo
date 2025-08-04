@@ -1,20 +1,32 @@
 import { prisma } from "@/prisma/singlePrismaClient"
 import { EventDetailsCard } from "../[slug]/EventDetailsCard"
+import { Attendees } from "../[slug]/_attendees/Attendees"
+import { getAuthSession } from "@/lib/auth"
 
 type InvitePageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 export default async function InvitePage({ searchParams }: InvitePageProps) {
-  const { event } = await searchParams
+  const session = await getAuthSession()
+  const { event, token } = await searchParams
 
   const eventToInvite = await prisma.event.findUnique({
     where: { id: event as string },
     include: {
-      attendees: { include: { member: true, statistics: true } },
+      attendees: { include: { member: true, statistics: true, event: { include: { team: true } } } },
       team: { include: { members: { include: { member: true } } } },
     },
   })
+
+  const isTokenValid =
+    (await prisma.user.findFirst({
+      where: {
+        authToken: {
+          token: token as string,
+        },
+      },
+    })) && session?.user.email.includes("guest")
 
   if (!eventToInvite) {
     return <h1 className="text-center text-2xl font-bold">Event not found</h1>
@@ -26,6 +38,10 @@ export default async function InvitePage({ searchParams }: InvitePageProps) {
         You were invited to {eventToInvite.title}
       </h1>
       <EventDetailsCard event={eventToInvite} />
+      <Attendees
+        event={eventToInvite}
+        enableInvitationResponses={!!isTokenValid}
+      />
     </main>
   )
 }

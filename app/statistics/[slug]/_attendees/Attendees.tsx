@@ -12,17 +12,17 @@ type AttendeesCardProps = {
     include: {
       attendees: {
         include: {
-          member: { select: { firstName: true; lastName: true } }
+          member: { select: { id: true; firstName: true; lastName: true } }
           event: { include: { team: true } }
         }
       }
       team?: true
     }
   }>
-  enableInvitationResponse?: boolean
+  enableInvitationResponses?: boolean
 }
 
-export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCardProps) => {
+export const Attendees = async ({ event, enableInvitationResponses }: AttendeesCardProps) => {
   const session = await getAuthSession()
   if (!session) {
     redirect("/login")
@@ -76,7 +76,7 @@ export const Attendees = async ({ event, enableInvitationResponse }: AttendeesCa
               <AttendeeCard
                 attendee={attendee}
                 eventSlug={event.slug}
-                enableInvitationResponse={enableInvitationResponse || isAdmin}
+                enableInvitationResponses={enableInvitationResponses}
                 isFromOtherTeam={await isFromOtherTeam(attendee.id, event.team?.id || "")}
               />
             </li>

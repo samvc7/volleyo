@@ -23,20 +23,21 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { PermissionClient } from "@/components/ui/custom/PermissionClient"
 
 type AttendeeCardProps = {
   attendee: Prisma.AttendeeGetPayload<{
     include: { member: { select: { firstName: true; lastName: true } }; event: { include: { team: true } } }
   }>
   eventSlug: string
-  enableInvitationResponse?: boolean
+  enableInvitationResponses?: boolean
   isFromOtherTeam?: boolean
 }
 
 export const AttendeeCard = ({
   attendee,
   eventSlug,
-  enableInvitationResponse = false,
+  enableInvitationResponses = false,
   isFromOtherTeam,
 }: AttendeeCardProps) => {
   const router = useRouter()
@@ -44,7 +45,10 @@ export const AttendeeCard = ({
   const token = searchParams.get("token")
   const [isStatusUpdating, startStatusTransition] = useTransition()
   const fullName = `${attendee.member.firstName} ${attendee.member.lastName}`
-  const isAdmin = useSession().data?.user.teamRoles[attendee.event.team?.slug || ""] === "ADMIN"
+  const session = useSession().data
+  const isAdmin = session?.user.teamRoles[attendee.event.team?.slug || ""] === "ADMIN"
+  const isCurrentlyLoggedIn = session?.user.members.find(member => member.id === attendee.memberId)
+  const shouldShowInvitationResponse = enableInvitationResponses || isCurrentlyLoggedIn || isAdmin
 
   const handleAcceptInvitation = () => {
     startStatusTransition(async () => {
@@ -124,8 +128,9 @@ export const AttendeeCard = ({
                 )
               })
             : null}
-          {/* TODO: permission component? */}
-          {isAdmin ? <EditPositonsDialog attendee={attendee} /> : null}
+          <PermissionClient teamSlug={attendee.event.team?.slug || ""}>
+            <EditPositonsDialog attendee={attendee} />
+          </PermissionClient>
         </div>
       </div>
 
@@ -142,7 +147,7 @@ export const AttendeeCard = ({
           status={attendee.status}
           isUpdating={isStatusUpdating}
         />
-        {enableInvitationResponse && (
+        {shouldShowInvitationResponse && (
           <>
             <ConfirmDialog
               onConfirmAction={handleAcceptInvitation}
