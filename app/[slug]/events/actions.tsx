@@ -53,5 +53,5 @@ export const updateEvent = async (eventId: string, date: Date, formData: FormDat
     },
   })
 
-  revalidatePath("statistics/[slug]", "page")
+  revalidatePath("event/[slug]", "page")
 }

@@ -5,7 +5,7 @@ import { EventWithRelations } from "./page"
 import { DATE_FORMAT, TIME_FORMAT } from "@/app/utils"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { isEventCompetitive } from "@/app/statistics/util"
+import { isEventCompetitive } from "@/app/event/util"
 
 type EventCardLinkProps = {
   event: EventWithRelations
@@ -14,7 +14,7 @@ type EventCardLinkProps = {
 export const EventCardLink = ({ event }: EventCardLinkProps) => {
   return (
     <Link
-      href={`/statistics/${event.slug}`}
+      href={`/event/${event.slug}`}
       legacyBehavior
       passHref
     >

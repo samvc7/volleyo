@@ -14,10 +14,10 @@ import {
   flexRender,
 } from "@tanstack/react-table"
 import { useState } from "react"
-import { ColumnHeader } from "../../statistics/[slug]/columnHeader"
-import { Statistics } from "@/app/statistics/[slug]/columns"
-import { getCommonPinningClasses } from "@/app/statistics/[slug]/columns/utils"
-import { ViewOptions } from "../../statistics/[slug]/viewOptions"
+import { ColumnHeader } from "../../event/[slug]/columnHeader"
+import { Statistics } from "@/app/event/[slug]/columns"
+import { getCommonPinningClasses } from "@/app/event/[slug]/columns/utils"
+import { ViewOptions } from "../../event/[slug]/viewOptions"
 // import { Button } from "@/components/ui/button"
 // import { MoreHorizontal } from "lucide-react"
 // import {

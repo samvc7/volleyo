@@ -1,4 +1,4 @@
-import { DataTable } from "@/app/statistics/[slug]/data-table"
+import { DataTable } from "@/app/event/[slug]/data-table"
 import { Statistics } from "./columns"
 import { columns } from "./columns"
 import { prisma } from "@/prisma/singlePrismaClient"

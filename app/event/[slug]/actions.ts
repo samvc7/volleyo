@@ -47,7 +47,7 @@ export const saveStatistics = async (
       }),
   )
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const deleteStatistics = async (statisticIds: string[]) => {
@@ -55,7 +55,7 @@ export const deleteStatistics = async (statisticIds: string[]) => {
     where: { id: { in: statisticIds } },
   })
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const addNotAttendeeMembers = async (eventId: string, formData: FormData) => {
@@ -87,7 +87,7 @@ export const addNotAttendeeMembers = async (eventId: string, formData: FormData)
     })),
   })
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const addTeamsNotParticipating = async (eventId: string, formData: FormData) => {
@@ -106,7 +106,7 @@ export const addTeamsNotParticipating = async (eventId: string, formData: FormDa
     }),
   )
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const isFromOtherTeam = async (attendeeId: string, teamId: string) => {
@@ -165,7 +165,7 @@ export const acceptInvitation = async (attendeeId: string) => {
     },
   })
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const declineInvitation = async (attendeeId: string) => {
@@ -176,7 +176,7 @@ export const declineInvitation = async (attendeeId: string) => {
     },
   })
 
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }
 
 export const updateAttendeePositions = async (attendeeId: string, formData: FormData) => {
@@ -192,5 +192,5 @@ export const updateAttendeePositions = async (attendeeId: string, formData: Form
       positions,
     },
   })
-  revalidatePath("/statistics/[slug]", "page")
+  revalidatePath("/event/[slug]", "page")
 }

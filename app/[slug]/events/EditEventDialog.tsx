@@ -24,7 +24,7 @@ import { updateEvent } from "./actions"
 import { EventWithRelations } from "./page"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { EventType } from "@prisma/client"
-import { isEventCompetitive } from "@/app/statistics/util"
+import { isEventCompetitive } from "@/app/event/util"
 
 type EditEventDialogProps = {
   event: EventWithRelations

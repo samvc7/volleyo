@@ -60,7 +60,7 @@ export const AddMembersDialog = ({
     if (copiedInviteLink) return
     try {
       const authToken = await getAuthToken(event.slug)
-      const inviteLink = `${window.location.host}/statistics/invite?event=${event.slug}&token=${authToken.token}`
+      const inviteLink = `${window.location.host}/event/invite?event=${event.slug}&token=${authToken.token}`
       window.navigator.clipboard.writeText(inviteLink)
 
       setCopiedInviteLink(true)

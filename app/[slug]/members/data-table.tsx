@@ -16,12 +16,12 @@ import {
   flexRender,
 } from "@tanstack/react-table"
 import { MoreHorizontal, Loader2 } from "lucide-react"
-import { getCommonPinningClasses } from "@/app/statistics/[slug]/columns/utils"
-import { Pagination } from "../../statistics/[slug]/pagination"
-import { ViewOptions } from "../../statistics/[slug]/viewOptions"
+import { getCommonPinningClasses } from "@/app/event/[slug]/columns/utils"
+import { Pagination } from "../../event/[slug]/pagination"
+import { ViewOptions } from "../../event/[slug]/viewOptions"
 import { Button } from "@/components/ui/button"
 
-import { ColumnHeader } from "../../statistics/[slug]/columnHeader"
+import { ColumnHeader } from "../../event/[slug]/columnHeader"
 // import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,

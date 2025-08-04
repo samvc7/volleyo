@@ -70,7 +70,7 @@ export const AttendeeCard = ({
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
           await acceptInvitation(attendee.id)
-          router.push(`/statistics/${eventSlug}`)
+          router.push(`/event/${eventSlug}`)
           toast({ title: "Successfully accepted invitation" })
         }
       } catch (error) {
@@ -100,7 +100,7 @@ export const AttendeeCard = ({
           toast({ title: "Invalid token. Could not sign in. Please try again" })
         } else {
           await declineInvitation(attendee.id)
-          router.push(`/statistics/${eventSlug}`)
+          router.push(`/event/${eventSlug}`)
           toast({ title: "Declined invitation" })
         }
       } catch (error) {
