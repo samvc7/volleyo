@@ -54,7 +54,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     const { member, ...statisticData } = attendee
     return {
       ...statisticData,
-      name: `${member.firstName} ${member.lastName}`,
+      name: `${member.firstName} ${member.lastName} ${
+        attendee.playerNumber ? `#${attendee.playerNumber}` : ""
+      }`,
       attendeeId: attendee.id,
     }
   }) as Statistics[]

@@ -2,11 +2,16 @@
 
 import { useActionState, useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { XIcon, Loader2, CheckIcon, PlusIcon, UserCog } from "lucide-react"
+import { XIcon, Loader2, CheckIcon, PlusIcon, UserCog, HashIcon } from "lucide-react"
 import { Prisma } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
 import { positionBadgeColors, positionShortLabels } from "../columns/utils"
-import { acceptInvitation, declineInvitation, updateAttendeePositions } from "../actions"
+import {
+  acceptInvitation,
+  declineInvitation,
+  updateAttendeePlayerNumber,
+  updateAttendeePositions,
+} from "../actions"
 import { toast, useToast } from "@/hooks/use-toast"
 import { ConfirmDialog } from "../_components/ConfirmDialog"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -24,6 +29,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { PermissionClient } from "@/components/ui/custom/PermissionClient"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Input } from "@/components/ui/input"
 
 type AttendeeCardProps = {
   attendee: Prisma.AttendeeGetPayload<{
@@ -110,10 +117,30 @@ export const AttendeeCard = ({
     })
   }
 
+  const handlePlayerNumberChange = async (value: number) => {
+    try {
+      updateAttendeePlayerNumber(attendee.id, value)
+    } catch (error) {
+      console.error("Error updating player number:", error)
+      toast({ title: "Could not update player number. Please try again" })
+    }
+  }
+
   return (
     <>
       <div>
-        <div className="text-sm font-semibold">{fullName}</div>
+        <div className="flex items-center text-sm font-semibold gap-1">
+          {fullName}
+          <div className="flex items-center">
+            <PermissionClient teamSlug={attendee.event.team?.slug || ""}>
+              <EditPlayerNumber
+                value={attendee.playerNumber}
+                onChange={handlePlayerNumberChange}
+              />
+            </PermissionClient>
+            {attendee.playerNumber}
+          </div>
+        </div>
         <div className="flex gap-1">
           {attendee.positions.length > 0
             ? attendee.positions.map(position => {
@@ -292,5 +319,59 @@ const EditPositonsDialog = ({ attendee }: EditPositonsDialogProps) => {
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+const EditPlayerNumber = ({ value, onChange }: { value: number | null; onChange(value: number): void }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [input, setInput] = useState(value?.toString() || "")
+
+  const handleSaveInput = () => {
+    const parsed = parseInt(input)
+    if (!isNaN(parsed)) {
+      if (parsed < 0) {
+        toast({ title: "Invalid player number!" })
+        return
+      }
+      onChange(parsed)
+    }
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      handleSaveInput()
+    }
+    setIsOpen(open)
+  }
+
+  return (
+    <Popover
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+    >
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-6"
+        >
+          <HashIcon />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <Input
+          type="number"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Player Number"
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              handleSaveInput()
+              setIsOpen(false)
+            }
+          }}
+        />
+      </PopoverContent>
+    </Popover>
   )
 }

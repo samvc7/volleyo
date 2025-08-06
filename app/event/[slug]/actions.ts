@@ -194,3 +194,14 @@ export const updateAttendeePositions = async (attendeeId: string, formData: Form
   })
   revalidatePath("/event/[slug]", "page")
 }
+
+export const updateAttendeePlayerNumber = async (attendeeId: string, playerNumber: number) => {
+  await prisma.attendee.update({
+    where: { id: attendeeId },
+    data: {
+      playerNumber,
+    },
+  })
+
+  revalidatePath("/event/[slug]", "page")
+}
