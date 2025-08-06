@@ -1,11 +1,8 @@
 import { AttendeeStatus, Prisma } from "@prisma/client"
 import { Permission } from "@/components/ui/custom/Permission"
-import { AddMembersDialog } from "../AddMembersDialog"
 import { AttendeeCard } from "./AttendeeCard"
-import { prisma } from "@/prisma/singlePrismaClient"
-import { getAuthSession } from "@/lib/auth"
-import { redirect } from "next/navigation"
 import { isFromOtherTeam } from "../actions"
+import { AddMembers } from "./AddMembers"
 
 type AttendeesCardProps = {
   event: Prisma.EventGetPayload<{
@@ -27,45 +24,12 @@ type AttendeesCardProps = {
 }
 
 export const Attendees = async ({ event, attendees, enableInvitationResponses }: AttendeesCardProps) => {
-  const session = await getAuthSession()
-  if (!session) {
-    redirect("/login")
-  }
-
-  const isAdmin = session.user.teamRoles[event.team?.slug || ""] === "ADMIN"
-  const teamsOfAdmin = isAdmin
-    ? Object.keys(session.user.teamRoles).filter(teamSlug => teamSlug !== event.team?.slug)
-    : []
-
-  const membersNotParticipating = await prisma.member.findMany({
-    where: {
-      teams: { some: { team: { slug: event.team?.slug }, removedAt: null } },
-      attendees: { none: { eventId: event.id } },
-    },
-  })
-
-  const otherTeamMembersAndNotParticipating = await prisma.member.findMany({
-    where: {
-      teams: { some: { team: { slug: { in: teamsOfAdmin } }, removedAt: null } },
-      attendees: { none: { eventId: event.id } },
-    },
-  })
-
   return (
     <div className="mt-4">
       <div className="flex mb-4 items-center">
         <h3 className="font-semibold">Attendees</h3>
         <Permission teamSlug={event.team?.slug ?? ""}>
-          <div className="flex gap-1 ml-auto">
-            <AddMembersDialog
-              event={event}
-              membersNotParticipating={membersNotParticipating}
-              otherTeamMembers={otherTeamMembersAndNotParticipating}
-              disabled={
-                membersNotParticipating.length === 0 && otherTeamMembersAndNotParticipating.length === 0
-              }
-            />
-          </div>
+          <AddMembers event={event} />
         </Permission>
       </div>
 

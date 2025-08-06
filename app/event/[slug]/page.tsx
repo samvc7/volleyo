@@ -13,7 +13,7 @@ import { SaveButton } from "./Savebutton"
 import { Permission } from "@/components/ui/custom/Permission"
 import { isEventCompetitive } from "../util"
 import { Attendees } from "./_attendees/Attendees"
-import { AttendeeStatus, Prisma } from "@prisma/client"
+import { sortAndOrder } from "./util"
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
@@ -41,12 +41,6 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
     return <h1>Event not found</h1>
   }
 
-  const isMember = session.user.members.some(member =>
-    member.teams.some(team => team.teamId === event.teamId),
-  )
-  if (!isMember) {
-    redirect("/forbidden")
-  }
   const { attendees, ...eventWithoutAttendees } = event
   const groupedAndOrdered = sortAndOrder(attendees)
 
@@ -132,29 +126,4 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       )}
     </main>
   )
-}
-
-const sortAndOrder = (
-  attendees: Prisma.AttendeeGetPayload<{
-    include: {
-      member: { select: { id: true; firstName: true; lastName: true } }
-      statistics: true
-      event: { include: { team: true } }
-    }
-  }>[],
-) => {
-  const groupedAttendees = attendees.reduce((acc, attendee) => {
-    const status = attendee.status
-    if (!acc[status]) acc[status] = []
-    acc[status].push(attendee)
-    return acc
-  }, {} as Record<AttendeeStatus, typeof attendees>)
-
-  const orderedStatuses: AttendeeStatus[] = ["ACCEPTED", "PENDING", "DECLINED"]
-  const groupedAndOrdered = orderedStatuses.map(status => ({
-    status,
-    attendees: groupedAttendees?.[status] ?? [],
-  }))
-
-  return groupedAndOrdered
 }
