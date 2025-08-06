@@ -13,8 +13,9 @@ import { SaveButton } from "./Savebutton"
 import { Permission } from "@/components/ui/custom/Permission"
 import { isEventCompetitive } from "../util"
 import { Attendees } from "./_attendees/Attendees"
+import { AttendeeStatus, Prisma } from "@prisma/client"
 
-export default async function StatisticsPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const session = await getAuthSession()
   if (!session) {
     redirect("/login")
@@ -26,10 +27,11 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
     include: {
       attendees: {
         include: {
-          member: { select: { firstName: true, lastName: true } },
+          member: { select: { id: true, firstName: true, lastName: true } },
           statistics: true,
           event: { include: { team: true } },
         },
+        orderBy: [{ member: { firstName: "asc" } }],
       },
       team: true,
     },
@@ -45,6 +47,8 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
   if (!isMember) {
     redirect("/forbidden")
   }
+  const { attendees, ...eventWithoutAttendees } = event
+  const groupedAndOrdered = sortAndOrder(attendees)
 
   const statistics = event?.attendees.map(attendee => {
     const { member, ...statisticData } = attendee
@@ -93,7 +97,10 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
 
             <TabsContent value="details">
               <EventDetailsCard event={event} />
-              <Attendees event={event} />
+              <Attendees
+                event={eventWithoutAttendees}
+                attendees={groupedAndOrdered}
+              />
             </TabsContent>
 
             <TabsContent value="court">
@@ -123,4 +130,29 @@ export default async function StatisticsPage({ params }: { params: Promise<{ slu
       )}
     </main>
   )
+}
+
+const sortAndOrder = (
+  attendees: Prisma.AttendeeGetPayload<{
+    include: {
+      member: { select: { id: true; firstName: true; lastName: true } }
+      statistics: true
+      event: { include: { team: true } }
+    }
+  }>[],
+) => {
+  const groupedAttendees = attendees.reduce((acc, attendee) => {
+    const status = attendee.status
+    if (!acc[status]) acc[status] = []
+    acc[status].push(attendee)
+    return acc
+  }, {} as Record<AttendeeStatus, typeof attendees>)
+
+  const orderedStatuses: AttendeeStatus[] = ["ACCEPTED", "PENDING", "DECLINED"]
+  const groupedAndOrdered = orderedStatuses.map(status => ({
+    status,
+    attendees: groupedAttendees?.[status] ?? [],
+  }))
+
+  return groupedAndOrdered
 }

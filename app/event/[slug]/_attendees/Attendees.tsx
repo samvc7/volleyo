@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client"
+import { AttendeeStatus, Prisma } from "@prisma/client"
 import { Permission } from "@/components/ui/custom/Permission"
 import { AddMembersDialog } from "../AddMembersDialog"
 import { AttendeeCard } from "./AttendeeCard"
@@ -10,23 +10,28 @@ import { isFromOtherTeam } from "../actions"
 type AttendeesCardProps = {
   event: Prisma.EventGetPayload<{
     include: {
-      attendees: {
-        include: {
-          member: { select: { id: true; firstName: true; lastName: true } }
-          event: { include: { team: true } }
-        }
-      }
       team?: true
     }
   }>
+  attendees: {
+    status: AttendeeStatus
+    attendees: Prisma.AttendeeGetPayload<{
+      include: {
+        member: { select: { id: true; firstName: true; lastName: true } }
+        statistics: true
+        event: { include: { team: true } }
+      }
+    }>[]
+  }[]
   enableInvitationResponses?: boolean
 }
 
-export const Attendees = async ({ event, enableInvitationResponses }: AttendeesCardProps) => {
+export const Attendees = async ({ event, attendees, enableInvitationResponses }: AttendeesCardProps) => {
   const session = await getAuthSession()
   if (!session) {
     redirect("/login")
   }
+
   const isAdmin = session.user.teamRoles[event.team?.slug || ""] === "ADMIN"
   const teamsOfAdmin = isAdmin
     ? Object.keys(session.user.teamRoles).filter(teamSlug => teamSlug !== event.team?.slug)
@@ -64,24 +69,31 @@ export const Attendees = async ({ event, enableInvitationResponses }: AttendeesC
         </Permission>
       </div>
 
-      {event.attendees.length === 0 ? (
+      {Object.keys(attendees).length === 0 ? (
         <p className="text-sm text-muted-foreground">No attendees yet. Invite members to join.</p>
       ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {event.attendees.map(async attendee => (
-            <li
-              key={attendee.id}
-              className="flex flex-row justify-between items-center p-2 border rounded-lg min-h-16"
+        <div className="space-y-6">
+          {Object.entries(attendees).map(([status, attendeesList]) => (
+            <ul
+              key={`${status}-attendees-list`}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
             >
-              <AttendeeCard
-                attendee={attendee}
-                eventSlug={event.slug}
-                enableInvitationResponses={enableInvitationResponses}
-                isFromOtherTeam={await isFromOtherTeam(attendee.id, event.team?.id || "")}
-              />
-            </li>
+              {attendeesList.attendees.map(async attendee => (
+                <li
+                  key={attendee.id}
+                  className="flex flex-row justify-between items-center p-2 border rounded-lg min-h-16"
+                >
+                  <AttendeeCard
+                    attendee={attendee}
+                    eventSlug={event.slug}
+                    enableInvitationResponses={enableInvitationResponses}
+                    isFromOtherTeam={await isFromOtherTeam(attendee.id, event.team?.id || "")}
+                  />
+                </li>
+              ))}
+            </ul>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )
