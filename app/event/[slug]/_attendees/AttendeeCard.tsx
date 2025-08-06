@@ -118,6 +118,7 @@ export const AttendeeCard = ({
   }
 
   const handlePlayerNumberChange = async (value: number) => {
+    if (value === attendee.playerNumber) return
     try {
       updateAttendeePlayerNumber(attendee.id, value)
     } catch (error) {
