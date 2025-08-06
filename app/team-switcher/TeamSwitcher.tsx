@@ -44,7 +44,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
     try {
       const createdTeam = await createTeam(formData)
       setShowNewTeamDialog(false)
-      router.push(`/${createdTeam.slug}`)
+      router.push(`/${createdTeam.slug}/events`)
     } catch (error) {
       console.error(error)
       return "Could not create new team. Please try again."
@@ -58,7 +58,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
 
   const handleSelectTeam = (team: Team) => {
     setOpen(false)
-    router.push(`/${team.slug}`)
+    router.push(`/${team.slug}/events`)
   }
 
   return (

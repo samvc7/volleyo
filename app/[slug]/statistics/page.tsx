@@ -13,23 +13,29 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { EventWithRelations } from "../events/page"
 
-type OverviewProps = {
-  teamSlug: string
-  fromDateFilter?: Date
-  toDateFilter?: Date
-}
+export default async function StatisticsView({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const { slug } = await params
+  const { from, to } = await searchParams
 
-export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: OverviewProps) => {
-  const hasDateFilter = !!fromDateFilter && !!toDateFilter
+  const fromDate = from ? new Date(from as string) : undefined
+  const toDate = to ? new Date(to as string) : undefined
+
+  const hasDateFilter = !!fromDate && !!toDate
   const eventWhereQuery = {
-    team: { slug: teamSlug },
+    team: { slug },
     AND: [
       { teamScore: { not: null }, opponentScore: { not: null } },
       { type: { notIn: [EventType.SOCIAL, EventType.OTHER] } },
     ],
     date: {
       not: null,
-      ...(hasDateFilter ? { gte: fromDateFilter, lte: toDateFilter } : {}),
+      ...(hasDateFilter ? { gte: fromDate, lte: toDate } : {}),
     },
   }
 
@@ -131,10 +137,10 @@ export const Overview = async ({ teamSlug, fromDateFilter, toDateFilter }: Overv
         <h2 className="text-2xl font-bold tracking-tight">No statistics yet.</h2>
         <p className="text-muted-foreground max-w-md mt-2 mb-6">
           There are no games found and therefor no statistics to show. Start planning your games by adding new
-          games and document statistics.
+          games and document statistics. Or change the date filter.
         </p>
         <Link
-          href={`/${teamSlug}/events`}
+          href={`/${slug}/events`}
           legacyBehavior
           passHref
         >

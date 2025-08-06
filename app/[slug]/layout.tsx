@@ -3,7 +3,7 @@ import { prisma } from "@/prisma/singlePrismaClient"
 import { DatePickerWithRange } from "../DateRangePicker"
 import { TeamSwitcher } from "../team-switcher/TeamSwitcher"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
-import { OverviewLink } from "./navigations/OverviewLink"
+import { StatisticsLink } from "./navigations/StatisticsLink"
 import { EventLink } from "./navigations/EventLink"
 import { MembersLink } from "./navigations/MembersLink"
 import { getAuthSession } from "@/lib/auth"
@@ -43,11 +43,11 @@ export default async function Layout({
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem className="space-x-1">
-              <OverviewLink href={`/${slug}`} />
+              <EventLink href={`/${slug}/events`} />
             </NavigationMenuItem>
 
             <NavigationMenuItem className="space-x-1">
-              <EventLink href={`/${slug}/events`} />
+              <StatisticsLink href={`/${slug}/statistics`} />
             </NavigationMenuItem>
 
             <Permission teamSlug={slug}>
