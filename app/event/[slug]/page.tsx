@@ -58,10 +58,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const isAdmin = session.user.teamRoles[event.team?.slug ?? ""] === "ADMIN"
 
   return (
-    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
+    <>
       {isEventCompetitive(event.type) ? (
         <Tabs
-          className="flex flex-col gap-4"
+          className="flex flex-col"
           defaultValue="details"
         >
           <StatisticsProvider
@@ -91,7 +91,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               </TabsList>
             </div>
 
-            <TabsContent value="details">
+            <TabsContent
+              className="mt-4"
+              value="details"
+            >
               <EventDetailsCard event={event} />
               <Attendees
                 event={eventWithoutAttendees}
@@ -124,6 +127,6 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
       ) : (
         <EventDetailsCard event={event} />
       )}
-    </main>
+    </>
   )
 }

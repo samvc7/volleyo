@@ -34,7 +34,7 @@ export default async function Layout({
   }
 
   return (
-    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
+    <>
       <div className="flex gap-4">
         <TeamSwitcher
           teams={teams}
@@ -60,6 +60,6 @@ export default async function Layout({
         <DatePickerWithRange className="ml-auto" />
       </div>
       {children}
-    </main>
+    </>
   )
 }

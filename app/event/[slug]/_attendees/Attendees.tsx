@@ -26,7 +26,7 @@ type AttendeesCardProps = {
 export const Attendees = async ({ event, attendees, enableInvitationResponses }: AttendeesCardProps) => {
   return (
     <div className="mt-4">
-      <div className="flex mb-4 items-center">
+      <div className="flex items-center">
         <h3 className="font-semibold">Attendees</h3>
         <Permission teamSlug={event.team?.slug ?? ""}>
           <AddMembers event={event} />

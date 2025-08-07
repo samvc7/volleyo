@@ -41,7 +41,7 @@ export default async function InvitePage({ searchParams }: InvitePageProps) {
   const groupedAndOrdered = sortAndOrder(attendees)
 
   return (
-    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
+    <>
       <h1 className="flex flex-col items-center justify-center text-2xl font-bold">
         You were invited to {eventToInvite.title}
       </h1>
@@ -51,6 +51,6 @@ export default async function InvitePage({ searchParams }: InvitePageProps) {
         attendees={groupedAndOrdered}
         enableInvitationResponses={!!isTokenValid}
       />
-    </main>
+    </>
   )
 }

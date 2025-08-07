@@ -195,7 +195,7 @@ export default function CourtTracker() {
         </Card>
       </div>
 
-      <Card className="mb-10">
+      <Card>
         <CardHeader>
           <CardTitle className="font-medium">Bench Players</CardTitle>
           <CardDescription className="flex flex-col gap-2">

@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <Providers>
           <MainNav />
-          {children}
+          <main className="container flex flex-col max-w-screen-2xl my-5 gap-4">{children}</main>
           <Toaster />
         </Providers>
       </body>

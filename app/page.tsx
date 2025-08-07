@@ -16,9 +16,5 @@ export default async function Home() {
     select: { slug: true, name: true, description: true, id: true },
   })
 
-  return (
-    <main className="container flex min-h-screen max-w-screen-2xl flex-col mt-5 gap-4">
-      <TeamSwitcher teams={teams} />
-    </main>
-  )
+  return <TeamSwitcher teams={teams} />
 }
