@@ -122,6 +122,8 @@ model Attendee {
   memberId String
   event    Event  @relation(fields: [eventId], references: [id])
   member   Member @relation(fields: [memberId], references: [id])
+
+  @@unique([eventId, memberId])
 }
 
 model Statistics {
