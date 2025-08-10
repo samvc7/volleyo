@@ -10,7 +10,8 @@ setup("authenticate", async ({ page }) => {
   await page.getByRole("textbox", { name: "Password" }).fill("admin123")
   await page.getByRole("button", { name: "Login" }).click()
 
-  await expect(page.getByText("Select Team")).toBeVisible()
+  await page.waitForLoadState("networkidle")
+  await expect(page.getByText("Select Team")).toBeVisible({ timeout: 10000 })
 
   await page.context().storageState({ path: authFile })
 
