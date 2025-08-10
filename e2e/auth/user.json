@@ -1,16 +1,6 @@
 {
   "cookies": [
     {
-      "name": "next-auth.csrf-token",
-      "value": "5807bd06945c04e9c29d26a1ad0b7f779aa70b3098e0c50a818f9c6698ba29e8%7Cf486f47ef298f9174e134dfb884e261d8087c21e4aff6adb88c40a7374b2f62a",
-      "domain": "127.0.0.1",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
       "name": "next-auth.callback-url",
       "value": "http%3A%2F%2Flocalhost%3A3000",
       "domain": "127.0.0.1",
@@ -21,11 +11,21 @@
       "sameSite": "Lax"
     },
     {
-      "name": "next-auth.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..hgYS2s1WZCT-TUuI.1Jso4iJBdoqztOu3vpWT311VpnYvsiWabiSH679P1Qqvo-j-kJo9CC6zXTkjQinswsOgN33OD7NyVWjq2w0hsv-jpqPFXfPb693Mnk04ikb2TCKqlzctQqaSzNkRV4U6xL158XN-Yn__XjyUmynSpquyBqXaDU7nrMaRwlBUAGjGSl6rrmqMwAdhh6yTeg.Fz1VfM9YRj5wFMyFULg-Sg",
+      "name": "next-auth.csrf-token",
+      "value": "5c6d0af5f234ebb98b23b5f9432db1b8c531a362aee5994b8b2ebac049f13af6%7C71ba74662bdadda044fb9489f7b070e026e88358ada5756aa6c516fe9c5b1cb4",
       "domain": "127.0.0.1",
       "path": "/",
-      "expires": 1757426064.112397,
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "next-auth.session-token",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..yDUKFnNDCZvFZeYu.JVEdRePfKnFGOBBijz0BvY-80orWP4b6-YYeZzPOUUhd6lR1CLNAjqtSpg4fjzFA5XFzYHh8sLAaXHjwQVuiaaAnZrb85hqvU5cdLskftydsYgoXc049WPIe86eNUgq2_wPIvuUfBI4zsA4YBwVAelqolvisdJYdkw_7rmg9AAG6LaRFGsRh4Y8kn9OnXw.HqNoAN8q0MG-ZeWjgiU0GA",
+      "domain": "127.0.0.1",
+      "path": "/",
+      "expires": 1757430105.240311,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "nextauth.message",
-          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1754834064}"
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1754838105}"
         }
       ]
     }
