@@ -31,13 +31,13 @@ git clone https://github.com/samvc7/volleyo.git
 cd volleyo
 ```
 
-1. Install dependencies:
+2. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-1. Set up environment variables:
+3. Set up environment variables:
     
     Create a .env file in the root with the following:
     
@@ -48,13 +48,13 @@ NEXTAUTH_SECRET=your_auth_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
-1. Generate Prisma client:
+4. Generate Prisma client:
 
 ```bash
 npx prisma generate
 ```
 
-1. Run locally:
+5. Run locally:
 
 ```bash
 pnpm dev
