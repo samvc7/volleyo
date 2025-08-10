@@ -25,7 +25,9 @@ export const EventDetailsCard = ({ event, enableCollapse = true }: EventDetailsC
       <CardHeader>
         <div className="flex justify-between">
           <div className="flex flex-col gap-2">
-            <CardTitle>{event.title}</CardTitle>
+            <CardTitle>
+              <h2>{event.title}</h2>
+            </CardTitle>
             <CardDescription className="inline-flex items-center gap-2">
               {event.date ? (
                 <>

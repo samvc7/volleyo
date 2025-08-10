@@ -21,7 +21,9 @@ export const EventCardLink = ({ event }: EventCardLinkProps) => {
       <Card className="hover:bg-slate-100 dark:hover:bg-slate-50 cursor-pointer">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>{event.title}</CardTitle>
+            <CardTitle>
+              <h2>{event.title}</h2>
+            </CardTitle>
           </div>
         </CardHeader>
         <CardContent>

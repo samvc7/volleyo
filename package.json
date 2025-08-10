@@ -9,7 +9,11 @@
     "lint": "next lint",
     "db:pull": "dotenv -e .env.local -- npx prisma db pull",
     "db:push": "dotenv -e .env.local -- npx prisma db push",
-    "db:reset": "dotenv -e .env.local -- npx prisma db push --force-reset"
+    "db:reset": "dotenv -e .env.local -- npx prisma db push --force-reset",
+    "e2e": "exec playwright test --headed",
+    "e2e:ui": "exec playwright test --ui",
+    "e2e:cli": "exec playwright test",
+    "e2e:report": "exec playwright show-report"
   },
   "prisma": {
     "seed": "dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -53,6 +57,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.17.16",
     "@types/react": "^18.3.18",
