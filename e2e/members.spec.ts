@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test"
 
-test.only("navigate to members page", async ({ page }) => {
+test("navigate to members page", async ({ page }) => {
   await page.goto("/alpha-squad/events")
   await page.getByRole("link", { name: "Members" }).click()
 

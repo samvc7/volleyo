@@ -2,7 +2,7 @@ import { DATE_FORMAT } from "@/app/utils"
 import { test, expect } from "@playwright/test"
 import { format } from "date-fns"
 
-test.only("navigate to team events page", async ({ page }) => {
+test("navigate to team events page", async ({ page }) => {
   await page.goto("/")
   await page.getByRole("combobox", { name: "Select Team" }).click()
   await page.getByRole("option", { name: "Alpha Squad" }).click()
