@@ -8,6 +8,7 @@ dotenv.config({ path: ".env.local" })
 setup("authenticate", async ({ page }) => {
   const username = process.env.ADMIN_USERNAME
   const pw = process.env.ADMIN_PW
+  console.log("🚀 ~ username:", username, pw)
 
   if (!username || !pw) {
     throw new Error("ADMIN_USERNAME and ADMIN_PW must be set in environment variables")
