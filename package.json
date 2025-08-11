@@ -16,7 +16,8 @@
     "e2e:report": "exec playwright show-report"
   },
   "prisma": {
-    "seed": "dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    "seed": "dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "db:reset:test": "prisma db push --skip-generate && ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
