@@ -10,14 +10,14 @@
     "db:pull": "dotenv -e .env.local -- npx prisma db pull",
     "db:push": "dotenv -e .env.local -- npx prisma db push",
     "db:reset": "dotenv -e .env.local -- npx prisma db push --force-reset",
+    "db:reset:test": "prisma db push --skip-generate && ts-node prisma/seed.ts",
     "e2e": "exec playwright test --headed",
     "e2e:ui": "exec playwright test --ui",
     "e2e:cli": "exec playwright test",
     "e2e:report": "exec playwright show-report"
   },
   "prisma": {
-    "seed": "dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
-    "db:reset:test": "prisma db push --skip-generate && ts-node prisma/seed.ts"
+    "seed": "dotenv -e .env.local -- ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
