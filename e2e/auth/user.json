@@ -1,6 +1,16 @@
 {
   "cookies": [
     {
+      "name": "next-auth.csrf-token",
+      "value": "b9f5597d134f766ceef81f88626b34b92ccdd26e96cf179c839234f828c38500%7Cfc3698e31f5d09afe058fcee6a69dfc6c6a2385d32964429eec7ca3e882d1bec",
+      "domain": "127.0.0.1",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
       "name": "next-auth.callback-url",
       "value": "http%3A%2F%2Flocalhost%3A3000",
       "domain": "127.0.0.1",
@@ -11,21 +21,11 @@
       "sameSite": "Lax"
     },
     {
-      "name": "next-auth.csrf-token",
-      "value": "5c6d0af5f234ebb98b23b5f9432db1b8c531a362aee5994b8b2ebac049f13af6%7C71ba74662bdadda044fb9489f7b070e026e88358ada5756aa6c516fe9c5b1cb4",
-      "domain": "127.0.0.1",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": true,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
       "name": "next-auth.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..yDUKFnNDCZvFZeYu.JVEdRePfKnFGOBBijz0BvY-80orWP4b6-YYeZzPOUUhd6lR1CLNAjqtSpg4fjzFA5XFzYHh8sLAaXHjwQVuiaaAnZrb85hqvU5cdLskftydsYgoXc049WPIe86eNUgq2_wPIvuUfBI4zsA4YBwVAelqolvisdJYdkw_7rmg9AAG6LaRFGsRh4Y8kn9OnXw.HqNoAN8q0MG-ZeWjgiU0GA",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..EdwsBa_ByVvoeiBJ.nG0ZobIkSdcOh-i99IRd3mpbFQx7fzKK94ZQOXHnAfiK5AQMkl5xtKcgvAVOK7AAswuDl1FCfyFrdxVo-OpEASNspAG3bNgNaZanlTT86y_vmVt0J9zBiGCGW5FZQnKQ3oqz9T88nJ15o-HV2_x56sowv2c0KxkZ4o1BPLsDm7LVff1EqIC7whvLdtqdOg.1wVoTTlrFSAhbN9IboOWbQ",
       "domain": "127.0.0.1",
       "path": "/",
-      "expires": 1757430105.240311,
+      "expires": 1757433576.885902,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "nextauth.message",
-          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1754838105}"
+          "value": "{\"event\":\"session\",\"data\":{\"trigger\":\"getSession\"},\"timestamp\":1754841576}"
         }
       ]
     }

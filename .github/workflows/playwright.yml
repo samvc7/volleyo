@@ -8,6 +8,12 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      AUTH_URL: http://127.0.0.1:3000
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      ADMIN_PW: ${{ secrets.ADMIN_PW }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
