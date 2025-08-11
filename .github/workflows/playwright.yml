@@ -13,8 +13,8 @@ jobs:
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
       ADMIN_PW: ${{ secrets.ADMIN_PW }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      DATABASE_URL: "file:./test.db"
+      CI: "true"
 
     steps:
       - uses: actions/checkout@v4
