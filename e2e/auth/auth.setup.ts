@@ -8,7 +8,6 @@ dotenv.config({ path: ".env.local" })
 setup("authenticate", async ({ page }) => {
   const username = process.env.ADMIN_USERNAME
   const pw = process.env.ADMIN_PW
-  console.log("🚀 ~ username:", username, pw)
 
   if (!username || !pw) {
     throw new Error("ADMIN_USERNAME and ADMIN_PW must be set in environment variables")
@@ -21,7 +20,7 @@ setup("authenticate", async ({ page }) => {
   await page.getByRole("button", { name: "Login" }).click()
 
   await page.waitForLoadState("networkidle")
-  // await expect(page.getByText("Teams")).toBeVisible({ timeout: 10000 })
+  await expect(page.getByText("Teams")).toBeVisible()
 
   await page.context().storageState({ path: authFile })
 

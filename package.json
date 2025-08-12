@@ -10,7 +10,6 @@
     "db:pull": "dotenv -e .env.local -- npx prisma db pull",
     "db:push": "dotenv -e .env.local -- npx prisma db push",
     "db:reset": "dotenv -e .env.local -- npx prisma db push --force-reset",
-    "db:reset:test": "prisma db push --skip-generate && ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
     "e2e": "exec playwright test --headed",
     "e2e:ui": "exec playwright test --ui",
     "e2e:cli": "exec playwright test",
