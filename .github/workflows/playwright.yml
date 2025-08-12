@@ -24,10 +24,10 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: npm install -g pnpm && pnpm install
-      - name: Generate Prisma Client
-        run: npx prisma generate
-      - name: Prepare database
-        run: pnpm db:reset:test
+      # - name: Generate Prisma Client
+      #   run: npx prisma generate
+      # - name: Prepare database
+      #   run: pnpm db:reset:test
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
