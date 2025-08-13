@@ -16,7 +16,9 @@ export default async function EventsView({
   const { slug } = await params
   const { from, to } = await searchParams
   const fromDate = new Date(from as string)
+  fromDate.setHours(0, 0, 0, 0)
   const toDate = new Date(to as string)
+  toDate.setHours(23, 59, 59, 999)
 
   const events = await prisma.event.findMany({
     include: { attendees: { include: { statistics: true } }, team: true },
