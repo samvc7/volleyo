@@ -13,7 +13,7 @@ import {
   updateAttendeePositions,
 } from "../actions"
 import { toast, useToast } from "@/hooks/use-toast"
-import { ConfirmDialog } from "../_components/ConfirmDialog"
+import { ConfirmDialog } from "../../../../components/ui/custom/ConfirmDialog"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
@@ -57,7 +57,7 @@ export const AttendeeCard = ({
   const isCurrentlyLoggedIn = session?.user.members.find(member => member.id === attendee.memberId)
   const shouldShowInvitationResponse = enableInvitationResponses || isCurrentlyLoggedIn || isAdmin
 
-  const handleAcceptInvitation = () => {
+  const handleAcceptInvitation = async () => {
     startStatusTransition(async () => {
       try {
         if (isAdmin && searchParams.has("invite")) {
@@ -87,7 +87,7 @@ export const AttendeeCard = ({
     })
   }
 
-  const handleDeclineInvitation = () => {
+  const handleDeclineInvitation = async () => {
     startStatusTransition(async () => {
       try {
         if (isAdmin) {

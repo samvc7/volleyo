@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table"
 import {
@@ -15,7 +15,7 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table"
-import { MoreHorizontal, Loader2 } from "lucide-react"
+import { MoreHorizontal } from "lucide-react"
 import { getCommonPinningClasses } from "@/app/event/[slug]/columns/utils"
 import { Pagination } from "../../event/[slug]/pagination"
 import { ViewOptions } from "../../event/[slug]/viewOptions"
@@ -28,14 +28,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Member } from "@prisma/client"
 import { removeMember } from "./actions"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
 import { AddTeamMemberDialog, EditTeamMemberDialog } from "./dialogs"
+
+import { ConfirmDialog } from "@/components/ui/custom/ConfirmDialog"
 
 export const columns: ColumnDef<Member>[] = [
   // {
@@ -200,19 +201,15 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
 const MemberActions = ({ member }: { member: Member }) => {
   const { slug } = useParams() as { slug: string }
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
 
-  const handleRemove = () => {
-    startTransition(async () => {
-      try {
-        await removeMember(slug, member.id)
-        toast({ title: "Team member removed successfully" })
-      } catch (error) {
-        console.error(error)
-        toast({ title: "Could not remove team member. Please try again" })
-      }
-    })
+  const handleRemove = async () => {
+    try {
+      await removeMember(slug, member.id)
+      toast({ title: "Team member removed successfully" })
+    } catch (error) {
+      console.error(error)
+      toast({ title: "Could not remove team member. Please try again" })
+    }
   }
 
   return (
@@ -221,19 +218,9 @@ const MemberActions = ({ member }: { member: Member }) => {
         <Button
           variant="ghost"
           className="h-8 w-8 p-0"
-          disabled={isPending}
         >
-          {isPending ? (
-            <>
-              <span className="sr-only">Loading</span>
-              <Loader2 className="animate-spin h-4 w-4" />
-            </>
-          ) : (
-            <>
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </>
-          )}
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -247,10 +234,22 @@ const MemberActions = ({ member }: { member: Member }) => {
             Edit
           </DropdownMenuItem>
         </EditTeamMemberDialog>
-        <DropdownMenuItem onClick={handleRemove}>Remove</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>View Player</DropdownMenuItem>
-        <DropdownMenuItem disabled>View Statistics</DropdownMenuItem>
+        <ConfirmDialog
+          onConfirmAction={handleRemove}
+          title="Removing Team Member"
+          description={
+            <>
+              Are you sure you want to remove{" "}
+              <strong>{member.nickName || `${member.firstName} ${member.lastName}`}</strong> from the team?
+            </>
+          }
+        >
+          <DropdownMenuItem onSelect={e => e.preventDefault()}>Remove</DropdownMenuItem>
+        </ConfirmDialog>
+
+        {/* <DropdownMenuSeparator /> */}
+        {/* <DropdownMenuItem disabled>View Player</DropdownMenuItem> */}
+        {/* <DropdownMenuItem disabled>View Statistics</DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

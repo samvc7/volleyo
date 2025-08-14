@@ -32,7 +32,10 @@ export const AddTeamMemberDialog = () => {
       toast({ title: "Team member added successfully" })
     } catch (error) {
       console.error(error)
-      return "Could not create new team member. Please try again"
+      toast({
+        title: "Could not add new team member. Please try again.",
+        description: (error as Error).message,
+      })
     }
 
     return null
@@ -52,7 +55,7 @@ export const AddTeamMemberDialog = () => {
           variant={"outline"}
           size="sm"
           aria-expanded={showDialog}
-          aria-label="Create Team Member"
+          aria-label="Add Member"
           onClick={() => {
             setShowDialog(true)
           }}
