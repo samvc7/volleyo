@@ -38,3 +38,11 @@ test("create, edit, remove team member", async ({ page }) => {
   await page.getByRole("button", { name: "Continue" }).click()
   await expect(page.getByRole("cell", { name: "No Results" })).toBeVisible()
 })
+
+test("authorization admin", async ({ page }) => {
+  await page.goto("/alpha-squad/members")
+  await expect(page.getByRole("button", { name: "Add Member" })).toBeVisible()
+  await expect(page.getByRole("cell", { name: "Email" })).toBeVisible()
+  const rowActionsCount = await page.getByRole("button", { name: "Open Menu" }).count()
+  expect(rowActionsCount).toBeGreaterThan(0)
+})

@@ -60,7 +60,7 @@ export const AttendeeCard = ({
   const handleAcceptInvitation = async () => {
     startStatusTransition(async () => {
       try {
-        if (isAdmin && searchParams.has("invite")) {
+        if (isAdmin) {
           // If the user is an admin, we can directly accept the invitation without needing a token
           await acceptInvitation(attendee.id)
           toast({ title: "Successfully accepted invitation" })
@@ -136,26 +136,34 @@ export const AttendeeCard = ({
             <PermissionClient teamSlug={attendee.event.team?.slug || ""}>
               <EditPlayerNumber
                 value={attendee.playerNumber}
+                playerName={fullName}
                 onChange={handlePlayerNumberChange}
               />
             </PermissionClient>
+            {!isAdmin && <span>#</span>}
             {attendee.playerNumber}
           </div>
         </div>
         <div className="flex gap-1">
-          {attendee.positions.length > 0
-            ? attendee.positions.map(position => {
+          {attendee.positions.length > 0 ? (
+            <ul
+              className="flex gap-1"
+              aria-label={`Positions ${fullName}`}
+            >
+              {attendee.positions.map(position => {
                 return (
-                  <Badge
-                    key={`${attendee.id}-${position}`}
-                    variant="outline"
-                    className={positionBadgeColors[position]}
-                  >
-                    {positionShortLabels[position]}
-                  </Badge>
+                  <li key={`${attendee.id}-${position}`}>
+                    <Badge
+                      variant="outline"
+                      className={positionBadgeColors[position]}
+                    >
+                      {positionShortLabels[position]}
+                    </Badge>
+                  </li>
                 )
-              })
-            : null}
+              })}
+            </ul>
+          ) : null}
           <PermissionClient teamSlug={attendee.event.team?.slug || ""}>
             <EditPositonsDialog attendee={attendee} />
           </PermissionClient>
@@ -191,6 +199,7 @@ export const AttendeeCard = ({
                 variant="ghost"
                 size="icon"
                 className="size-6"
+                aria-label={`Accept Invitation ${fullName}`}
               >
                 <CheckIcon />
               </Button>
@@ -205,6 +214,7 @@ export const AttendeeCard = ({
                 variant="ghost"
                 size="icon"
                 className="size-6"
+                aria-label={`Decline Invitation ${fullName}`}
               >
                 <XIcon />
               </Button>
@@ -282,6 +292,7 @@ const EditPositonsDialog = ({ attendee }: EditPositonsDialogProps) => {
           variant="ghost"
           size="icon"
           className="size-6"
+          aria-label={`Edit Position ${attendee.member.firstName} ${attendee.member.lastName}`}
         >
           {attendee.positions.length > 0 ? <PlusIcon /> : <UserCog />}
         </Button>
@@ -323,7 +334,15 @@ const EditPositonsDialog = ({ attendee }: EditPositonsDialogProps) => {
   )
 }
 
-const EditPlayerNumber = ({ value, onChange }: { value: number | null; onChange(value: number): void }) => {
+const EditPlayerNumber = ({
+  value,
+  playerName,
+  onChange,
+}: {
+  value: number | null
+  playerName: string
+  onChange(value: number): void
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState(value?.toString() || "")
 
@@ -355,6 +374,7 @@ const EditPlayerNumber = ({ value, onChange }: { value: number | null; onChange(
           variant="ghost"
           size="icon"
           className="size-6"
+          aria-label={`Edit Player Number ${playerName}`}
         >
           <HashIcon />
         </Button>
