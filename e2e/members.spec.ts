@@ -46,3 +46,19 @@ test("authorization admin", async ({ page }) => {
   const rowActionsCount = await page.getByRole("button", { name: "Open Menu" }).count()
   expect(rowActionsCount).toBeGreaterThan(0)
 })
+
+test.describe("authorization guest", () => {
+  test.use({ storageState: "./e2e/auth/guest.json" })
+
+  test("does not see members tab", async ({ page }) => {
+    await page.goto("/alpha-squad/events")
+    await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
+    const membersTab = page.getByRole("link", { name: "Members" })
+    await expect(membersTab).toHaveCount(0)
+  })
+
+  test("cannot navigate to members page", async ({ page }) => {
+    await page.goto("/alpha-squad/members")
+    await expect(page.getByText("Forbidden")).toBeVisible()
+  })
+})

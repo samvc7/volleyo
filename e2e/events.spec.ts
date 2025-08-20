@@ -162,3 +162,5 @@ test.describe("authorization admin", () => {
     await expect(guestPage.getByRole("list").filter({ hasText: "Mia" }).getByText("Accepted")).toBeVisible()
   })
 })
+
+test.describe("authorization guest", () => {})

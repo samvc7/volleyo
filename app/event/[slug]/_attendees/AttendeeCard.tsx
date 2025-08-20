@@ -140,7 +140,7 @@ export const AttendeeCard = ({
                 onChange={handlePlayerNumberChange}
               />
             </PermissionClient>
-            {!isAdmin && <span>#</span>}
+            {!isAdmin && attendee.playerNumber !== null && <span>#</span>}
             {attendee.playerNumber}
           </div>
         </div>

@@ -55,6 +55,12 @@ export default defineConfig({
       dependencies: ["setup"],
     },
 
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"], storageState: "./e2e/auth/guest.json" },
+      dependencies: ["setup"],
+    },
+
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',
