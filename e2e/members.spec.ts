@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 
 test("navigate to members page", async ({ page }) => {
-  await page.goto("/alpha-squad/events")
+  await page.goto("/alpha-team/events")
   await page.getByRole("link", { name: "Members" }).click()
 
   await expect(page.getByRole("button", { name: "Create Team Member" })).toBeVisible()
@@ -10,7 +10,7 @@ test("navigate to members page", async ({ page }) => {
 })
 
 test("create, edit, remove team member", async ({ page }) => {
-  await page.goto("/alpha-squad/members")
+  await page.goto("/alpha-team/members")
 
   // Add member
   await page.getByRole("button", { name: "Add Member" }).click()
@@ -40,7 +40,7 @@ test("create, edit, remove team member", async ({ page }) => {
 })
 
 test("authorization admin", async ({ page }) => {
-  await page.goto("/alpha-squad/members")
+  await page.goto("/alpha-team/members")
   await expect(page.getByRole("button", { name: "Add Member" })).toBeVisible()
   await expect(page.getByRole("cell", { name: "Email" })).toBeVisible()
   const rowActionsCount = await page.getByRole("button", { name: "Open Menu" }).count()
@@ -51,14 +51,14 @@ test.describe("authorization guest", () => {
   test.use({ storageState: "./e2e/auth/guest.json" })
 
   test("does not see members tab", async ({ page }) => {
-    await page.goto("/alpha-squad/events")
+    await page.goto("/alpha-team/events")
     await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
     const membersTab = page.getByRole("link", { name: "Members" })
     await expect(membersTab).toHaveCount(0)
   })
 
   test("cannot navigate to members page", async ({ page }) => {
-    await page.goto("/alpha-squad/members")
+    await page.goto("/alpha-team/members")
     await expect(page.getByText("Forbidden")).toBeVisible()
   })
 })

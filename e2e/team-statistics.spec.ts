@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 
 test("navigate to team statistics page", async ({ page }) => {
-  await page.goto("/alpha-squad/events")
+  await page.goto("/alpha-team/events")
 
   await page.getByRole("link", { name: "Statistics" }).click()
   await expect(page.getByText("Games Overview")).toBeVisible()

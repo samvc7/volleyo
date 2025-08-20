@@ -3,9 +3,9 @@ test.describe("events page", () => {
   test("navigate to team events page", async ({ page }) => {
     await page.goto("/")
     await page.getByRole("combobox", { name: "Select Team" }).click()
-    await page.getByRole("option", { name: "Alpha Squad" }).click()
+    await page.getByRole("option", { name: "Alpha Team" }).click()
 
-    await expect(page.getByText("Alpha Squad")).toBeVisible()
+    await expect(page.getByText("Alpha Team")).toBeVisible()
     await expect(page.getByText("Past Events")).toBeVisible()
     await expect(page.getByText("Game")).toHaveCount(5)
     await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
@@ -14,7 +14,7 @@ test.describe("events page", () => {
   })
 
   test("create event", async ({ page }) => {
-    await page.goto("/alpha-squad/events")
+    await page.goto("/alpha-team/events")
 
     await page.getByRole("button", { name: "Add Event" }).click()
 
@@ -39,7 +39,7 @@ test.describe("events page", () => {
   })
 
   test("filter events by date range", async ({ page }) => {
-    await page.goto("/alpha-squad/events?from=2025-08-06&to=2025-08-08")
+    await page.goto("/alpha-team/events?from=2025-08-06&to=2025-08-08")
     await expect(page.getByText("Game")).toHaveCount(2)
   })
 })
@@ -66,7 +66,7 @@ test.describe("event details", () => {
   })
 
   test("navigate to event details", async ({ page }) => {
-    await page.goto("/alpha-squad/events")
+    await page.goto("/alpha-team/events")
     await page.getByRole("heading", { name: "Game 5" }).click()
 
     await expect(page.getByRole("tab", { name: "Details" })).toBeVisible()
