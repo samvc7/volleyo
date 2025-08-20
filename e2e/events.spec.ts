@@ -163,4 +163,48 @@ test.describe("authorization admin", () => {
   })
 })
 
-test.describe("authorization guest", () => {})
+test.describe("authorization guest", () => {
+  test.use({ storageState: "./e2e/auth/guest.json" })
+
+  test("cannot add members to event", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Add Members" })).toHaveCount(0)
+  })
+
+  test("cannot edit event", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Edit Event" })).toHaveCount(0)
+  })
+
+  test("cannot edit attendee position", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Edit Position Caro" })).toHaveCount(0)
+  })
+
+  test("cannot accept invitation", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Accept Invitation Milani" })).toHaveCount(0)
+  })
+
+  test("cannot decline invitation", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Decline Invitation Milani" })).toHaveCount(0)
+  })
+
+  test("cannot edit attendee number", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Edit Player Number Caro" })).toHaveCount(0)
+  })
+
+  test("cannot edit attendee positions", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("button", { name: "Edit Position Caro" })).toHaveCount(0)
+  })
+
+  test("cannot see court tracker", async ({ page }) => {
+    await page.goto("/event/game-3")
+    await expect(page.getByRole("tab", { name: "Details" })).toBeVisible()
+    await expect(page.getByRole("tab", { name: "Statistics" })).toBeVisible()
+    await expect(page.getByRole("tab", { name: "Court" })).toHaveCount(0)
+  })
+})
