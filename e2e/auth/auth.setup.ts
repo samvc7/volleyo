@@ -31,6 +31,13 @@ setup("authenticate", async ({ page, context }) => {
 })
 
 setup("authenticate guest", async ({ page }) => {
+  const username = process.env.ADMIN_USERNAME
+  const pw = process.env.ADMIN_PW
+
+  if (!username || !pw) {
+    throw new Error("ADMIN_USERNAME and ADMIN_PW must be set in environment variables")
+  }
+
   const guestUsername = process.env.GUEST_USERNAME
   const guestPw = process.env.GUEST_PW
 
