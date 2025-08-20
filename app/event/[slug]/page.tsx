@@ -76,12 +76,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 >
                   Details
                 </TabsTrigger>
-                <TabsTrigger
-                  className="w-full"
-                  value={"court"}
-                >
-                  Court
-                </TabsTrigger>
+                <Permission teamSlug={event.team?.slug ?? ""}>
+                  <TabsTrigger
+                    className="w-full"
+                    value={"court"}
+                  >
+                    Court
+                  </TabsTrigger>
+                </Permission>
                 <TabsTrigger
                   className="w-full"
                   value={"stats"}
@@ -102,9 +104,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               />
             </TabsContent>
 
-            <TabsContent value="court">
-              <CourtTracker />
-            </TabsContent>
+            <Permission teamSlug={event.team?.slug ?? ""}>
+              <TabsContent value="court">
+                <CourtTracker />
+              </TabsContent>
+            </Permission>
 
             <TabsContent
               className="flex flex-col"
