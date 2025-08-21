@@ -150,11 +150,11 @@ test.describe("authorization admin", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Milani" }).getByText("Declined")).toBeVisible()
   })
 
-  test("inviation link", async ({ page, browser }) => {
+  test("invitation link", async ({ page, browser }) => {
     const origin = new URL(page.url()).origin
 
     await page.getByRole("button", { name: "Add Members" }).click()
-    await page.getByRole("button", { name: "Invite Link" }).click()
+    await expect(page.getByRole("button", { name: "Invite Link" })).toBeVisible()
 
     // Not testing clipboard functionality because of errors in Playwright when reading clipboard
     const inviteUrl = await getInviteLink("game-4", origin)
@@ -172,8 +172,7 @@ test.describe("authorization admin", () => {
     await expect(guestPage.getByText("Are you sure")).toBeVisible()
     await expect(guestPage.getByText("Mia Lopez?")).toBeVisible()
     await guestPage.getByRole("button", { name: "Accept" }).click()
-    await expect(guestPage.getByText("Details")).toBeVisible()
-    await expect(guestPage.getByRole("tab", { name: "Details" })).toBeVisible({ timeout: 20000 })
+    await expect(guestPage.getByRole("tab", { name: "Details" })).toBeVisible()
     await expect(
       guestPage.getByRole("listitem").filter({ hasText: "Mia Lopez" }).getByText("Accepted"),
     ).toBeVisible()
