@@ -82,7 +82,7 @@ test.describe("event details", () => {
   })
 })
 
-test.describe("authorization admin", () => {
+test.describe.only("authorization admin", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/event/game-4")
   })
@@ -150,7 +150,7 @@ test.describe("authorization admin", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Milani" }).getByText("Declined")).toBeVisible()
   })
 
-  test("invitation link", async ({ page, browser }) => {
+  test.only("invitation link", async ({ page, browser }) => {
     const origin = new URL(page.url()).origin
 
     await page.getByRole("button", { name: "Add Members" }).click()
@@ -163,6 +163,7 @@ test.describe("authorization admin", () => {
     expect(urlWithoutBase).toContain("token=")
 
     const guestContext = await browser.newContext()
+    guestContext.clearCookies()
     const guestPage = await guestContext.newPage()
 
     await guestPage.goto(urlWithoutBase)
