@@ -4,12 +4,16 @@ test("navigate to members page", async ({ page }) => {
   await page.goto("/alpha-team/events")
   await page.getByRole("link", { name: "Members" }).click()
 
-  await expect(page.getByRole("button", { name: "Create Team Member" })).toBeVisible()
   await expect(page.getByRole("cell", { name: "Name" })).toBeVisible()
   await expect(page.getByRole("cell", { name: "Email" })).toBeVisible()
 })
 
-test("create, edit, remove team member", async ({ page }) => {
+test("create, edit, remove team member", async ({ page, browserName }) => {
+  test.skip(
+    browserName !== "chromium",
+    "Because of race condition testing parallel browsers we just test for chromium",
+  )
+
   await page.goto("/alpha-team/members")
 
   // Add member

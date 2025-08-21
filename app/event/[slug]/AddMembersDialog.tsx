@@ -59,8 +59,7 @@ export const AddMembersDialog = ({
     e.preventDefault()
     if (copiedInviteLink) return
     try {
-      const authToken = await getAuthToken(event.slug)
-      const inviteLink = `${window.location.host}/event/invite?event=${event.slug}&token=${authToken.token}`
+      const inviteLink = await getInviteLink(event.slug)
       window.navigator.clipboard.writeText(inviteLink)
 
       setCopiedInviteLink(true)
@@ -178,4 +177,12 @@ export const AddMembersDialog = ({
       </DialogContent>
     </Dialog>
   )
+}
+
+export const getInviteLink = async (eventSlug: string, host?: string) => {
+  const authToken = await getAuthToken(eventSlug)
+  const correctHost = host || window.location.host
+  const inviteLink = `${correctHost}/event/invite?event=${eventSlug}&token=${authToken.token}`
+
+  return inviteLink
 }
