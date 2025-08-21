@@ -50,9 +50,9 @@ async function main() {
 
       const team = await tx.team.create({
         data: {
-          name: "Alpha Squad",
+          name: "Alpha Team",
           description: "Elite volleyball team",
-          slug: "alpha-squad",
+          slug: "alpha-team",
           members: {
             create: memberRecords.map(member => ({
               memberId: member.id,

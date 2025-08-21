@@ -8,10 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useState } from "react"
+import { useState, useTransition } from "react"
+import { ButtonWithLoading } from "./ButtonWithLoading"
 
 type ConfirmDialogProps = {
-  onConfirmAction: () => void
+  onConfirmAction: () => Promise<void>
   title: string
   description: string | JSX.Element
   confirmText?: string
@@ -28,10 +29,13 @@ export const ConfirmDialog = ({
   children,
 }: ConfirmDialogProps) => {
   const [showDialog, setShowDialog] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const handleConfirm = () => {
-    setShowDialog(false)
-    onConfirmAction()
+    startTransition(async () => {
+      setShowDialog(false)
+      await onConfirmAction()
+    })
   }
 
   return (
@@ -59,7 +63,12 @@ export const ConfirmDialog = ({
           >
             {cancelText}
           </Button>
-          <Button onClick={handleConfirm}>{confirmText}</Button>
+          <ButtonWithLoading
+            label={confirmText}
+            loadingLabel="Loading..."
+            disabled={isPending}
+            onClick={handleConfirm}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>
