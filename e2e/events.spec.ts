@@ -82,7 +82,7 @@ test.describe("event details", () => {
   })
 })
 
-test.describe.only("authorization admin", () => {
+test.describe("authorization admin", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/event/game-4")
   })
@@ -150,7 +150,7 @@ test.describe.only("authorization admin", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Milani" }).getByText("Declined")).toBeVisible()
   })
 
-  test.only("invitation link", async ({ page, browser }) => {
+  test("invitation link", async ({ page, browser }) => {
     const origin = new URL(page.url()).origin
 
     await page.getByRole("button", { name: "Add Members" }).click()
