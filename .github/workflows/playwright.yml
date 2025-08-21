@@ -44,7 +44,7 @@ jobs:
       - name: Prepare schema (no migrations)
         run: pnpm prisma db push --force-reset
       - name: Seed data
-        run: pnpm prisma db seed
+        run: pnpm ts-node --compiler-options '{"module":"CommonJS"}' prisma/seed.ts
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
