@@ -8,6 +8,9 @@ import { compare } from "bcryptjs"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { TeamRole } from "@prisma/client"
 
+// 2 days in seconds
+const MAX_SESSION_AGE = 60 * 60 * 24 * 2
+
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -35,7 +38,7 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: MAX_SESSION_AGE },
   callbacks: {
     async session({ session, token }) {
       if (token?.sub && session.user) {
