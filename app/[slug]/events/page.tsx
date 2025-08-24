@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client"
 import { Separator } from "@/components/ui/separator"
 import { Volleyball } from "lucide-react"
 import { Permission } from "@/components/ui/custom/Permission"
+import { NoneFound } from "@/components/ui/custom/NoneFound"
 
 export default async function EventsView({
   params,
@@ -50,19 +51,15 @@ export default async function EventsView({
 
   if (!events.length) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
-        <div className="mb-4 rounded-full bg-muted p-6">
-          {<Volleyball className="h-12 w-12 text-muted-foreground" />}
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight">No events yet.</h2>
-        <p className="text-muted-foreground max-w-md mt-2 mb-6">
-          {`You haven't added any events yet. Start planning your events and document statistics by adding new
-          events.`}
-        </p>
+      <NoneFound
+        title="No events yet."
+        description="You haven't added any events yet. Start planning your events and document statistics by adding new events."
+        icon={Volleyball}
+      >
         <Permission teamSlug={slug}>
           <NewEventDialog />
         </Permission>
-      </div>
+      </NoneFound>
     )
   }
 
