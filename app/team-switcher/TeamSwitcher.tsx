@@ -27,8 +27,9 @@ import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
-import { createTeam } from "./actions"
+import { createTeam, updateLastSelectedTeam } from "./actions"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
+import { useSession } from "next-auth/react"
 
 type TeamSwitcherProps = {
   teams: Team[]
@@ -38,6 +39,7 @@ type TeamSwitcherProps = {
 
 export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherProps) => {
   const router = useRouter()
+  const session = useSession()
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
@@ -56,7 +58,12 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
   const teamList = parseTeams(teams)
   const selectedTeamParsed = selectedTeam ? parseTeam(selectedTeam) : undefined
 
-  const handleSelectTeam = (team: Team) => {
+  const handleSelectTeam = async (team: Team) => {
+    if (session.data?.user.id) {
+      await updateLastSelectedTeam(team.id, session.data?.user.id)
+    } else {
+      console.warn("User session not found, skipping last selected team update.")
+    }
     setOpen(false)
     router.push(`/${team.slug}/events`)
   }
