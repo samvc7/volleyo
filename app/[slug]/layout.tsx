@@ -20,10 +20,6 @@ export default async function Layout({
   }
 
   const { slug } = await params
-  const teams = await prisma.team.findMany({
-    where: { members: { some: { member: { userId: session.user.id } } } },
-    orderBy: { name: "asc" },
-  })
   // TODO: not found team with slug
   const selectedTeam = (await prisma.team.findUnique({ where: { slug } })) ?? undefined
 
@@ -37,10 +33,6 @@ export default async function Layout({
   return (
     <>
       <div className="flex gap-4">
-        <TeamSwitcher
-          teams={teams}
-          selectedTeam={selectedTeam}
-        />
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem className="space-x-1">
