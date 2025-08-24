@@ -1,8 +1,11 @@
 import * as React from "react"
 import { prisma } from "@/prisma/singlePrismaClient"
-import { TeamSwitcher } from "./team-switcher/TeamSwitcher"
 import { getAuthSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { NoneFound } from "@/components/ui/custom/NoneFound"
+import { PlusCircle, Volleyball } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { CreateTeamDialog } from "./CreateTeamDialog"
 
 export default async function Home() {
   const session = await getAuthSession()
@@ -29,12 +32,22 @@ export default async function Home() {
   })
 
   if (teams.length === 0) {
-    // TODO: No teams found -> implement and show create team card with button
     return (
-      <TeamSwitcher
-        teams={teams}
-        selectedTeam={teams[0]}
-      />
+      <NoneFound
+        title="No teams found yet."
+        description="You do not have any teams yet. Start creating a team."
+        icon={Volleyball}
+      >
+        <CreateTeamDialog>
+          <Button
+            variant="outline"
+            aria-label="Create Team"
+          >
+            <PlusCircle className="h-5 w-5" />
+            Create Team
+          </Button>
+        </CreateTeamDialog>
+      </NoneFound>
     )
   }
   redirect(`/${teams[0]?.slug}/events`)

@@ -68,6 +68,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
     router.push(`/${team.slug}/events`)
   }
 
+  // Not using the CreateTeamDialog component because of the complexity with the popover and command component
   return (
     <Dialog
       open={showNewTeamDialog}
