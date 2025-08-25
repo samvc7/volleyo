@@ -3,7 +3,7 @@ import { DATE_ISO_FORMAT } from "@/app/utils"
 import { test, expect } from "@playwright/test"
 import { format, subDays } from "date-fns"
 test.describe("events page", () => {
-  test("navigate to other team events page", async ({ page }) => {
+  test("navigate to other team events", async ({ page }) => {
     await page.goto("/")
     await page.getByRole("combobox", { name: "Select Team" }).click()
     await page.getByRole("option", { name: "Beta Team" }).click()
