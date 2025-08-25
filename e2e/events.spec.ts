@@ -3,14 +3,13 @@ import { DATE_ISO_FORMAT } from "@/app/utils"
 import { test, expect } from "@playwright/test"
 import { format, subDays } from "date-fns"
 test.describe("events page", () => {
-  test("navigate to team events page", async ({ page }) => {
+  test("navigate to other team events page", async ({ page }) => {
     await page.goto("/")
     await page.getByRole("combobox", { name: "Select Team" }).click()
-    await page.getByRole("option", { name: "Alpha Team" }).click()
+    await page.getByRole("option", { name: "Beta Team" }).click()
 
-    await expect(page.getByText("Alpha Team")).toBeVisible()
-    await expect(page.getByText("Past Events")).toBeVisible()
-    await expect(page.getByText("Game")).toHaveCount(5)
+    await expect(page.getByText("Beta Team")).toBeVisible()
+    await expect(page.getByText("No events yet")).toBeVisible()
     await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
     await expect(page.getByRole("link", { name: "Statistics" })).toBeVisible()
     await expect(page.getByRole("link", { name: "Members" })).toBeVisible()
