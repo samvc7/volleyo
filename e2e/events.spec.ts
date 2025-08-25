@@ -8,7 +8,8 @@ test.describe("events page", () => {
     await page.getByRole("combobox", { name: "Select Team" }).click()
     await page.getByRole("option", { name: "Beta Team" }).click()
 
-    await expect(page.getByText("Beta Team")).toBeVisible()
+    const betaTeamTextCount = await page.getByText("Beta Team").count()
+    expect(betaTeamTextCount).toBeGreaterThan(0)
     await expect(page.getByText("No events yet")).toBeVisible()
     await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
     await expect(page.getByRole("link", { name: "Statistics" })).toBeVisible()
