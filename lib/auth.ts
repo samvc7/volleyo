@@ -50,6 +50,8 @@ export const authOptions: AuthOptions = {
           session.user.id = dbUser.id
           session.user.role = dbUser.role
           session.user.members = dbUser.members
+          session.user.firstName = dbUser.firstName
+          session.user.lastName = dbUser.lastName
 
           const teamRoles: Record<string, TeamRole> = {}
 

@@ -6,7 +6,7 @@ const authFile = path.join(__dirname, "./user.json")
 const authGuestFile = path.join(__dirname, "./guest.json")
 dotenv.config({ path: ".env.local" })
 
-setup("authenticate", async ({ page, context }) => {
+setup("authenticate", async ({ page }) => {
   const username = process.env.ADMIN_USERNAME
   const pw = process.env.ADMIN_PW
 
@@ -21,11 +21,10 @@ setup("authenticate", async ({ page, context }) => {
   await page.getByRole("button", { name: "Login" }).click()
 
   await page.waitForLoadState("networkidle")
-  await expect(page.getByText("Teams")).toBeVisible()
 
   await page.context().storageState({ path: authFile })
 
-  await page.getByRole("button", { name: "A" }).click()
+  await page.getByRole("button", { name: "A", exact: true }).click()
   await page.getByRole("menuitem", { name: "Logout" }).click()
   await expect(page.getByText("Login").first()).toBeVisible()
 })
@@ -52,11 +51,10 @@ setup("authenticate guest", async ({ page }) => {
   await page.getByRole("button", { name: "Login" }).click()
 
   await page.waitForLoadState("networkidle")
-  await expect(page.getByText("Teams")).toBeVisible()
 
   await page.context().storageState({ path: authGuestFile })
 
-  await page.getByRole("button", { name: "G" }).click()
+  await page.getByRole("button", { name: "G", exact: true }).click()
   await page.getByRole("menuitem", { name: "Logout" }).click()
   await expect(page.getByText("Login").first()).toBeVisible()
 })

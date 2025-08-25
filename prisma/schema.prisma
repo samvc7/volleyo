@@ -9,17 +9,19 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  email     String     @unique
-  username  String?    @unique
-  password  String?
-  firstName String     @map("first_name")
-  lastName  String     @map("last_name")
-  role      UserRole   @default(USER)
-  authToken AuthToken?
-  accounts  Account[]
-  members   Member[]
-  sessions  Session[]
+  id                 String     @id @default(cuid())
+  email              String     @unique
+  username           String?    @unique
+  password           String?
+  firstName          String     @map("first_name")
+  lastName           String     @map("last_name")
+  role               UserRole   @default(USER)
+  authToken          AuthToken?
+  accounts           Account[]
+  members            Member[]
+  sessions           Session[]
+  lastSelectedTeamId String?    @unique @map("last_selected_team_id")
+  lastSelectedTeam   Team?      @relation(fields: [lastSelectedTeamId], references: [id])
 }
 
 model Account {
@@ -73,12 +75,14 @@ model Member {
 }
 
 model Team {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  name        String
-  description String?
-  events      Event[]
-  members     TeamMember[]
+  id                String       @id @default(cuid())
+  slug              String       @unique
+  name              String
+  description       String?
+  events            Event[]
+  members           TeamMember[]
+  // Minimal back-field only to satisfy Prisma's relation resolution. Does not add new column or table.
+  usersLastSelected User[]
 }
 
 model TeamMember {

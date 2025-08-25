@@ -60,3 +60,18 @@ export const createTeam = async (formData: FormData) => {
     return team
   }
 }
+
+export const updateLastSelectedTeam = async (teamId: string, userId: string) => {
+  const team = await prisma.team.findUnique({
+    where: { id: teamId },
+  })
+
+  if (!team) {
+    throw new Error("Team not found")
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { lastSelectedTeam: { connect: { id: team.id } } },
+  })
+}

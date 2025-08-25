@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
+import { getTeamSlug } from "./actions"
 
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState("")
@@ -28,7 +29,12 @@ export default function LoginForm() {
       console.error("Login error:", res.error)
       setError("Invalid credentials")
     } else {
-      router.push("/")
+      const teamSlug = await getTeamSlug()
+      if (teamSlug) {
+        router.push(`/${teamSlug}/events`)
+      } else {
+        router.push("/")
+      }
     }
   }
 
