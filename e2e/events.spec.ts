@@ -130,7 +130,7 @@ test.describe("authorization admin", () => {
     await page.getByRole("button", { name: "Edit Player Number Caro" }).click()
     await page.getByRole("spinbutton").fill("10")
     await page.getByRole("button", { name: "Edit Player Number Caro" }).click()
-    await expect(page.getByText("10")).toBeVisible()
+    await expect(page.getByRole("listitem").filter({ hasText: "Caro" }).getByText("10")).toBeVisible()
   })
 
   test("can accept invitation", async ({ page }) => {
