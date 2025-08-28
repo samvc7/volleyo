@@ -12,6 +12,7 @@ import { Event, EventType } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { EventWithRelations } from "../events/page"
+import { NoneFound } from "@/components/ui/custom/NoneFound"
 
 export default async function StatisticsView({
   params,
@@ -130,15 +131,11 @@ export default async function StatisticsView({
 
   if (events.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] text-center p-4">
-        <div className="mb-4 rounded-full bg-muted p-6">
-          {<Volleyball className="h-12 w-12 text-muted-foreground" />}
-        </div>
-        <h2 className="text-2xl font-bold tracking-tight">No statistics yet.</h2>
-        <p className="text-muted-foreground max-w-md mt-2 mb-6">
-          There are no games found and therefor no statistics to show. Start planning your games by adding new
-          games and document statistics. Or change the date filter.
-        </p>
+      <NoneFound
+        title="No statistics yet."
+        description="There are no games found and therefor no statistics to show. Start planning your games by adding new games and document statistics or change the date filter."
+        icon={Volleyball}
+      >
         <Link
           href={`/${slug}/events`}
           legacyBehavior
@@ -146,7 +143,7 @@ export default async function StatisticsView({
         >
           <Button variant="outline">Go to Events</Button>
         </Link>
-      </div>
+      </NoneFound>
     )
   }
 

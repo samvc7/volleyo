@@ -3,14 +3,14 @@ import { DATE_ISO_FORMAT } from "@/app/utils"
 import { test, expect } from "@playwright/test"
 import { format, subDays } from "date-fns"
 test.describe("events page", () => {
-  test("navigate to team events page", async ({ page }) => {
+  test("navigate to other team events", async ({ page }) => {
     await page.goto("/")
     await page.getByRole("combobox", { name: "Select Team" }).click()
-    await page.getByRole("option", { name: "Alpha Team" }).click()
+    await page.getByRole("option", { name: "Beta Team" }).click()
 
-    await expect(page.getByText("Alpha Team")).toBeVisible()
-    await expect(page.getByText("Past Events")).toBeVisible()
-    await expect(page.getByText("Game")).toHaveCount(5)
+    const betaTeamTextCount = await page.getByText("Beta Team").count()
+    expect(betaTeamTextCount).toBeGreaterThan(0)
+    await expect(page.getByText("No events yet")).toBeVisible()
     await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
     await expect(page.getByRole("link", { name: "Statistics" })).toBeVisible()
     await expect(page.getByRole("link", { name: "Members" })).toBeVisible()
@@ -130,7 +130,7 @@ test.describe("authorization admin", () => {
     await page.getByRole("button", { name: "Edit Player Number Caro" }).click()
     await page.getByRole("spinbutton").fill("10")
     await page.getByRole("button", { name: "Edit Player Number Caro" }).click()
-    await expect(page.getByText("10")).toBeVisible()
+    await expect(page.getByRole("listitem").filter({ hasText: "Caro" }).getByText("10")).toBeVisible()
   })
 
   test("can accept invitation", async ({ page }) => {

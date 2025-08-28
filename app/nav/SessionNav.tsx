@@ -1,63 +1,30 @@
-"use client"
+import { UserMenu } from "./UserMenu"
+import { getAuthSession } from "@/lib/auth"
+import { TeamSwitcher } from "../team-switcher/TeamSwitcher"
+import { prisma } from "@/prisma/singlePrismaClient"
 
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { signOut, useSession } from "next-auth/react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+export const SessionNav = async () => {
+  const session = await getAuthSession()
+  if (!session) return null
 
-export const SessionNav = () => {
-  const { data: session, status } = useSession()
+  const usersLastSelectedTeam = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { lastSelectedTeam: true },
+  })
 
-  if (status === "loading" || !session?.user) return null
+  const teams = await prisma.team.findMany({
+    where: { members: { some: { member: { userId: session.user.id } } } },
+    orderBy: { name: "asc" },
+  })
 
   return (
     <div className="w-full flex items-center justify-between">
-      <NavigationMenu>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <Link
-              href="/"
-              legacyBehavior
-              passHref
-            >
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>Teams</NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
+      <TeamSwitcher
+        teams={teams}
+        selectedTeam={usersLastSelectedTeam?.lastSelectedTeam ?? undefined}
+      />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="p-0 rounded-full h-9 w-9"
-          >
-            <Avatar>
-              <AvatarFallback>{session.user.email?.[0].toUpperCase()}</AvatarFallback>
-            </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{session.user.email}</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <UserMenu user={session.user} />
     </div>
   )
 }
