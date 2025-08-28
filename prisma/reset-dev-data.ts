@@ -1,6 +1,6 @@
 import { prisma } from "./singlePrismaClient"
 
-async function main() {
+async function resetDevData() {
   console.log("🔄 Resetting dev-only data...")
 
   await prisma.statistics.deleteMany({
@@ -40,7 +40,7 @@ async function main() {
   console.log("✅ Dev data reset complete.")
 }
 
-main()
+resetDevData()
   .catch(err => {
     console.error("❌ Error during dev data reset:", err)
     process.exit(1)
