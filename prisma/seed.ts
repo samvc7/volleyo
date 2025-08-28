@@ -9,18 +9,18 @@ async function main() {
       const memberRecords: Member[] = []
       for (const member of members) {
         const record = await tx.member.create({
-          data: member,
+          data: { ...member, isDev: true },
         })
         memberRecords.push(record)
       }
 
       const admin = await tx.member.create({
-        data: adminMember,
+        data: { ...adminMember, isDev: true },
       })
       memberRecords.push(admin)
 
       const guest = await tx.member.create({
-        data: guestMember,
+        data: { ...guestMember, isDev: true },
       })
       memberRecords.push(guest)
 
@@ -33,6 +33,7 @@ async function main() {
           members: {
             connect: { id: admin.id },
           },
+          isDev: true,
         },
       })
 
@@ -45,6 +46,7 @@ async function main() {
           members: {
             connect: { id: guest.id },
           },
+          isDev: true,
         },
       })
 
@@ -59,13 +61,14 @@ async function main() {
               roles: member.email === "admin@example.com" ? ["ADMIN"] : ["MEMBER"],
             })),
           },
+          isDev: true,
         },
       })
 
       const memberRecordsBeta: Member[] = []
       for (const member of membersBeta) {
         const record = await tx.member.create({
-          data: member,
+          data: { ...member, isDev: true },
         })
         memberRecordsBeta.push(record)
       }
@@ -84,6 +87,7 @@ async function main() {
               roles: member.email === "admin@example.com" ? ["ADMIN"] : ["MEMBER"],
             })),
           },
+          isDev: true,
         },
       })
 

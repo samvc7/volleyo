@@ -22,6 +22,7 @@ model User {
   sessions           Session[]
   lastSelectedTeamId String?    @unique @map("last_selected_team_id")
   lastSelectedTeam   Team?      @relation(fields: [lastSelectedTeamId], references: [id])
+  isDev              Boolean    @default(false) @map("is_dev")
 }
 
 model Account {
@@ -72,6 +73,7 @@ model Member {
   user      User?        @relation(fields: [userId], references: [id])
   teams     TeamMember[]
   attendees Attendee[]
+  isDev     Boolean      @default(false) @map("is_dev")
 }
 
 model Team {
@@ -83,6 +85,7 @@ model Team {
   members           TeamMember[]
   // Minimal back-field only to satisfy Prisma's relation resolution. Does not add new column or table.
   usersLastSelected User[]
+  isDev             Boolean      @default(false) @map("is_dev")
 }
 
 model TeamMember {
