@@ -122,7 +122,7 @@ export const AddMembersDialog = ({
 
           {otherTeamMembers && otherTeamMembers.length > 0 && (
             <div className="space-y-2 pb-4">
-              <Label htmlFor="members">From Other Teams</Label>
+              <Label htmlFor="other-team-members">From Other Teams</Label>
               <MultiSelect
                 id="other-team-members"
                 name="other-team-members"

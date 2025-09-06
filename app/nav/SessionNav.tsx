@@ -17,11 +17,20 @@ export const SessionNav = async () => {
     orderBy: { name: "asc" },
   })
 
+  const teamMembersNotConnectedToUser = await prisma.teamMember.findMany({
+    where: {
+      member: { email: session.user.email, OR: [{ userId: null }, { userId: { not: session.user.id } }] },
+      removedAt: null,
+    },
+    include: { team: true },
+  })
+
   return (
     <div className="w-full flex items-center justify-between">
       <TeamSwitcher
         teams={teams}
         selectedTeam={usersLastSelectedTeam?.lastSelectedTeam ?? undefined}
+        suggestedTeamsWithMember={teamMembersNotConnectedToUser}
       />
 
       <UserMenu user={session.user} />

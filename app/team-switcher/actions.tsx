@@ -75,3 +75,14 @@ export const updateLastSelectedTeam = async (teamId: string, userId: string) => 
     data: { lastSelectedTeam: { connect: { id: team.id } } },
   })
 }
+
+export const connectUserWithTeamMember = async (userId: string, teamMemberId: string) => {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      members: {
+        connect: { id: teamMemberId },
+      },
+    },
+  })
+}
