@@ -29,7 +29,7 @@ export const SessionNav = async () => {
     <div className="w-full flex items-center justify-between">
       <TeamSwitcher
         teams={teams}
-        selectedTeam={usersLastSelectedTeam?.lastSelectedTeam ?? undefined}
+        initialSelectedTeam={usersLastSelectedTeam?.lastSelectedTeam ?? undefined}
         suggestedTeamsWithMember={teamMembersNotConnectedToUser}
       />
 

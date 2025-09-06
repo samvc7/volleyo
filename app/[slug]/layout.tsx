@@ -1,7 +1,6 @@
 import { ReactNode } from "react"
 import { prisma } from "@/prisma/singlePrismaClient"
 import { DatePickerWithRange } from "../DateRangePicker"
-import { TeamSwitcher } from "../team-switcher/TeamSwitcher"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
 import { StatisticsLink } from "./navigations/StatisticsLink"
 import { EventLink } from "./navigations/EventLink"

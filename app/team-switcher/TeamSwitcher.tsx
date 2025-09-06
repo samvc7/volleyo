@@ -1,7 +1,7 @@
 "use client"
 
 import { useActionState, useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Team } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,19 +38,21 @@ type SuggestedTeamsWithMember = {
 
 type TeamSwitcherProps = {
   teams: Team[]
-  selectedTeam?: Team
+  initialSelectedTeam?: Team
   suggestedTeamsWithMember?: SuggestedTeamsWithMember[]
   className?: string
 }
 
 export const TeamSwitcher = ({
   teams,
-  selectedTeam,
+  initialSelectedTeam,
   suggestedTeamsWithMember,
   className,
 }: TeamSwitcherProps) => {
   const router = useRouter()
   const session = useSession()
+  const pathname = usePathname()
+  const teamSlugInPathname = pathname.split("/")[1]
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
   const [selectedTeamToJoin, setSelectedTeamToJoin] = useState<SuggestedTeamsWithMember | undefined>()
@@ -80,7 +82,10 @@ export const TeamSwitcher = ({
   }
 
   const teamList = parseTeams(teams)
-  const selectedTeamParsed = selectedTeam ? parseTeam(selectedTeam) : undefined
+  const selectedTeamParsed =
+    teamList.find(
+      team => team.value.id === initialSelectedTeam?.id || team.value.slug === teamSlugInPathname,
+    ) ?? undefined
 
   const handleSelectTeam = async (team: Team) => {
     if (session.data?.user.id) {
@@ -127,7 +132,7 @@ export const TeamSwitcher = ({
                     <Check
                       className={cn(
                         "ml-auto",
-                        selectedTeam?.id === team.value.id ? "opacity-100" : "opacity-0",
+                        initialSelectedTeam?.id === team.value.id ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>
