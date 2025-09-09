@@ -100,7 +100,7 @@ test.describe("authorization admin", () => {
     await page.getByRole("option", { name: "Bridget" }).click()
     await page.getByRole("option", { name: "Close" }).click()
 
-    await page.getByRole("button", { name: "Other Members" }).click()
+    await page.getByRole("button", { name: "From Other Teams" }).click()
     await page.getByRole("option", { name: "Aria" }).click()
     await page.getByRole("option", { name: "close" }).click()
 

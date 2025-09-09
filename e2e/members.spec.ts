@@ -8,7 +8,7 @@ test("navigate to members page", async ({ page }) => {
   await expect(page.getByRole("cell", { name: "Email" })).toBeVisible()
 })
 
-test("create, edit, remove team member", async ({ page, browserName }) => {
+test("add, edit, remove team member", async ({ page, browserName }) => {
   test.skip(
     browserName !== "chromium",
     "Because of race condition testing parallel browsers we just test for chromium",
@@ -22,7 +22,7 @@ test("create, edit, remove team member", async ({ page, browserName }) => {
   await page.getByRole("textbox", { name: "First Name" }).fill("John")
   await page.getByRole("textbox", { name: "Last Name" }).fill("Doe")
   await page.getByRole("textbox", { name: "Email" }).fill("john.doe@example.com")
-  await page.getByRole("button", { name: "Create" }).click()
+  await page.getByRole("button", { name: "Add" }).click()
   await page.getByRole("textbox", { name: "Filter names" }).fill("John")
   await expect(page.getByRole("cell", { name: "John Doe" })).toBeVisible()
 
