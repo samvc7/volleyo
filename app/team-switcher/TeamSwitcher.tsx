@@ -29,6 +29,8 @@ import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
 import { connectUserWithTeamMember, createTeam, updateLastSelectedTeam } from "./actions"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { useSession } from "next-auth/react"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 
 type SuggestedTeamsWithMember = {
   teamId: string
@@ -53,6 +55,7 @@ export const TeamSwitcher = ({
   const session = useSession()
   const pathname = usePathname()
   const teamSlugInPathname = pathname.split("/")[1]
+  const hasSuggestedTeams = suggestedTeamsWithMember && suggestedTeamsWithMember.length > 0
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
   const [selectedTeamToJoin, setSelectedTeamToJoin] = useState<SuggestedTeamsWithMember | undefined>()
@@ -110,10 +113,24 @@ export const TeamSwitcher = ({
             role="combobox"
             aria-expanded={open}
             aria-label="Select Team"
-            className={cn("w-[200px] justify-between", className)}
+            className={cn("relative w-[200px] justify-between", className)}
           >
             {selectedTeamParsed ? selectedTeamParsed.label : "Select Team"}
             <ChevronsUpDown className="ml-auto opacity-50" />
+            {hasSuggestedTeams && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge className=" absolute top-8 -right-1 h-2.5 w-2.5 rounded-full p-0 bg-red-400 hover:bg-red-500">
+                      <span className="sr-only">Suggested Teams</span>
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>You have suggested teams</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </Button>
         </PopoverTrigger>
 
@@ -139,7 +156,7 @@ export const TeamSwitcher = ({
                 ))}
               </CommandGroup>
 
-              {suggestedTeamsWithMember && suggestedTeamsWithMember.length > 0 && (
+              {hasSuggestedTeams && (
                 <CommandGroup heading="Suggested Teams to Join">
                   {suggestedTeamsWithMember.map(teamMember => {
                     return (
