@@ -43,6 +43,31 @@ test("add, edit, remove team member", async ({ page, browserName }) => {
   await expect(page.getByRole("cell", { name: "No Results" })).toBeVisible()
 })
 
+test.describe("regular member", () => {
+  test.use({ storageState: "./e2e/auth/test-member.json" })
+  test("Can connect user to suggested team/member", async ({ page, browserName }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Because of race condition testing parallel browsers we just test for chromium",
+    )
+
+    await page.goto("/")
+
+    await expect(page.getByRole("heading", { name: "No teams found yet" })).toBeVisible()
+    await page.getByRole("combobox", { name: "Select Team" }).click()
+    await expect(page.getByText("Suggested Teams to Join")).toBeVisible()
+    await page.getByRole("option", { name: "Alpha Team" }).click()
+
+    await expect(page.getByRole("heading", { name: "Join team" })).toBeVisible()
+    await page.getByRole("button", { name: "Join" }).click()
+
+    await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
+    await expect(page.getByRole("link", { name: "Statistics" })).toBeVisible()
+    const alphaTeamTextCount = await page.getByText("Alpha Team").count()
+    expect(alphaTeamTextCount).toBeGreaterThan(0)
+  })
+})
+
 test("authorization admin", async ({ page }) => {
   await page.goto("/alpha-team/members")
   await expect(page.getByRole("button", { name: "Add Member" })).toBeVisible()

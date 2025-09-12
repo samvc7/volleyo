@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 
 const authFile = path.join(__dirname, "./user.json")
 const authGuestFile = path.join(__dirname, "./guest.json")
+const authTestMemberFile = path.join(__dirname, "./test-member.json")
 dotenv.config({ path: ".env.local" })
 
 setup("authenticate", async ({ page }) => {
@@ -30,13 +31,6 @@ setup("authenticate", async ({ page }) => {
 })
 
 setup("authenticate guest", async ({ page }) => {
-  const username = process.env.ADMIN_USERNAME
-  const pw = process.env.ADMIN_PW
-
-  if (!username || !pw) {
-    throw new Error("ADMIN_USERNAME and ADMIN_PW must be set in environment variables")
-  }
-
   const guestUsername = process.env.GUEST_USERNAME
   const guestPw = process.env.GUEST_PW
 
@@ -55,6 +49,28 @@ setup("authenticate guest", async ({ page }) => {
   await page.context().storageState({ path: authGuestFile })
 
   await page.getByRole("button", { name: "G", exact: true }).click()
+  await page.getByRole("menuitem", { name: "Logout" }).click()
+  await expect(page.getByText("Login").first()).toBeVisible()
+})
+
+setup("authenticate test member", async ({ page }) => {
+  const username = process.env.TEST_MEMBER_USERNAME
+  const pw = process.env.TEST_MEMBER_PW
+
+  if (!username || !pw) {
+    throw new Error("TEST_MEMBER_USERNAME and TEST_MEMBER_PW must be set in environment variables")
+  }
+
+  await page.goto("/")
+  await page.getByRole("textbox", { name: "Email or Username" }).fill(username)
+  await page.getByRole("textbox", { name: "Password" }).fill(pw)
+  await page.getByRole("button", { name: "Login" }).click()
+
+  await page.waitForLoadState("networkidle")
+
+  await page.context().storageState({ path: authTestMemberFile })
+
+  await page.getByRole("button", { name: "M", exact: true }).click()
   await page.getByRole("menuitem", { name: "Logout" }).click()
   await expect(page.getByText("Login").first()).toBeVisible()
 })
