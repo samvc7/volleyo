@@ -8,7 +8,7 @@ test("navigate to members page", async ({ page }) => {
   await expect(page.getByRole("cell", { name: "Email" })).toBeVisible()
 })
 
-test("create, edit, remove team member", async ({ page, browserName }) => {
+test("add, edit, remove team member", async ({ page, browserName }) => {
   test.skip(
     browserName !== "chromium",
     "Because of race condition testing parallel browsers we just test for chromium",
@@ -22,7 +22,7 @@ test("create, edit, remove team member", async ({ page, browserName }) => {
   await page.getByRole("textbox", { name: "First Name" }).fill("John")
   await page.getByRole("textbox", { name: "Last Name" }).fill("Doe")
   await page.getByRole("textbox", { name: "Email" }).fill("john.doe@example.com")
-  await page.getByRole("button", { name: "Create" }).click()
+  await page.getByRole("button", { name: "Add" }).click()
   await page.getByRole("textbox", { name: "Filter names" }).fill("John")
   await expect(page.getByRole("cell", { name: "John Doe" })).toBeVisible()
 
@@ -41,6 +41,31 @@ test("create, edit, remove team member", async ({ page, browserName }) => {
   await expect(page.getByRole("heading", { name: "Removing Team Member" })).toBeVisible()
   await page.getByRole("button", { name: "Continue" }).click()
   await expect(page.getByRole("cell", { name: "No Results" })).toBeVisible()
+})
+
+test.describe("regular member", () => {
+  test.use({ storageState: "./e2e/auth/test-member.json" })
+  test("Can connect user to suggested team/member", async ({ page, browserName }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Because of race condition testing parallel browsers we just test for chromium",
+    )
+
+    await page.goto("/")
+
+    await expect(page.getByRole("heading", { name: "No teams found yet" })).toBeVisible()
+    await page.getByRole("combobox", { name: "Select Team" }).click()
+    await expect(page.getByText("Suggested Teams to Join")).toBeVisible()
+    await page.getByRole("option", { name: "Alpha Team" }).click()
+
+    await expect(page.getByRole("heading", { name: "Join team" })).toBeVisible()
+    await page.getByRole("button", { name: "Join" }).click()
+
+    await expect(page.getByRole("link", { name: "Events" })).toBeVisible()
+    await expect(page.getByRole("link", { name: "Statistics" })).toBeVisible()
+    const alphaTeamTextCount = await page.getByText("Alpha Team").count()
+    expect(alphaTeamTextCount).toBeGreaterThan(0)
+  })
 })
 
 test("authorization admin", async ({ page }) => {

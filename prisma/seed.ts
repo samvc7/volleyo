@@ -1,6 +1,6 @@
 import bycript from "bcryptjs"
 import { Member, PrismaClient } from "@prisma/client"
-import { adminMember, events, attendees, guestMember, members, membersBeta } from "./seedData"
+import { adminMember, events, attendees, guestMember, members, membersBeta, miaMember } from "./seedData"
 
 const prisma = new PrismaClient()
 async function main() {
@@ -46,6 +46,14 @@ async function main() {
           members: {
             connect: { id: guest.id },
           },
+          isDev: true,
+        },
+      })
+
+      await tx.user.create({
+        data: {
+          ...miaMember,
+          password: await bycript.hash("mia123", 10),
           isDev: true,
         },
       })

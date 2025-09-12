@@ -20,7 +20,7 @@ model User {
   accounts           Account[]
   members            Member[]
   sessions           Session[]
-  lastSelectedTeamId String?    @unique @map("last_selected_team_id")
+  lastSelectedTeamId String?    @map("last_selected_team_id")
   lastSelectedTeam   Team?      @relation(fields: [lastSelectedTeamId], references: [id])
   isDev              Boolean    @default(false) @map("is_dev")
 }
@@ -95,7 +95,7 @@ model TeamMember {
   memberSince DateTime?  @default(now()) @map("created_at")
   removedAt   DateTime?  @map("removed_at")
   member      Member     @relation(fields: [memberId], references: [id])
-  team        Team       @relation(fields: [teamId], references: [id])
+  team        Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@id([memberId, teamId])
   @@map("TeamMember")

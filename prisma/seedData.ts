@@ -1,6 +1,8 @@
 import { EventType } from "@prisma/client"
 import { subDays } from "date-fns"
 
+export const miaMember = { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" }
+
 export const members = [
   { firstName: "Caroline", lastName: "Toberman", email: "caroline.toberman@example.com" },
   { firstName: "Madison", lastName: "Maxwell", email: "madison.maxwell@example.com" },
@@ -11,7 +13,7 @@ export const members = [
   { firstName: "Hannah", lastName: "Shaffer", email: "hannah.shaffer@example.com" },
   { firstName: "Jaydin", lastName: "Watts", email: "jaydin.watts@example.com" },
   { firstName: "Benjamin", lastName: "Wilson", email: "benjamin.wilson@example.com" },
-  { firstName: "Mia", lastName: "Lopez", email: "mia.lopez@example.com" },
+  miaMember,
 ]
 
 export const membersBeta = [

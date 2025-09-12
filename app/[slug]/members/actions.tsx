@@ -38,6 +38,7 @@ export const createMember = async (teamSlug: string, formData: FormData) => {
               slug: teamSlug,
             },
           },
+          roles: { set: ["MEMBER"] },
         },
       },
     },

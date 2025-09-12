@@ -113,8 +113,8 @@ export const AddTeamMemberDialog = () => {
               Cancel
             </Button>
             <ButtonWithLoading
-              label="Create"
-              loadingLabel="Creating..."
+              label="Add"
+              loadingLabel="Adding..."
               disabled={isPending}
               type="submit"
             />

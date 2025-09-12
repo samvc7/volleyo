@@ -29,6 +29,8 @@ jobs:
       ADMIN_PW: ${{ secrets.ADMIN_PW }}
       GUEST_USERNAME: ${{ secrets.GUEST_USERNAME }}
       GUEST_PW: ${{ secrets.GUEST_PW }}
+      TEST_MEMBER_USERNAME: ${{ secrets.TEST_MEMBER_USERNAME }}
+      TEST_MEMBER_PW: ${{ secrets.TEST_MEMBER_PW }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       DIRECT_URL: ${{ secrets.DIRECT_URL }}
       CI: true

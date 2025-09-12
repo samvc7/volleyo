@@ -1,7 +1,7 @@
 "use client"
 
-import { useActionState, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useActionState, useState, useTransition } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { Team } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,28 +20,46 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { Check, ChevronsUpDown, PlusCircle } from "lucide-react"
-import { createTeam, updateLastSelectedTeam } from "./actions"
+import { connectUserWithTeamMember, createTeam, updateLastSelectedTeam } from "./actions"
 import { ButtonWithLoading } from "@/components/ui/custom/ButtonWithLoading"
 import { useSession } from "next-auth/react"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
+
+type SuggestedTeamsWithMember = {
+  teamId: string
+  team: { name: string; slug: string }
+  memberId: string
+}
 
 type TeamSwitcherProps = {
   teams: Team[]
-  selectedTeam?: Team
+  initialSelectedTeam?: Team
+  suggestedTeamsWithMember?: SuggestedTeamsWithMember[]
   className?: string
 }
 
-export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherProps) => {
+export const TeamSwitcher = ({
+  teams,
+  initialSelectedTeam,
+  suggestedTeamsWithMember,
+  className,
+}: TeamSwitcherProps) => {
   const router = useRouter()
   const session = useSession()
+  const pathname = usePathname()
+  const teamSlugInPathname = pathname.split("/")[1]
+  const hasSuggestedTeams = suggestedTeamsWithMember && suggestedTeamsWithMember.length > 0
   const [open, setOpen] = useState(false)
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false)
+  const [selectedTeamToJoin, setSelectedTeamToJoin] = useState<SuggestedTeamsWithMember | undefined>()
+
   const [, formAction, isPending] = useActionState<null | string, FormData>(async (_, formData) => {
     try {
       const createdTeam = await createTeam(formData)
@@ -55,8 +73,22 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
     return null
   }, null)
 
+  const [isPeningJoinTeam, startJoiningTeamTransition] = useTransition()
+
+  const onJoinTeam = () => {
+    startJoiningTeamTransition(async () => {
+      if (!selectedTeamToJoin || !session.data?.user.id) return
+      await connectUserWithTeamMember(session.data.user.id, selectedTeamToJoin.memberId)
+      setSelectedTeamToJoin(undefined)
+      router.push(`/${selectedTeamToJoin.team.slug}/events`)
+    })
+  }
+
   const teamList = parseTeams(teams)
-  const selectedTeamParsed = selectedTeam ? parseTeam(selectedTeam) : undefined
+  const selectedTeamParsed =
+    teamList.find(
+      team => team.value.id === initialSelectedTeam?.id || team.value.slug === teamSlugInPathname,
+    ) ?? undefined
 
   const handleSelectTeam = async (team: Team) => {
     if (session.data?.user.id) {
@@ -70,10 +102,7 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
 
   // Not using the CreateTeamDialog component because of the complexity with the popover and command component
   return (
-    <Dialog
-      open={showNewTeamDialog}
-      onOpenChange={setShowNewTeamDialog}
-    >
+    <>
       <Popover
         open={open}
         onOpenChange={setOpen}
@@ -84,10 +113,24 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
             role="combobox"
             aria-expanded={open}
             aria-label="Select Team"
-            className={cn("w-[200px] justify-between", className)}
+            className={cn("relative w-[200px] justify-between", className)}
           >
             {selectedTeamParsed ? selectedTeamParsed.label : "Select Team"}
             <ChevronsUpDown className="ml-auto opacity-50" />
+            {hasSuggestedTeams && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge className=" absolute top-8 -right-1 h-2.5 w-2.5 rounded-full p-0 bg-red-400 hover:bg-red-500">
+                      <span className="sr-only">Suggested Teams</span>
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>You have suggested teams</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </Button>
         </PopoverTrigger>
 
@@ -106,69 +149,123 @@ export const TeamSwitcher = ({ teams, selectedTeam, className }: TeamSwitcherPro
                     <Check
                       className={cn(
                         "ml-auto",
-                        selectedTeam?.id === team.value.id ? "opacity-100" : "opacity-0",
+                        initialSelectedTeam?.id === team.value.id ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>
                 ))}
               </CommandGroup>
+
+              {hasSuggestedTeams && (
+                <CommandGroup heading="Suggested Teams to Join">
+                  {suggestedTeamsWithMember.map(teamMember => {
+                    return (
+                      <CommandItem
+                        key={teamMember.teamId}
+                        onSelect={() => {
+                          setOpen(false)
+                          setSelectedTeamToJoin(teamMember)
+                        }}
+                      >
+                        {teamMember.team.name}
+                      </CommandItem>
+                    )
+                  })}
+                </CommandGroup>
+              )}
             </CommandList>
 
             <CommandSeparator />
 
             <CommandList>
               <CommandGroup>
-                <DialogTrigger asChild>
-                  <CommandItem
-                    onSelect={() => {
-                      setOpen(false)
-                      setShowNewTeamDialog(true)
-                    }}
-                  >
-                    <PlusCircle className="h-5 w-5" />
-                    Create Team
-                  </CommandItem>
-                </DialogTrigger>
+                <CommandItem
+                  onSelect={() => {
+                    setOpen(false)
+                    setShowNewTeamDialog(true)
+                  }}
+                >
+                  <PlusCircle className="h-5 w-5" />
+                  Create Team
+                </CommandItem>
               </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
-
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create Team</DialogTitle>
-          <DialogDescription>Add a new team to manage statistics and players.</DialogDescription>
-        </DialogHeader>
-        <form action={formAction}>
-          <div className="space-y-4 py-2 pb-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Team Name</Label>
-              <Input
-                id="name"
-                name="name"
-                required
-              />
+      <Dialog
+        open={showNewTeamDialog}
+        onOpenChange={setShowNewTeamDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Team</DialogTitle>
+            <DialogDescription>Add a new team to manage statistics and players.</DialogDescription>
+          </DialogHeader>
+          <form action={formAction}>
+            <div className="space-y-4 py-2 pb-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Team Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  required
+                />
+              </div>
             </div>
-          </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowNewTeamDialog(false)}
+              >
+                Cancel
+              </Button>
+              <ButtonWithLoading
+                label="Create"
+                loadingLabel="Creating..."
+                disabled={isPending}
+                type="submit"
+              />
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={!!selectedTeamToJoin}
+        onOpenChange={open => {
+          if (!open) setSelectedTeamToJoin(undefined)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Join team</DialogTitle>
+            <DialogDescription>
+              {selectedTeamToJoin
+                ? `We found "${selectedTeamToJoin.team.name}" already list your email. Do you want to join?`
+                : null}
+            </DialogDescription>
+          </DialogHeader>
 
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowNewTeamDialog(false)}
+              onClick={() => setSelectedTeamToJoin(undefined)}
             >
-              Cancel
+              Not now
             </Button>
             <ButtonWithLoading
-              label="Create"
-              loadingLabel="Creating..."
-              disabled={isPending}
+              label="Join"
+              loadingLabel="Joining..."
+              disabled={isPeningJoinTeam}
               type="submit"
+              onClick={onJoinTeam}
             />
           </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 

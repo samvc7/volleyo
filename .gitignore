@@ -43,3 +43,4 @@ node_modules/
 /playwright/.cache/
 /e2e/auth/user.json
 /e2e/auth/guest.json
+/e2e/auth/test-member.json
